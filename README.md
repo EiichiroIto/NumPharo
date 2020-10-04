@@ -1,7 +1,7 @@
 # NumPharo
 NumPy like tools for Pharo Smalltalk.
 
-[![Build Status](https://api.travis-ci.com/EiichiroIto/NumPharo.svg?branch=main&status=unknown)
+![Build Status](https://api.travis-ci.com/EiichiroIto/NumPharo.svg?branch=main&status=unknown)
 
 This is just personal project.
 
@@ -30,4 +30,3 @@ see PharoPlotSample class methods and DeepLearningFromScratch1Chapter classes.
 ```
 PharoPlotSample example1.
 ```
-
