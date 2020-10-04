@@ -251,9 +251,14 @@ PharoPlotFigure >> form [
 ]
 
 { #category : #private }
+PharoPlotFigure >> gridCount [
+	^ 5
+]
+
+{ #category : #private }
 PharoPlotFigure >> gridSizeOf: aRange [
 	| w log10 |
-	w := aRange extent / 5.
+	w := aRange extent abs / self gridCount.
 	log10 := (w log: 10) floor.
 	^ (w roundTo: (10 raisedTo: log10)) asFloat
 ]
@@ -366,7 +371,7 @@ PharoPlotFigure >> scalesOf: aRange [
 	t := aRange extent + aRange first.
 	(cur - grid closeTo: t)
 		ifFalse: [ s nextPut: t ].
-	log10 := (aRange extent log: 10) rounded.
+	log10 := (aRange extent abs log: 10) rounded.
 	^ s contents
 		collect:
 			[ :each | Array with: each

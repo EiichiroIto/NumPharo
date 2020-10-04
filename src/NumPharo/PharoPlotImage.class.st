@@ -35,6 +35,11 @@ PharoPlotImage >> drawImage: aDictionary [
 	canvas drawImage: f at: (rectangle left + 1 @ (rectangle bottom - f height))
 ]
 
+{ #category : #private }
+PharoPlotImage >> gridCount [
+	^ 2
+]
+
 { #category : #testing }
 PharoPlotImage >> hasImage [
 	^ image notNil

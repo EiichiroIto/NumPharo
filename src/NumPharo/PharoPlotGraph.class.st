@@ -166,24 +166,6 @@ PharoPlotGraph >> newData [
 	^ PharoPlotData new
 ]
 
-{ #category : #private }
-PharoPlotGraph >> screenPoints: anArray1 ranges: anArray2 rectangle: aRectangle [
-	^ anArray1
-		collect: [ :each | 
-			| px py |
-			px := self
-				positionOf: each x
-				inRange: anArray2 first
-				from: aRectangle left
-				to: aRectangle right.
-			py := self
-				positionOf: each y
-				inRange: anArray2 second
-				from: aRectangle bottom
-				to: aRectangle top.
-			Array with: px with: py ]
-]
-
 { #category : #drawing }
 PharoPlotGraph >> setupForm: aForm context: aDictionary [
 	| range tlm brm l yScaleWidth |
