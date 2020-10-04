@@ -44,5 +44,5 @@ example1
   ^ plt
 ```
 
-![Example1](https://raw.githubusercontent.com/EiichiroIto/NumPharo/master/images/example1.png)
+![Example1](https://raw.githubusercontent.com/EiichiroIto/NumPharo/main/images/example1.png)
 
