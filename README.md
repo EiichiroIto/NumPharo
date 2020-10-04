@@ -28,5 +28,21 @@ Metacello new
 see PharoPlotSample class methods and DeepLearningFromScratch1Chapter classes.
 
 ```
-PharoPlotSample example1.
+example1
+  | x y plt |
+  x := NDArray arangeFrom: 0 to: 6 by: 0.1.
+  y := x sin.
+  plt := PharoPlot new.
+  plt extent: 500 @ 200.
+  plt plotX: x y: y label: 'sin'.
+  plt plotX: x y: x cos label: 'cos'.
+  plt title: 'sin & cos'.
+  plt xLabel: 'x'.
+  plt yLabel: 'y'.
+  plt showLegend: true.
+  plt show.
+  ^ plt
 ```
+
+![Example1](https://raw.githubusercontent.com/EiichiroIto/NumPharo/master/images/example1.png)
+
