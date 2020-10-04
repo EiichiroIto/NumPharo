@@ -13,7 +13,7 @@ but the book uses NumPy and some tools, So I decide to implement NumPy like tool
 For now, I implemented some alternative tools like this:
 
 - NumPy (NDArray)
-- Matplotlib.pyplot
+- Matplotlib.pyplot (line graph, scatter graph, bar graph and image)
 
 ## Install repository on Pharo (for developer)
 
