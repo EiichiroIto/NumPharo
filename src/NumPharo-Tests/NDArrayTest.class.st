@@ -505,6 +505,22 @@ NDArrayTest >> testOnes [
 ]
 
 { #category : #test }
+NDArrayTest >> testPresumeShape [
+	| x r |
+	x := self newArrayFrom: #(1 2 3).
+	r := x presumeShape: #(-1).
+	self assertCollection: x shape equals: #(3).
+	self assertCollection: r equals: #(3).
+	x := self newArrayFrom: #((1 2 3 4) (5 6 7 8) (9 10 11 12)).
+	r := x presumeShape: #(-1).
+	self assertCollection: x shape equals: #(3 4).
+	self assertCollection: r equals: #(12).
+	r := x presumeShape: #(-1 2).
+	self assertCollection: x shape equals: #(3 4).
+	self assertCollection: r equals: #(6 2)
+]
+
+{ #category : #test }
 NDArrayTest >> testPrivArray [
 	| a |
 	a := self newArray.
@@ -635,7 +651,22 @@ NDArrayTest >> testWithShape [
 	self assertCollection: r shape equals: #(1 6).
 	r := a withShape: #(6 1).
 	self assertCollection: r array equals: arr.
-	self assertCollection: r shape equals: #(6 1)
+	self assertCollection: r shape equals: #(6 1).
+	a := self newArrayFrom: #(1 2 3).
+	r := a withShape: #(-1).
+	self assertCollection: r array equals: a array.
+	self assertCollection: r shape equals: #(3).
+	self assert: r dtype equals: a dtype.
+	a := self newArrayFrom: #((1 2 3 4) (5 6 7 8) (9 10 11 12)).
+	self assertCollection: a shape equals: #(3 4).
+	r := a withShape: #(-1).
+	self assertCollection: r array equals: a array.
+	self assertCollection: r shape equals: #(12).
+	self assert: r dtype equals: a dtype.
+	r := a withShape: #(-1 2).
+	self assertCollection: r array equals: a array.
+	self assertCollection: r shape equals: #(6 2).
+	self assert: r dtype equals: a dtype
 ]
 
 { #category : #test }

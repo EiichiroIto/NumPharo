@@ -611,6 +611,18 @@ NDArray >> ndim [
 	^ self shape size
 ]
 
+{ #category : #private }
+NDArray >> presumeShape: anArray [
+	| r index |
+	r := self class finiteProductOf: anArray.
+	index := anArray indexOf: -1.
+	(r < 0 and: [ index > 0 ])
+		ifFalse: [ self error ].
+	^ anArray copy
+		at: index put: self array size // r negated;
+		yourself
+]
+
 { #category : #printing }
 NDArray >> printOn: aStream [
 	aStream nextPutAll: 'array['.
@@ -680,8 +692,12 @@ NDArray >> withDtype: aSymbol [
 
 { #category : #converting }
 NDArray >> withShape: anArray [
+	| newShape |
+	newShape := (anArray anySatisfy: [ :each | each < 0 ])
+		ifTrue: [ self presumeShape: anArray ]
+		ifFalse: [ anArray  ].
 	(self class finiteProductOf: self shape)
-		= (self class finiteProductOf: anArray)
+		= (self class finiteProductOf: newShape)
 		ifFalse: [ self error ].
-	^ self class array: self array shape: anArray dtype: self dtype
+	^ self class array: self array shape: newShape dtype: self dtype
 ]
