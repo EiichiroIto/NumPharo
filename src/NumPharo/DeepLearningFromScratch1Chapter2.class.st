@@ -52,7 +52,7 @@ DeepLearningFromScratch1Chapter2 >> or233X1: x1 x2: x2 [
 		ifFalse: [ 1 ]
 ]
 
-{ #category : #private }
+{ #category : #test }
 DeepLearningFromScratch1Chapter2 >> testChapter2_3_1 [
 	self assert: (self and231X1: 0 x2: 0) equals: 0.
 	self assert: (self and231X1: 1 x2: 0) equals: 0.
@@ -60,7 +60,7 @@ DeepLearningFromScratch1Chapter2 >> testChapter2_3_1 [
 	self assert: (self and231X1: 1 x2: 1) equals: 1
 ]
 
-{ #category : #private }
+{ #category : #test }
 DeepLearningFromScratch1Chapter2 >> testChapter2_3_2 [
 	| x w b r |
 	x := NDArray fromArray: #(0 1).
@@ -76,7 +76,7 @@ DeepLearningFromScratch1Chapter2 >> testChapter2_3_2 [
 	self assert: r closeTo: -0.2
 ]
 
-{ #category : #private }
+{ #category : #test }
 DeepLearningFromScratch1Chapter2 >> testChapter2_3_3 [
 	self assert: (self and233X1: 0 x2: 0) equals: 0.
 	self assert: (self and233X1: 1 x2: 0) equals: 0.
@@ -92,7 +92,7 @@ DeepLearningFromScratch1Chapter2 >> testChapter2_3_3 [
 	self assert: (self or233X1: 1 x2: 1) equals: 1
 ]
 
-{ #category : #private }
+{ #category : #test }
 DeepLearningFromScratch1Chapter2 >> testChapter2_3_4 [
 	self assert: (self xor252X1: 0 x2: 0) equals: 0.
 	self assert: (self xor252X1: 1 x2: 0) equals: 1.

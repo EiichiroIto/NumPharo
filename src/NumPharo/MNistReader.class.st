@@ -23,6 +23,9 @@ Internal Representation and Key Implementation Points.
 Class {
 	#name : #MNistReader,
 	#superclass : #Object,
+	#classVars : [
+		'CachedData'
+	],
 	#category : #'NumPharo-MNist'
 }
 
@@ -54,14 +57,7 @@ MNistReader class >> labelDataFrom: aString [
 
 { #category : #api }
 MNistReader class >> load [
-	| trainings tests |
-	trainings := Array
-		with: (self imageDataFrom: self trainingImageFilename)
-		with: (self labelDataFrom: self trainingLabelFilename).
-	tests := Array
-		with: (self imageDataFrom: self testImageFilename)
-		with: (self labelDataFrom: self testLabelFilename).
-	^ Array with: trainings with: tests
+	^ CachedData ifNil: [ CachedData := self privLoad ]
 ]
 
 { #category : #private }
@@ -77,6 +73,24 @@ MNistReader class >> newImage [
 { #category : #private }
 MNistReader class >> newLabel [
 	^ MNistLabelReader new
+]
+
+{ #category : #private }
+MNistReader class >> privLoad [
+	| trainings tests |
+	trainings := Array
+		with: (self imageDataFrom: self trainingImageFilename)
+		with: (self labelDataFrom: self trainingLabelFilename).
+	tests := Array
+		with: (self imageDataFrom: self testImageFilename)
+		with: (self labelDataFrom: self testLabelFilename).
+	^ Array with: trainings with: tests
+]
+
+{ #category : #api }
+MNistReader class >> reset [
+	"self reset"
+	CachedData := nil
 ]
 
 { #category : #private }

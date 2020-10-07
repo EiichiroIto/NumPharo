@@ -13,6 +13,19 @@ TNDArrayArithmeticsTest >> newArrayFrom: anArray [
 ]
 
 { #category : #test }
+TNDArrayArithmeticsTest >> testArgMax [
+	| a |
+	a := self newArrayFrom: #(5 3 1 2 6 2 4).
+	self assert: a argMax equals: 5.
+	a := self newArrayFrom: #(1 2 3 2 1 2 3).
+	self assert: a argMax equals: 3.
+	a := self newArrayFrom: #(9 2 3 2 1 2 3).
+	self assert: a argMax equals: 1.
+	a := self newArrayFrom: #(9 2 3 2 1 2 30).
+	self assert: a argMax equals: 7
+]
+
+{ #category : #test }
 TNDArrayArithmeticsTest >> testCol [
 	| a r |
 	a := self newArrayFrom: #((1 2) (3 4) (5 6)).

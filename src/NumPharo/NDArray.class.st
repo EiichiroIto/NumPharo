@@ -135,11 +135,6 @@ NDArray class >> meanSquaredErrorY: y andT: t [
 	^ 0.5 * ((y - t) ** 2) sum
 ]
 
-{ #category : #'instance creation' }
-NDArray class >> new [
-	self shouldNotImplement
-]
-
 { #category : #private }
 NDArray class >> normalizedIndex: anObject [
 	^ anObject isNumber
@@ -565,6 +560,11 @@ NDArray >> copyWithNdim: anInteger [
 		dtype: self dtype
 ]
 
+{ #category : #accessing }
+NDArray >> count [
+	^ self shape first
+]
+
 { #category : #enumerating }
 NDArray >> do: aBlock [
 	1 to: self shape first do: [ :each | aBlock cull: (self at: each) ]
@@ -693,9 +693,9 @@ NDArray >> withDtype: aSymbol [
 { #category : #converting }
 NDArray >> withShape: anArray [
 	| newShape |
-	newShape := (anArray anySatisfy: [ :each | each < 0 ])
+	newShape := (anArray includes: -1)
 		ifTrue: [ self presumeShape: anArray ]
-		ifFalse: [ anArray  ].
+		ifFalse: [ anArray ].
 	(self class finiteProductOf: self shape)
 		= (self class finiteProductOf: newShape)
 		ifFalse: [ self error ].

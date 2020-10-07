@@ -80,6 +80,13 @@ TNDArrayArithmetics >> adaptToNumber: rcvr andSend: selector [
 		dtype: newDtype
 ]
 
+{ #category : #arithmetic }
+TNDArrayArithmetics >> argMax [
+	| max |
+	max := self array max.
+	^ self array detectIndex: [ :each | each = max ]
+]
+
 { #category : #accessing }
 TNDArrayArithmetics >> col: anInteger [
 	| newArray |
@@ -154,6 +161,24 @@ TNDArrayArithmetics >> log [
 { #category : #arithmetic }
 TNDArrayArithmetics >> max [
 	^ self array max
+]
+
+{ #category : #arithmetic }
+TNDArrayArithmetics >> max: max [
+	| newArray |
+	newArray := self array
+		withIndexCollect:
+			[ :each :index | each max: (max ndValueAt: index) ].
+	^ self class array: newArray shape: self shape dtype: self dtype
+]
+
+{ #category : #arithmetic }
+TNDArrayArithmetics >> min: min [
+	| newArray |
+	newArray := self array
+		withIndexCollect:
+			[ :each :index | each min: (min ndValueAt: index) ].
+	^ self class array: newArray shape: self shape dtype: self dtype
 ]
 
 { #category : #arithmetic }
