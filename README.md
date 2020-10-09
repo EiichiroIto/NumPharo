@@ -3,7 +3,7 @@ NumPy like tools for Pharo Smalltalk.
 
 ![Build Status](https://api.travis-ci.com/EiichiroIto/NumPharo.svg?branch=main&status=unknown)
 
-This is just personal project.
+This is just my personal project.
 
 I bought the book "Deep Learning from Scratch" last year.
 
