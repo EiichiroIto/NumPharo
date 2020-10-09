@@ -269,7 +269,7 @@ NDArrayTest >> testConvertToBoolean [
 	self assertCollection: r dtype equals: #Boolean.
 	a := NDArray fromArray: { true. false. true }.
 	r := a convertToBoolean.
-	self assert: r equals: a
+	self assert: r identicalTo: a
 ]
 
 { #category : #test }
@@ -290,7 +290,7 @@ NDArrayTest >> testConvertToFloat [
 	| a r |
 	a := NDArray arangeFrom: -1 to: 2 by: 1.
 	r := a convertToFloat.
-	self assert: r equals: a.
+	self assert: r identicalTo: a.
 	a := NDArray fromArray: {true. false}.
 	r := a convertToFloat.
 	self assertCollection: r array equals: #(1 0) asFloatArray.
@@ -318,7 +318,7 @@ NDArrayTest >> testConvertToInteger [
 	self assert: r dtype equals: #Integer.
 	a := NDArray fromArray: #(1 2) asIntegerArray.
 	r := a convertToInteger.
-	self assert: r equals: a
+	self assert: r identicalTo: a
 ]
 
 { #category : #test }
@@ -444,6 +444,15 @@ NDArrayTest >> testItemSizeList [
 	self assertCollection: a itemSizeList equals: #(3 1).
 	a := self newArrayFrom: #(((1 2 3) (4 5 6)) ((7 8 9) (10 11 12)) ((13 14 15) (16 17 18))).
 	self assertCollection: a itemSizeList equals: #(6 3 1)
+]
+
+{ #category : #test }
+NDArrayTest >> testLen [
+	| a |
+	a := self newArrayFrom: #(1 2 3 4).
+	self assert: a len equals: 4.
+	a := self newArrayFrom: #((1 2) (3 4)).
+	self assert: a len equals: 2
 ]
 
 { #category : #test }
@@ -610,6 +619,15 @@ NDArrayTest >> testShapeWithNdim [
 ]
 
 { #category : #test }
+NDArrayTest >> testSize [
+	| a |
+	a := self newArrayFrom: #(1 2 3 4).
+	self assert: a size equals: 4.
+	a := self newArrayFrom: #((1 2) (3 4)).
+	self assert: a size equals: 4
+]
+
+{ #category : #test }
 NDArrayTest >> testSoftMax [
 	| a y |
 	a := NDArray fromArray: #(0.3 2.9 4.0).
@@ -634,7 +652,7 @@ NDArrayTest >> testWithDtype [
 	self assert: r dtype equals: #Word.
 	a := self newArrayFrom: #(-2 -1 0 1 200000).
 	r := a withDtype: #Float.
-	self assert: a equals: r
+	self assert: a identicalTo: r
 ]
 
 { #category : #test }

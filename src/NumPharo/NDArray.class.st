@@ -560,11 +560,6 @@ NDArray >> copyWithNdim: anInteger [
 		dtype: self dtype
 ]
 
-{ #category : #accessing }
-NDArray >> count [
-	^ self shape first
-]
-
 { #category : #enumerating }
 NDArray >> do: aBlock [
 	1 to: self shape first do: [ :each | aBlock cull: (self at: each) ]
@@ -604,6 +599,11 @@ NDArray >> itemSizeAt: anInteger [
 { #category : #private }
 NDArray >> itemSizeList [
 	^ (1 to: self ndim) collect: [ :each | self itemSizeAt: each ]
+]
+
+{ #category : #accessing }
+NDArray >> len [
+	^ self shape first
 ]
 
 { #category : #accessing }
@@ -671,6 +671,11 @@ NDArray >> shapeWithNdim: anInteger [
 	ndim > anInteger
 		ifTrue: [ self error ].
 	^ (Array new: anInteger - ndim withAll: 1) , self shape
+]
+
+{ #category : #accessing }
+NDArray >> size [
+	^ self array size
 ]
 
 { #category : #converting }

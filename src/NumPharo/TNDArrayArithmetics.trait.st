@@ -28,29 +28,47 @@ TNDArrayArithmetics >> / other [
 	^ other adaptToNDArray: self andSend: #/
 ]
 
-{ #category : #arithmetic }
-TNDArrayArithmetics >> < aNumber [
-	^ self adaptToNumber: aNumber andSend: #>
+{ #category : #comparing }
+TNDArrayArithmetics >> < other [
+	^ other adaptToNDArray: self andCompare: #<
 ]
 
-{ #category : #arithmetic }
-TNDArrayArithmetics >> <= aNumber [
-	^ self adaptToNumber: aNumber andSend: #>=
+{ #category : #comparing }
+TNDArrayArithmetics >> <= other [
+	^ other adaptToNDArray: self andCompare: #<=
 ]
 
-{ #category : #arithmetic }
-TNDArrayArithmetics >> > aNumber [
-	^ self adaptToNumber: aNumber andSend: #<
+{ #category : #comparing }
+TNDArrayArithmetics >> = other [
+	^ other adaptToNDArray: self andCompare: #=
 ]
 
-{ #category : #arithmetic }
-TNDArrayArithmetics >> >= aNumber [
-	^ self adaptToNumber: aNumber andSend: #<=
+{ #category : #comparing }
+TNDArrayArithmetics >> > other [
+	^ other adaptToNDArray: self andCompare: #>
+]
+
+{ #category : #comparing }
+TNDArrayArithmetics >> >= other [
+	^ other adaptToNDArray: self andCompare: #>=
 ]
 
 { #category : #converting }
 TNDArrayArithmetics >> adaptToInteger: rcvr andSend: selector [
 	^ self adaptToNumber: rcvr andSend: selector
+]
+
+{ #category : #converting }
+TNDArrayArithmetics >> adaptToNDArray: anObject andCompare: selector [
+	| obj rcvr |
+	self shape = anObject shape
+		ifTrue: [ obj := self.
+			rcvr := anObject ]
+		ifFalse: [ obj := self broadcastTo: anObject.
+			rcvr := anObject broadcastTo: self ].
+	^ rcvr
+		newArrayComparing: [ :x :y | x perform: selector with: y ]
+		with: obj
 ]
 
 { #category : #converting }
@@ -138,9 +156,32 @@ TNDArrayArithmetics >> dot: aNDArray [
 	^ ret
 ]
 
+{ #category : #private }
+TNDArrayArithmetics >> equalsTo: other [
+	self dtype = other dtype
+		ifFalse: [ ^ false ].
+	self shape = other shape
+		ifFalse: [ ^ false ].
+	self array = other array
+		ifFalse: [ ^ false ].
+	^ true
+]
+
 { #category : #arithmetic }
 TNDArrayArithmetics >> exp [
 	^ self newArrayDoing: #exp
+]
+
+{ #category : #accessing }
+TNDArrayArithmetics >> indexAt: anInteger [
+	| r v a |
+	v := anInteger - 1.
+	r := WriteStream on: Array new.
+	1 to: self ndim do: [ :each | 
+		a := self itemSizeAt: each.
+		r nextPut: (v // a) + 1.
+		v := v \\ a ].
+	^ r contents
 ]
 
 { #category : #testing }
@@ -205,6 +246,28 @@ TNDArrayArithmetics >> negated [
 ]
 
 { #category : #private }
+TNDArrayArithmetics >> newArrayComparing: aBlock [
+	^ self class
+		array: (self array asArray collect: aBlock)
+		shape: self shape
+		dtype: #Boolean
+]
+
+{ #category : #private }
+TNDArrayArithmetics >> newArrayComparing: aBlock with: aNDArray [
+	| obj dt |
+	self dtype = aNDArray dtype
+		ifTrue: [ dt := self dtype.
+			obj := self ]
+		ifFalse: [ dt := self class coerceArray: self dtype with: aNDArray dtype.
+			obj := self withDtype: dt ].
+	^ self class
+		array: (obj array asArray with: aNDArray array collect: aBlock)
+		shape: self shape
+		dtype: #Boolean
+]
+
+{ #category : #private }
 TNDArrayArithmetics >> newArrayDoing: aBlock [
 	^ self class
 		array: (self array collect: aBlock)
@@ -241,4 +304,24 @@ TNDArrayArithmetics >> sin [
 { #category : #arithmetic }
 TNDArrayArithmetics >> sum [
 	^ self array sum
+]
+
+{ #category : #accessing }
+TNDArrayArithmetics >> where [
+	| result |
+	result := (1 to: self ndim)
+		collect: [ :each | OrderedCollection new ].
+	1 to: self array size do: [ :each | 
+		(self ndValueAt: each)
+			ifTrue: [ | index |
+				index := self indexAt: each.
+				index
+					withIndexDo: [ :each2 :index2 | (result at: index2) add: each2 ] ] ].
+	^ result
+		collect: [ :each | self class array: each asIntegerArray shape: {each size} dtype: #Integer ]
+]
+
+{ #category : #comparing }
+TNDArrayArithmetics >> ~= other [
+	^ other adaptToNDArray: self andCompare: #~=
 ]
