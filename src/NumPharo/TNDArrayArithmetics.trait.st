@@ -53,6 +53,11 @@ TNDArrayArithmetics >> >= other [
 	^ other adaptToNDArray: self andCompare: #>=
 ]
 
+{ #category : #arithmetic }
+TNDArrayArithmetics >> \\ other [
+	^ other adaptToNDArray: self andSend: #\\
+]
+
 { #category : #converting }
 TNDArrayArithmetics >> adaptToInteger: rcvr andSend: selector [
 	^ self adaptToNumber: rcvr andSend: selector
@@ -86,16 +91,10 @@ TNDArrayArithmetics >> adaptToNDArray: anObject andSend: selector [
 
 { #category : #converting }
 TNDArrayArithmetics >> adaptToNumber: rcvr andSend: selector [
-	| arr newDtype |
-	arr := self array.
-	newDtype := self dtype.
-	(#(< > = ~= <= >=) includes: selector)
-		ifTrue: [ arr := self array asArray.
-			newDtype := #Boolean ].
 	^ self class
-		array: (arr collect: [ :each | rcvr perform: selector with: each ])
+		array: (self array collect: [ :each | rcvr perform: selector with: each ])
 		shape: self shape
-		dtype: newDtype
+		dtype: self dtype
 ]
 
 { #category : #arithmetic }

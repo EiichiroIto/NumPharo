@@ -347,6 +347,23 @@ NDArray >> atAll: anObject [
 
 { #category : #private }
 NDArray >> atAllBooleans: aBooleanArray [
+	| s |
+	self size = aBooleanArray size
+		ifFalse: [ ^ self atAllFlatBooleans: aBooleanArray ].
+	s := WriteStream on: self array class new.
+	self array
+		with: aBooleanArray
+		do: [ :each :flag | 
+			flag
+				ifTrue: [ s nextPut: each ] ].
+	^ self class
+		array: s contents
+		shape: {s contents size}
+		dtype: self dtype
+]
+
+{ #category : #private }
+NDArray >> atAllFlatBooleans: aBooleanArray [
 	| s c |
 	self shape first = aBooleanArray size
 		ifFalse: [ self error ].

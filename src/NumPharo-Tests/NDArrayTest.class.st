@@ -193,10 +193,20 @@ NDArrayTest >> testAtAll [
 
 { #category : #test }
 NDArrayTest >> testAtAllBooleans [
-	| a r |
+	| a r i |
 	a := self newArrayFrom: #(1 2 3 4 5).
 	r := a atAllBooleans: {true . false . true . false . false}.
-	self assertCollection: r array equals: #(1 3) asFloatArray
+	self assertCollection: r array equals: #(1 3) asFloatArray.
+	a := self newArrayFrom: #(((1 2) (3 4)) ((5 6) (7 8))).
+	r := a atAllBooleans: {true . false}.
+	self assertCollection: r array equals: #(1 2 3 4) asFloatArray.
+	self assertCollection: r shape equals: #(1 2 2).
+	self assert: r dtype equals: #Float.
+	i := a \\ 2 = 0.
+	r := a atAllBooleans: i array.
+	self assertCollection: r array equals: #(2 4 6 8) asFloatArray.
+	self assertCollection: r shape equals: #(4).
+	self assert: r dtype equals: #Float
 ]
 
 { #category : #test }
