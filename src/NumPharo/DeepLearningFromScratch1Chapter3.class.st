@@ -5,6 +5,21 @@ Class {
 }
 
 { #category : #private }
+DeepLearningFromScratch1Chapter3 >> checkFileNamed: aString1 ifNotDownloadFrom: aString2 [
+	| fr fn |
+	fr := FileSystem workingDirectory / aString1.
+	fr isFile
+		ifTrue: [ ^ fr ].
+	fn := aString1 , '.gz'.
+	(ZnClient new url: aString2) downloadTo: fn.
+	GZipReadStream unzip: fn.
+	fr isFile
+		ifFalse: [ self error ].
+	(FileSystem workingDirectory / fn) delete.
+	^ fr
+]
+
+{ #category : #private }
 DeepLearningFromScratch1Chapter3 >> forward343: network x: x [
 	| w1 w2 w3 b1 b2 b3 a1 a2 a3 z1 z2 y |
 	w1 := network at: #W1.
@@ -59,8 +74,9 @@ DeepLearningFromScratch1Chapter3 >> initNetwork343 [
 { #category : #private }
 DeepLearningFromScratch1Chapter3 >> initNetwork362 [
 	| fr |
-	fr := FileSystem workingDirectory / 'sample_weight.ston'.
-	fr isFile ifFalse: [ self error ].
+	fr := self
+		checkFileNamed: 'sample_weight.ston'
+		ifNotDownloadFrom: self sampleWeightURL.
 	^ STON fromStream: fr readStream
 ]
 
@@ -84,6 +100,11 @@ DeepLearningFromScratch1Chapter3 >> predict362: network x: x [
 { #category : #private }
 DeepLearningFromScratch1Chapter3 >> relu327: x [
 	^ x max: 0
+]
+
+{ #category : #private }
+DeepLearningFromScratch1Chapter3 >> sampleWeightURL [
+	^ 'https://github.com/EiichiroIto/NumPharo/raw/main/DLFS/sample_weight.ston.gz'
 ]
 
 { #category : #private }
