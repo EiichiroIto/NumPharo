@@ -51,6 +51,23 @@ NDArrayTest >> testArrayAt [
 ]
 
 { #category : #test }
+NDArrayTest >> testArrayAtPut [
+	| a |
+	a := self newArrayFrom: #((10 20) (30 40)).
+	self assert: (a arrayAt: 1) equals: 10.
+	self assert: (a arrayAt: 2) equals: 20.
+	self assert: (a arrayAt: 3) equals: 30.
+	self assert: (a arrayAt: 4) equals: 40.
+	a arrayAt: 1 put: 100.
+	a arrayAt: 2 put: 200.
+	a arrayAt: 3 put: 300.
+	a arrayAt: 4 put: 400.
+	self assertCollection: a array equals: #(100 200 300 400) asFloatArray.
+	self assertCollection: a shape equals: #(2 2).
+	self assert: a dtype equals: #Float
+]
+
+{ #category : #test }
 NDArrayTest >> testArrayFromToNumWithEndPoint [
 	| a |
 	a := NDArray

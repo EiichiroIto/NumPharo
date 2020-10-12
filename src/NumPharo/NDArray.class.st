@@ -101,20 +101,20 @@ NDArray class >> fromArray: anArray shape: anArray2 dtype: aSymbol [
 	| arr size |
 	arr := nil.
 	aSymbol = #Float
-		ifTrue: [ arr := anArray asFloatArray ].
+		ifTrue: [ arr := anArray copy asFloatArray ].
 	aSymbol = #Integer
-		ifTrue: [ arr := anArray asIntegerArray ].
+		ifTrue: [ arr := anArray copy asIntegerArray ].
 	aSymbol = #Byte
-		ifTrue: [ arr := anArray asByteArray ].
+		ifTrue: [ arr := anArray copy asByteArray ].
 	aSymbol = #Word
-		ifTrue: [ arr := anArray asWordArray ].
+		ifTrue: [ arr := anArray copy asWordArray ].
 	aSymbol = #Boolean
 		ifTrue: [ arr := anArray copy ].
 	arr ifNil: [ self error: 'invalid dtype' ].
 	size := self finiteProductOf: anArray2.
 	size = arr size
 		ifFalse: [ self error: 'invalid shape' ].
-	^ self array: arr copy shape: anArray2 dtype: aSymbol
+	^ self array: arr shape: anArray2 dtype: aSymbol
 ]
 
 { #category : #'class initialization' }
@@ -251,6 +251,11 @@ NDArray >> array [
 { #category : #private }
 NDArray >> arrayAt: anInteger [
 	^ array at: anInteger
+]
+
+{ #category : #private }
+NDArray >> arrayAt: anInteger put: anObject [
+	array at: anInteger put: anObject
 ]
 
 { #category : #private }
@@ -417,7 +422,7 @@ NDArray >> broadcastTo: anObject [
 
 { #category : #private }
 NDArray >> broadcastToShape: anArray [
-	| r1 r2 newShape num count newArray s pos |
+	| r1 r2 newShape itemSize count newArray s pos |
 	self ndim = anArray size
 		ifFalse: [ self error ].
 	newShape := self shape copy.
@@ -429,14 +434,14 @@ NDArray >> broadcastToShape: anArray [
 			ifTrue: [ self error ].
 		(r1 = 1 and: [ r2 > r1 ])
 			ifTrue: [ newShape at: index put: r2.
-				num := self itemSizeAt: index.
+				itemSize := self itemSizeAt: index.
 				count := self class
 					finiteProductOf: (newShape copyFrom: 1 to: index - 1).
 				s := WriteStream on: newArray class new.
 				1 to: count do: [ :each | 
-					pos := (each - 1) * num + 1.
+					pos := (each - 1) * itemSize + 1.
 					r2
-						timesRepeat: [ s nextPutAll: (newArray copyFrom: pos to: pos + num - 1) ] ].
+						timesRepeat: [ s nextPutAll: (newArray copyFrom: pos to: pos + itemSize - 1) ] ].
 				newArray := s contents ] ].
 	^ self class array: newArray shape: newShape dtype: self dtype
 ]
@@ -623,6 +628,13 @@ NDArray >> len [
 	^ self shape first
 ]
 
+{ #category : #modifying }
+NDArray >> modifyAll: aBlock [
+	self array
+		withIndexDo:
+			[ :each :index | self array at: index put: (aBlock cull: each) ]
+]
+
 { #category : #accessing }
 NDArray >> ndim [
 	^ self shape size
@@ -676,6 +688,18 @@ NDArray >> rawAt: anInteger [
 	^ array copyFrom: from to: to
 ]
 
+{ #category : #modifying }
+NDArray >> reShape: anArray [
+	| newShape |
+	newShape := (anArray includes: -1)
+		ifTrue: [ self presumeShape: anArray ]
+		ifFalse: [ anArray ].
+	(self class finiteProductOf: self shape)
+		= (self class finiteProductOf: newShape)
+		ifFalse: [ self error ].
+	shape := newShape
+]
+
 { #category : #accessing }
 NDArray >> shape [
 	^ shape
@@ -721,5 +745,5 @@ NDArray >> withShape: anArray [
 	(self class finiteProductOf: self shape)
 		= (self class finiteProductOf: newShape)
 		ifFalse: [ self error ].
-	^ self class array: self array shape: newShape dtype: self dtype
+	^ self class array: self array copy shape: newShape dtype: self dtype
 ]

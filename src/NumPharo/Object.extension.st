@@ -1,11 +1,11 @@
 Extension { #name : #Object }
 
 { #category : #'*NumPharo' }
-Object >> isNDArray [
-	^ false
+Object >> arrayAt: anInteger [
+	^ self
 ]
 
 { #category : #'*NumPharo' }
-Object >> ndValueAt: anInteger [
-	^ self
+Object >> isNDArray [
+	^ false
 ]

@@ -31,6 +31,16 @@ TNDArrayArithmeticsTest >> testArgMax [
 ]
 
 { #category : #test }
+TNDArrayArithmeticsTest >> testBackslashBackslash [
+	| a r |
+	a := self newArrayFrom: #(1 2 3 4 5 6 7).
+	r := a \\ 3.
+	self assertCollection: r array equals: #(1 2 0 1 2 0 1) asFloatArray.
+	self assertCollection: r shape equals: #(7).
+	self assert: r dtype equals: #Float
+]
+
+{ #category : #test }
 TNDArrayArithmeticsTest >> testCol [
 	| a r |
 	a := self newArrayFrom: #((1 2) (3 4) (5 6)).
@@ -44,6 +54,18 @@ TNDArrayArithmeticsTest >> testCol [
 	self assert: r dtype equals: #Float.
 	a := self newArrayFrom: #(1 2 3).
 	self should: [ a col: 1 ] raise: Error
+]
+
+{ #category : #test }
+TNDArrayArithmeticsTest >> testCos [
+	| a r |
+	a := self newArrayFrom: {0. Float pi / 2. Float pi}.
+	r := a cos.
+	self assert: r array first closeTo: 1.
+	self assert: r array second closeTo: 0.
+	self assert: r array third closeTo: -1.
+	self assertCollection: r shape equals: #(3).
+	self assert: r dtype equals: #Float
 ]
 
 { #category : #test }
@@ -79,6 +101,51 @@ TNDArrayArithmeticsTest >> testDot [
 ]
 
 { #category : #test }
+TNDArrayArithmeticsTest >> testEqualsSign [
+	| a b r |
+	a := self newArrayFrom: #(1 2 3).
+	b := self newArrayFrom: #(3 2 1).
+	r := a = b.
+	self assertCollection: r array equals: #(false true false).
+	self assertCollection: r shape equals: #(3).
+	self assert: r dtype equals: #Boolean
+]
+
+{ #category : #test }
+TNDArrayArithmeticsTest >> testExp [
+	| a r |
+	a := self newArrayFrom: #(1 2 3).
+	r := a exp.
+	self assert: r array first closeTo: 2.7182817459106445.
+	self assert: r array second closeTo: 7.389056205749512.
+	self assert: r array third closeTo: 20.08553695678711.
+	self assertCollection: r shape equals: #(3).
+	self assert: r dtype equals: #Float
+]
+
+{ #category : #test }
+TNDArrayArithmeticsTest >> testGreaterThan [
+	| a b r |
+	a := self newArrayFrom: #(1 2 3).
+	b := self newArrayFrom: #(3 2 1).
+	r := a > b.
+	self assertCollection: r array equals: #(false false true).
+	self assertCollection: r shape equals: #(3).
+	self assert: r dtype equals: #Boolean
+]
+
+{ #category : #test }
+TNDArrayArithmeticsTest >> testGreaterThanEqualsSign [
+	| a b r |
+	a := self newArrayFrom: #(1 2 3).
+	b := self newArrayFrom: #(3 2 1).
+	r := a >= b.
+	self assertCollection: r array equals: #(false true true).
+	self assertCollection: r shape equals: #(3).
+	self assert: r dtype equals: #Boolean
+]
+
+{ #category : #test }
 TNDArrayArithmeticsTest >> testIndexAt [
 	| a |
 	a := self newArrayFrom: #(10 20 30 40 50).
@@ -95,6 +162,78 @@ TNDArrayArithmeticsTest >> testIndexAt [
 	self assert: (a at: (a indexAt: 6)) equals: 60.
 	self assert: (a at: (a indexAt: 7)) equals: 70.
 	self assert: (a at: (a indexAt: 8)) equals: 80
+]
+
+{ #category : #test }
+TNDArrayArithmeticsTest >> testLessThan [
+	| a b r |
+	a := self newArrayFrom: #(1 2 3).
+	b := self newArrayFrom: #(3 2 1).
+	r := a < b.
+	self assertCollection: r array equals: #(true false false).
+	self assertCollection: r shape equals: #(3).
+	self assert: r dtype equals: #Boolean
+]
+
+{ #category : #test }
+TNDArrayArithmeticsTest >> testLessThanEqualsSign [
+	| a b r |
+	a := self newArrayFrom: #(1 2 3).
+	b := self newArrayFrom: #(3 2 1).
+	r := a <= b.
+	self assertCollection: r array equals: #(true true false).
+	self assertCollection: r shape equals: #(3).
+	self assert: r dtype equals: #Boolean
+]
+
+{ #category : #test }
+TNDArrayArithmeticsTest >> testLn [
+	| a r |
+	a := self newArrayFrom: {1. Float e. Float e * Float e}.
+	r := a ln.
+	self assert: r array first closeTo: 0.
+	self assert: r array second closeTo: 1.
+	self assert: r array third closeTo: 2.
+	self assertCollection: r shape equals: #(3).
+	self assert: r dtype equals: #Float
+]
+
+{ #category : #test }
+TNDArrayArithmeticsTest >> testLog [
+	| a r |
+	a := self newArrayFrom: {1. 10. 100}.
+	r := a log.
+	self assert: r array first closeTo: 0.
+	self assert: r array second closeTo: 1.
+	self assert: r array third closeTo: 2.
+	self assertCollection: r shape equals: #(3).
+	self assert: r dtype equals: #Float
+]
+
+{ #category : #test }
+TNDArrayArithmeticsTest >> testMax [
+	| a b r |
+	a := self newArrayFrom: #(1 2 3).
+	r := a max.
+	self assert: r equals: 3.
+	b := self newArrayFrom: #(3 2 1).
+	r := a max: b.
+	self assertCollection: r array equals: #(3 2 3) asFloatArray.
+	self assertCollection: r shape equals: #(3).
+	self assert: r dtype equals: #Float
+]
+
+{ #category : #test }
+TNDArrayArithmeticsTest >> testMin [
+	| a b r |
+	a := self newArrayFrom: #(1 2 3).
+	r := a min.
+	self assert: r equals: 1.
+	b := self newArrayFrom: #(3 2 1).
+	r := a min: b.
+	self assertCollection: r array equals: #(1 2 1) asFloatArray.
+	self assertCollection: r shape equals: #(3).
+	self assert: r dtype equals: #Float
 ]
 
 { #category : #test }
@@ -116,6 +255,16 @@ TNDArrayArithmeticsTest >> testMinus [
 	self assertCollection: r array equals: #(-1 -2 -3) asFloatArray.
 	self assertCollection: r shape equals: #(3).
 	self assertCollection: r dtype equals: #Float
+]
+
+{ #category : #test }
+TNDArrayArithmeticsTest >> testNegated [
+	| a r |
+	a := self newArrayFrom: #(1 2 -3).
+	r := a negated.
+	self assertCollection: r array equals: #(-1 -2 3) asFloatArray.
+	self assertCollection: r shape equals: #(3).
+	self assert: r dtype equals: #Float
 ]
 
 { #category : #test }
@@ -160,6 +309,140 @@ TNDArrayArithmeticsTest >> testPlus [
 ]
 
 { #category : #test }
+TNDArrayArithmeticsTest >> testPrivRollAxis [
+	| a r |
+	a := self newArrayFrom: #(0 1 2 3 4 5 6 7 8 9).
+	r := a privRoll: 3 axis: 1.
+	self
+		assertCollection: r array
+		equals: #(7 8 9 0 1 2 3 4 5 6) asFloatArray.
+	self assertCollection: r shape equals: #(10).
+	self assert: r dtype equals: #Float.
+	r := a privRoll: -3 axis: 1.
+	self
+		assertCollection: r array
+		equals: #(3 4 5 6 7 8 9 0 1 2) asFloatArray.
+	self assertCollection: r shape equals: #(10).
+	self assert: r dtype equals: #Float.
+	r := a privRoll: 12 axis: 1.
+	self
+		assertCollection: r array
+		equals: #(8 9 0 1 2 3 4 5 6 7) asFloatArray.
+	self assertCollection: r shape equals: #(10).
+	self assert: r dtype equals: #Float.
+	a := self newArrayFrom: #(#(0 1 2 3) #(4 5 6 7) #(8 9 10 11)).
+	r := a privRoll: 1 axis: 1.
+	self
+		assertCollection: r array
+		equals: #(8 9 10 11 0 1 2 3 4 5 6 7) asFloatArray.
+	self assertCollection: r shape equals: #(3 4).
+	self assert: r dtype equals: #Float.
+	r := a privRoll: 2 axis: 2.
+	self
+		assertCollection: r array
+		equals: #(2 3 0 1 6 7 4 5 10 11 8 9) asFloatArray.
+	self assertCollection: r shape equals: #(3 4).
+	self assert: r dtype equals: #Float.
+	r := a privRoll: 5 axis: 0.
+	self
+		assertCollection: r array
+		equals: #(7 8 9 10 11 0 1 2 3 4 5 6) asFloatArray.
+	self assertCollection: r shape equals: #(3 4).
+	self assert: r dtype equals: #Float.
+	a := NDArray arangeFrom: 0 to: 23 by: 1.
+	a reShape: #(2 3 4).
+	r := a privRoll: 3 axis: 0.
+	self
+		assertCollection: r array
+		equals:
+			#(21 22 23 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20)
+				asFloatArray.
+	self assertCollection: r shape equals: #(2 3 4).
+	self assert: r dtype equals: #Float
+]
+
+{ #category : #test }
+TNDArrayArithmeticsTest >> testRoll [
+	| a r |
+	a := self newArrayFrom: #(0 1 2 3 4 5 6 7 8 9).
+	r := a roll: 3.
+	self
+		assertCollection: r array
+		equals: #(7 8 9 0 1 2 3 4 5 6) asFloatArray.
+	self assertCollection: r shape equals: #(10).
+	self assert: r dtype equals: #Float.
+	r := a roll: -3.
+	self
+		assertCollection: r array
+		equals: #(3 4 5 6 7 8 9 0 1 2) asFloatArray.
+	self assertCollection: r shape equals: #(10).
+	self assert: r dtype equals: #Float.
+	r := a roll: 12.
+	self
+		assertCollection: r array
+		equals: #(8 9 0 1 2 3 4 5 6 7) asFloatArray.
+	self assertCollection: r shape equals: #(10).
+	self assert: r dtype equals: #Float.
+	a := self newArrayFrom: #(#(0 1 2 3) #(4 5 6 7) #(8 9 10 11)).
+	r := a roll: 2.
+	self
+		assertCollection: r array
+		equals: #(10 11 0 1 2 3 4 5 6 7 8 9) asFloatArray.
+	self assertCollection: r shape equals: #(3 4).
+	self assert: r dtype equals: #Float.
+	r := a roll: 5.
+	self
+		assertCollection: r array
+		equals: #(7 8 9 10 11 0 1 2 3 4 5 6) asFloatArray.
+	self assertCollection: r shape equals: #(3 4).
+	self assert: r dtype equals: #Float.
+	a := NDArray arangeFrom: 0 to: 23 by: 1.
+	a reShape: #(2 3 4).
+	r := a roll: 3.
+	self
+		assertCollection: r array
+		equals:
+			#(21 22 23 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20)
+				asFloatArray.
+	self assertCollection: r shape equals: #(2 3 4).
+	self assert: r dtype equals: #Float
+]
+
+{ #category : #test }
+TNDArrayArithmeticsTest >> testRollAxes [
+	| a r |
+	a := self newArrayFrom: #(#(0 1 2 3) #(4 5 6 7) #(8 9 10 11)).
+	r := a roll: 1 axes: 1.
+	self
+		assertCollection: r array
+		equals: #(8 9 10 11 0 1 2 3 4 5 6 7) asFloatArray.
+	self assertCollection: r shape equals: #(3 4).
+	self assert: r dtype equals: #Float.
+	r := a roll: 2 axes: 2.
+	self
+		assertCollection: r array
+		equals: #(2 3 0 1 6 7 4 5 10 11 8 9) asFloatArray.
+	self assertCollection: r shape equals: #(3 4).
+	self assert: r dtype equals: #Float.
+	r := a roll: #(1 2) axes: #(1 2).
+	self
+		assertCollection: r array
+		equals: #(10 11 8 9 2 3 0 1 6 7 4 5) asFloatArray.
+	self assertCollection: r shape equals: #(3 4).
+	self assert: r dtype equals: #Float.
+	a := NDArray arangeFrom: 0 to: 23 by: 1.
+	a reShape: #(2 3 4).
+	r := a roll: 2 axes: 3.
+	self
+		assertCollection: r array
+		equals:
+			#(2 3 0 1 6 7 4 5 10 11 8 9 14 15 12 13 18 19 16 17 22 23 20 21)
+				asFloatArray.
+	self assertCollection: r shape equals: #(2 3 4).
+	self assert: r dtype equals: #Float
+]
+
+{ #category : #test }
 TNDArrayArithmeticsTest >> testRow [
 	| a r |
 	a := self newArrayFrom: #((1 2) (3 4) (5 6)).
@@ -177,6 +460,18 @@ TNDArrayArithmeticsTest >> testRow [
 	self assert: r dtype equals: #Float.
 	a := self newArrayFrom: #(1 2 3).
 	self should: [ a row: 1 ] raise: Error
+]
+
+{ #category : #test }
+TNDArrayArithmeticsTest >> testSin [
+	| a r |
+	a := self newArrayFrom: {0. Float pi / 2. Float pi}.
+	r := a sin.
+	self assert: r array first closeTo: 0.
+	self assert: r array second closeTo: 1.
+	self assert: r array third closeTo: 0.
+	self assertCollection: r shape equals: #(3).
+	self assert: r dtype equals: #Float
 ]
 
 { #category : #test }
@@ -213,6 +508,41 @@ TNDArrayArithmeticsTest >> testStar [
 	self assertCollection: r array equals: #(10 20 30 40) asFloatArray.
 	self assertCollection: r shape equals: #(2 2).
 	self assertCollection: r dtype equals: #Float
+]
+
+{ #category : #test }
+TNDArrayArithmeticsTest >> testStarStar [
+	| x y r |
+	x := self newArrayFrom: #(1 2 3).
+	r := x ** 2.
+	self assertCollection: r array equals: #(1 4 9) asFloatArray.
+	self assertCollection: r shape equals: #(3).
+	self assertCollection: r dtype equals: #Float.
+	y := self newArrayFrom: #(3 4 5).
+	r := x ** y.
+	self assertCollection: r array equals: #(1 16 243) asFloatArray.
+	self assertCollection: r shape equals: #(3).
+	self assertCollection: r dtype equals: #Float
+]
+
+{ #category : #test }
+TNDArrayArithmeticsTest >> testSum [
+	| a |
+	a := self newArrayFrom: #(1 2 3 4 5).
+	self assert: a sum equals: 15.
+	a := self newArrayFrom: #((1 2) (3 4) (5 6)).
+	self assert: a sum equals: 21
+]
+
+{ #category : #test }
+TNDArrayArithmeticsTest >> testTildaEqualsSign [
+	| a b r |
+	a := self newArrayFrom: #(1 2 3).
+	b := self newArrayFrom: #(3 2 1).
+	r := a ~= b.
+	self assertCollection: r array equals: #(true false true).
+	self assertCollection: r shape equals: #(3).
+	self assert: r dtype equals: #Boolean
 ]
 
 { #category : #test }
@@ -254,4 +584,25 @@ TNDArrayArithmeticsTest >> testWhere [
 	self assertCollection: r third array equals: #(2 1 1 2) asIntegerArray.
 	self assertCollection: r third shape equals: #(4).
 	self assert: r third dtype equals: #Integer
+]
+
+{ #category : #test }
+TNDArrayArithmeticsTest >> testWrapCopyFromSize [
+	| a |
+	a := self newArrayFrom: #(1 2 3 4 5 6 7 8).
+	self
+		assertCollection: (a wrapCopyFrom: 2 size: 4)
+		equals: #(2 3 4 5) asFloatArray.
+	self
+		assertCollection: (a wrapCopyFrom: 6 size: 4)
+		equals: #(6 7 8 1) asFloatArray.
+	self
+		assertCollection: (a wrapCopyFrom: 8 size: 4)
+		equals: #(8 1 2 3) asFloatArray.
+	self
+		assertCollection: (a wrapCopyFrom: 9 size: 4)
+		equals: #(1 2 3 4) asFloatArray.
+	self
+		assertCollection: (a wrapCopyFrom: -1 size: 4)
+		equals: #(7 8 1 2) asFloatArray
 ]

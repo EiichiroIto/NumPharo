@@ -155,17 +155,6 @@ TNDArrayArithmetics >> dot: aNDArray [
 	^ ret
 ]
 
-{ #category : #private }
-TNDArrayArithmetics >> equalsTo: other [
-	self dtype = other dtype
-		ifFalse: [ ^ false ].
-	self shape = other shape
-		ifFalse: [ ^ false ].
-	self array = other array
-		ifFalse: [ ^ false ].
-	^ true
-]
-
 { #category : #arithmetic }
 TNDArrayArithmetics >> exp [
 	^ self newArrayDoing: #exp
@@ -204,21 +193,18 @@ TNDArrayArithmetics >> max [
 ]
 
 { #category : #arithmetic }
-TNDArrayArithmetics >> max: max [
-	| newArray |
-	newArray := self array
-		withIndexCollect:
-			[ :each :index | each max: (max ndValueAt: index) ].
-	^ self class array: newArray shape: self shape dtype: self dtype
+TNDArrayArithmetics >> max: other [
+	^ other adaptToNDArray: self andSend: #max:
 ]
 
 { #category : #arithmetic }
-TNDArrayArithmetics >> min: min [
-	| newArray |
-	newArray := self array
-		withIndexCollect:
-			[ :each :index | each min: (min ndValueAt: index) ].
-	^ self class array: newArray shape: self shape dtype: self dtype
+TNDArrayArithmetics >> min [
+	^ self array min
+]
+
+{ #category : #arithmetic }
+TNDArrayArithmetics >> min: other [
+	^ other adaptToNDArray: self andSend: #min:
 ]
 
 { #category : #arithmetic }
@@ -226,13 +212,8 @@ TNDArrayArithmetics >> min: min max: max [
 	| newArray |
 	newArray := self array
 		withIndexCollect:
-			[ :each :index | each min: (min ndValueAt: index) max: (max ndValueAt: index) ].
+			[ :each :index | each min: (min arrayAt: index) max: (max arrayAt: index) ].
 	^ self class array: newArray shape: self shape dtype: self dtype
-]
-
-{ #category : #private }
-TNDArrayArithmetics >> ndValueAt: anInteger [
-	^ self array at: anInteger
 ]
 
 { #category : #arithmetic }
@@ -288,6 +269,49 @@ TNDArrayArithmetics >> newArrayDoing: aBlock with: aNDArray [
 		dtype: dt
 ]
 
+{ #category : #private }
+TNDArrayArithmetics >> privRoll: anInteger1 axis: anInteger2 [
+	| shift s count1 count2 itemSize blockSize |
+	anInteger2 <= self ndim
+		ifFalse: [ self error ].
+	count1 := 1.
+	count2 := self size.
+	shift := anInteger1.
+	itemSize := 1.
+	anInteger2 > 0
+		ifTrue: [ count1 := self class
+				finiteProductOf: (self shape copyFrom: 1 to: anInteger2 - 1).
+			count2 := self shape at: anInteger2.
+			shift := anInteger1 \\ count2.
+			itemSize := self itemSizeAt: anInteger2 ].
+	blockSize := self size // count1.
+	s := WriteStream on: self array class new.
+	1 to: count1 do: [ :each | 
+		1 to: count2 do: [ :each2 | 
+			| pos |
+			pos := ((each - 1) * blockSize + ((each2 - shift - 1) \\ count2))
+				* itemSize + 1.
+			s nextPutAll: (self wrapCopyFrom: pos size: itemSize) ] ].
+	^ self class array: s contents shape: self shape dtype: self dtype
+]
+
+{ #category : #converting }
+TNDArrayArithmetics >> roll: anInteger [
+	^ self roll: anInteger axes: 0
+]
+
+{ #category : #converting }
+TNDArrayArithmetics >> roll: anObject1 axes: anObject2 [
+	| shifts axes obj |
+	shifts := self class normalizedIndex: anObject1.
+	axes := self class normalizedIndex: anObject2.
+	shifts size = axes size
+		ifFalse: [ self error ].
+	obj := self.
+	shifts with: axes do: [ :s :a | obj := obj privRoll: s axis: a ].
+	^ obj
+]
+
 { #category : #accessing }
 TNDArrayArithmetics >> row: anInteger [
 	self ndim = 2
@@ -311,13 +335,28 @@ TNDArrayArithmetics >> where [
 	result := (1 to: self ndim)
 		collect: [ :each | OrderedCollection new ].
 	1 to: self array size do: [ :each | 
-		(self ndValueAt: each)
+		(self arrayAt: each)
 			ifTrue: [ | index |
 				index := self indexAt: each.
 				index
 					withIndexDo: [ :each2 :index2 | (result at: index2) add: each2 ] ] ].
 	^ result
 		collect: [ :each | self class array: each asIntegerArray shape: {each size} dtype: #Integer ]
+]
+
+{ #category : #private }
+TNDArrayArithmetics >> wrapCopyFrom: anInteger1 size: anInteger2 [
+	| start end size s |
+	size := self array size.
+	start := (anInteger1 - 1) \\ size + 1.
+	end := start + anInteger2 - 1.
+	end <= size
+		ifTrue: [ ^ self array copyFrom: start to: end ].
+	s := WriteStream on: self array class new.
+	anInteger2
+		timesRepeat: [ s nextPut: (self array atWrap: start).
+			start := start + 1 ].
+	^ s contents
 ]
 
 { #category : #comparing }
