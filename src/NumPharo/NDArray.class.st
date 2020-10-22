@@ -336,7 +336,7 @@ NDArray >> at: anArray [
 	| arr pos num |
 	arr := self class normalizedIndex: anArray.
 	pos := self arrayIndexAt: arr.
-	num := self itemSizeAt: arr size.
+	num := self itemSizeAxis: arr size.
 	self ndim = arr size
 		ifTrue: [ ^ array at: pos ].
 	^ self class
@@ -348,6 +348,11 @@ NDArray >> at: anArray [
 { #category : #accessing }
 NDArray >> atAll: anObject [
 	^ anObject atAllInNDArray: self
+]
+
+{ #category : #modifying }
+NDArray >> atAll: anObject put: anObject2 [
+	self shouldBeImplemented
 ]
 
 { #category : #private }
@@ -434,7 +439,7 @@ NDArray >> broadcastToShape: anArray [
 			ifTrue: [ self error ].
 		(r1 = 1 and: [ r2 > r1 ])
 			ifTrue: [ newShape at: index put: r2.
-				itemSize := self itemSizeAt: index.
+				itemSize := self itemSizeAxis: index.
 				count := self class
 					finiteProductOf: (newShape copyFrom: 1 to: index - 1).
 				s := WriteStream on: newArray class new.
@@ -600,6 +605,18 @@ NDArray >> flatten [
 		dtype: self dtype
 ]
 
+{ #category : #accessing }
+NDArray >> indexAt: anInteger [
+	| r v a |
+	v := anInteger - 1.
+	r := WriteStream on: Array new.
+	1 to: self ndim do: [ :each | 
+		a := self itemSizeAxis: each.
+		r nextPut: (v // a) + 1.
+		v := v \\ a ].
+	^ r contents
+]
+
 { #category : #initialization }
 NDArray >> initialize [
 	shape := Array new.
@@ -613,14 +630,8 @@ NDArray >> isNDArray [
 ]
 
 { #category : #private }
-NDArray >> itemSizeAt: anInteger [
-	^ self class
-		finiteProductOf: (self shape copyFrom: anInteger + 1 to: self shape size)
-]
-
-{ #category : #private }
 NDArray >> itemSizeList [
-	^ (1 to: self ndim) collect: [ :each | self itemSizeAt: each ]
+	^ (1 to: self ndim) collect: [ :each | self itemSizeAxis: each ]
 ]
 
 { #category : #accessing }
@@ -675,6 +686,32 @@ NDArray >> privDtype: aSymbol [
 ]
 
 { #category : #private }
+NDArray >> privRoll: anInteger1 axis: anInteger2 [
+	| shift s count1 count2 itemSize blockSize |
+	anInteger2 <= self ndim
+		ifFalse: [ self error ].
+	count1 := 1.
+	count2 := self size.
+	shift := anInteger1.
+	itemSize := 1.
+	anInteger2 > 0
+		ifTrue: [ count1 := self class
+				finiteProductOf: (self shape copyFrom: 1 to: anInteger2 - 1).
+			count2 := self shape at: anInteger2.
+			shift := anInteger1 \\ count2.
+			itemSize := self itemSizeAxis: anInteger2 ].
+	blockSize := self size // count1.
+	s := WriteStream on: self array class new.
+	1 to: count1 do: [ :each | 
+		1 to: count2 do: [ :each2 | 
+			| pos |
+			pos := ((each - 1) * blockSize + ((each2 - shift - 1) \\ count2))
+				* itemSize + 1.
+			s nextPutAll: (self wrapCopyFrom: pos size: itemSize) ] ].
+	^ self class array: s contents shape: self shape dtype: self dtype
+]
+
+{ #category : #private }
 NDArray >> privShape: anArray [
 	shape := anArray
 ]
@@ -712,6 +749,11 @@ NDArray >> shapeWithNdim: anInteger [
 	ndim > anInteger
 		ifTrue: [ self error ].
 	^ (Array new: anInteger - ndim withAll: 1) , self shape
+]
+
+{ #category : #private }
+NDArray >> shapeWithoutAxis: anInteger [
+	^ self shape copyWithoutIndex: anInteger
 ]
 
 { #category : #accessing }

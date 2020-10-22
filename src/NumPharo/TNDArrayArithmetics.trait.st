@@ -97,11 +97,29 @@ TNDArrayArithmetics >> adaptToNumber: rcvr andSend: selector [
 		dtype: self dtype
 ]
 
+{ #category : #private }
+TNDArrayArithmetics >> argIndexAxis: anInteger [
+	| total itemSize delta |
+	itemSize := self itemSizeAxis: anInteger.
+	total := self size / (self shape at: anInteger).
+	delta := itemSize * (self shape at: anInteger).
+	^ (0 to: total - 1)
+		collect:
+			[ :each | 1 + (each \\ itemSize) + (each // itemSize * delta) ]
+]
+
 { #category : #arithmetic }
 TNDArrayArithmetics >> argMax [
 	| max |
 	max := self array max.
 	^ self array detectIndex: [ :each | each = max ]
+]
+
+{ #category : #arithmetic }
+TNDArrayArithmetics >> argMaxAxis: anInteger [
+	anInteger = 0
+		ifTrue: [ ^ self argMax ].
+	^ self collect: [ :array | array indexOf: array max ] axis: anInteger
 ]
 
 { #category : #accessing }
@@ -116,6 +134,26 @@ TNDArrayArithmetics >> col: anInteger [
 		array: newArray asFloatArray
 		shape: {self shape first}
 		dtype: self dtype
+]
+
+{ #category : #private }
+TNDArrayArithmetics >> collect: aBlock axis: anInteger [
+	| newShape items itemSize s s2 |
+	anInteger <= self ndim
+		ifFalse: [ self error ].
+	newShape := self shapeWithoutAxis: anInteger.
+	items := self shape at: anInteger.
+	itemSize := self itemSizeAxis: anInteger.
+	s := WriteStream on: Array new.
+	(self argIndexAxis: anInteger)
+		do: [ :each2 | 
+			s2 := WriteStream on: self array class new.
+			1 to: items do: [ :each | 
+				| pos |
+				pos := each2 + ((each - 1) * itemSize).
+				s2 nextPut: (self arrayAt: pos) ].
+			s nextPut: (aBlock cull: s2 contents) ].
+	^ self class array: s contents shape: newShape dtype: self dtype
 ]
 
 { #category : #arithmetic }
@@ -166,7 +204,7 @@ TNDArrayArithmetics >> indexAt: anInteger [
 	v := anInteger - 1.
 	r := WriteStream on: Array new.
 	1 to: self ndim do: [ :each | 
-		a := self itemSizeAt: each.
+		a := self itemSizeAxis: each.
 		r nextPut: (v // a) + 1.
 		v := v \\ a ].
 	^ r contents
@@ -175,6 +213,12 @@ TNDArrayArithmetics >> indexAt: anInteger [
 { #category : #testing }
 TNDArrayArithmetics >> isZero [
 	^ false
+]
+
+{ #category : #private }
+TNDArrayArithmetics >> itemSizeAxis: anInteger [
+	^ self class
+		finiteProductOf: (self shape copyFrom: anInteger + 1 to: self shape size)
 ]
 
 { #category : #arithmetic }
@@ -193,7 +237,14 @@ TNDArrayArithmetics >> max [
 ]
 
 { #category : #arithmetic }
-TNDArrayArithmetics >> max: other [
+TNDArrayArithmetics >> maxAxis: anInteger [
+	anInteger = 0
+		ifTrue: [ ^ self argMax ].
+	^ self collect: [ :array | array max ] axis: anInteger
+]
+
+{ #category : #arithmetic }
+TNDArrayArithmetics >> maximum: other [
 	^ other adaptToNDArray: self andSend: #max:
 ]
 
@@ -203,17 +254,24 @@ TNDArrayArithmetics >> min [
 ]
 
 { #category : #arithmetic }
-TNDArrayArithmetics >> min: other [
-	^ other adaptToNDArray: self andSend: #min:
-]
-
-{ #category : #arithmetic }
 TNDArrayArithmetics >> min: min max: max [
 	| newArray |
 	newArray := self array
 		withIndexCollect:
 			[ :each :index | each min: (min arrayAt: index) max: (max arrayAt: index) ].
 	^ self class array: newArray shape: self shape dtype: self dtype
+]
+
+{ #category : #arithmetic }
+TNDArrayArithmetics >> minAxis: anInteger [
+	anInteger = 0
+		ifTrue: [ ^ self min ].
+	^ self collect: [ :array | array min ] axis: anInteger
+]
+
+{ #category : #arithmetic }
+TNDArrayArithmetics >> minimum: other [
+	^ other adaptToNDArray: self andSend: #min:
 ]
 
 { #category : #arithmetic }
@@ -283,7 +341,7 @@ TNDArrayArithmetics >> privRoll: anInteger1 axis: anInteger2 [
 				finiteProductOf: (self shape copyFrom: 1 to: anInteger2 - 1).
 			count2 := self shape at: anInteger2.
 			shift := anInteger1 \\ count2.
-			itemSize := self itemSizeAt: anInteger2 ].
+			itemSize := self itemSizeAxis: anInteger2 ].
 	blockSize := self size // count1.
 	s := WriteStream on: self array class new.
 	1 to: count1 do: [ :each | 
@@ -326,7 +384,11 @@ TNDArrayArithmetics >> sin [
 
 { #category : #arithmetic }
 TNDArrayArithmetics >> sum [
-	^ self array sum
+	| arr |
+	arr := self dtype = #Boolean
+		ifTrue: [ (self withDtype: #Integer) array ]
+		ifFalse: [ self array ].
+	^ arr sum
 ]
 
 { #category : #accessing }

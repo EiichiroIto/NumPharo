@@ -99,7 +99,7 @@ DeepLearningFromScratch1Chapter3 >> predict362: network x: x [
 
 { #category : #private }
 DeepLearningFromScratch1Chapter3 >> relu327: x [
-	^ x max: 0
+	^ x maximum: 0
 ]
 
 { #category : #private }
@@ -362,4 +362,30 @@ DeepLearningFromScratch1Chapter3 >> testChapter3_6_2 [
 		(p = (t at: index))
 			ifTrue: [ accuracyCount := accuracyCount + 1 ] ].
 	self inform: 'Accuracy: ', ((accuracyCount / 100) asFloat asString)
+]
+
+{ #category : #test }
+DeepLearningFromScratch1Chapter3 >> testChapter3_6_3 [
+	| data x network w1 w2 w3 t batchSize accuracyCount xBatch yBatch p |
+	data := self getData362.
+	x := data first.
+	network := self initNetwork362.
+	w1 := network at: #W1.
+	w2 := network at: #W2.
+	w3 := network at: #W3.
+	self assertCollection: x shape equals: #(10000 784).
+	self assertCollection: (x at: 1) shape equals: #(784).
+	self assertCollection: w1 shape equals: #(784 50).
+	self assertCollection: w2 shape equals: #(50 100).
+	self assertCollection: w3 shape equals: #(100 10).
+	t := data second.
+	batchSize := 100.
+	accuracyCount := 0.
+	(1 to: x size by: batchSize)
+		do: [ :each | 
+			xBatch := x copyFrom: each to: each + batchSize - 1.
+			yBatch := self predict362: network x: xBatch.
+			p := yBatch argMaxAxis: 1.
+			accuracyCount := accuracyCount
+				+ (p = (t copyFrom: each to: each + batchSize - 1)) sum ]
 ]

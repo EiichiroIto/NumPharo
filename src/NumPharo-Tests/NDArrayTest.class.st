@@ -456,15 +456,6 @@ NDArrayTest >> testIsNDArray [
 ]
 
 { #category : #test }
-NDArrayTest >> testItemSizeAt [
-	| a |
-	a := NDArray ones: #(2 4 1 3 2).
-	self assert: (a itemSizeAt: 3) equals: 6.
-	self assert: (a itemSizeAt: 1) equals: 24.
-	self assert: (a itemSizeAt: 5) equals: 1
-]
-
-{ #category : #test }
 NDArrayTest >> testItemSizeList [
 	| a |
 	a := self newArrayFrom: #((1 2 3) (4 5 6)).
@@ -643,6 +634,25 @@ NDArrayTest >> testShapeWithNdim [
 	self assertCollection: a shape equals: #(2 3).
 	s := a shapeWithNdim: 5.
 	self assertCollection: s equals: #(1 1 1 2 3)
+]
+
+{ #category : #test }
+NDArrayTest >> testShapeWithoutAxis [
+	| a r |
+	a := self newArrayFrom: #((1 2) (3 4) (5 6)).
+	self assertCollection: a shape equals: #(3 2).
+	r := a shapeWithoutAxis: 1.
+	self assertCollection: r equals: #(2).
+	r := a shapeWithoutAxis: 2.
+	self assertCollection: r equals: #(3).
+	a := self newArrayFrom: #(((1 2) (3 4) (5 6)) ((7 6) (5 4) (3 2))).
+	self assertCollection: a shape equals: #(2 3 2).
+	r := a shapeWithoutAxis: 1.
+	self assertCollection: r equals: #(3 2).
+	r := a shapeWithoutAxis: 2.
+	self assertCollection: r equals: #(2 2).
+	r := a shapeWithoutAxis: 3.
+	self assertCollection: r equals: #(2 3)
 ]
 
 { #category : #test }
