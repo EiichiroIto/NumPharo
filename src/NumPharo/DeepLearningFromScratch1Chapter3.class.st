@@ -386,7 +386,8 @@ DeepLearningFromScratch1Chapter3 >> testChapter3_6_3 [
 		do: [ :each | 
 			xBatch := x copyFrom: each to: each + batchSize - 1.
 			yBatch := self predict362: network x: xBatch.
-			p := yBatch argMaxAxis: 2.
+			p := (yBatch argMaxAxis: 2) - 1.
 			tBatch := t copyFrom: each to: each + batchSize - 1.
-			accuracyCount := accuracyCount + ((p = tBatch) sum) ]
+			accuracyCount := accuracyCount + (p = tBatch) sum ].
+	self assert: (accuracyCount / x len) asFloat closeTo: 0.9352
 ]
