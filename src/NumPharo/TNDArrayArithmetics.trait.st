@@ -110,9 +110,7 @@ TNDArrayArithmetics >> argIndexAxis: anInteger [
 
 { #category : #arithmetic }
 TNDArrayArithmetics >> argMax [
-	| max |
-	max := self array max.
-	^ self array detectIndex: [ :each | each = max ]
+	^ self array indexOf: self array max
 ]
 
 { #category : #arithmetic }

@@ -366,7 +366,8 @@ DeepLearningFromScratch1Chapter3 >> testChapter3_6_2 [
 
 { #category : #test }
 DeepLearningFromScratch1Chapter3 >> testChapter3_6_3 [
-	| data x network w1 w2 w3 t batchSize accuracyCount xBatch yBatch p |
+	| data x network w1 w2 w3 t batchSize accuracyCount xBatch yBatch tBatch p |
+	self timeLimit: 300 seconds.
 	data := self getData362.
 	x := data first.
 	network := self initNetwork362.
@@ -381,11 +382,11 @@ DeepLearningFromScratch1Chapter3 >> testChapter3_6_3 [
 	t := data second.
 	batchSize := 100.
 	accuracyCount := 0.
-	(1 to: x size by: batchSize)
+	(1 to: x len by: batchSize)
 		do: [ :each | 
 			xBatch := x copyFrom: each to: each + batchSize - 1.
 			yBatch := self predict362: network x: xBatch.
-			p := yBatch argMaxAxis: 1.
-			accuracyCount := accuracyCount
-				+ (p = (t copyFrom: each to: each + batchSize - 1)) sum ]
+			p := yBatch argMaxAxis: 2.
+			tBatch := t copyFrom: each to: each + batchSize - 1.
+			accuracyCount := accuracyCount + ((p = tBatch) sum) ]
 ]
