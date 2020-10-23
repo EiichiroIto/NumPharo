@@ -183,14 +183,11 @@ TNDArrayArithmetics >> dot: aNDArray [
 	newArray := self class newArrayDtype: newDtype size: rows * cols.
 	index := 1.
 	1 to: rows do: [ :row | 
-		| r c sum |
+		| r c |
 		r := one row2DArray: row.
 		1 to: cols do: [ :col | 
 			c := another col2DArray: col.
-			sum := (1 to: count)
-				inject: 0
-				into: [ :prev :each | (r at: each) * (c at: each) + prev ].
-			newArray at: index put: sum.
+			newArray at: index put: (r dot: c).
 			index := index + 1 ] ].
 	newShape first = 1
 		ifTrue: [ newShape := Array with: newShape second ]
