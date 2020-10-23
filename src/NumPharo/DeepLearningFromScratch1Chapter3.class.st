@@ -5,6 +5,28 @@ Class {
 }
 
 { #category : #private }
+DeepLearningFromScratch1Chapter3 >> chapter3_6_3 [
+	| data x network w1 w2 w3 t batchSize accuracyCount xBatch yBatch tBatch p |
+	data := self getData362.
+	x := data first.
+	network := self initNetwork362.
+	w1 := network at: #W1.
+	w2 := network at: #W2.
+	w3 := network at: #W3.
+	t := data second.
+	batchSize := 100.
+	accuracyCount := 0.
+	(1 to: x len by: batchSize)
+		do: [ :each | 
+			xBatch := x copyFrom: each to: each + batchSize - 1.
+			yBatch := self predict362: network x: xBatch.
+			p := (yBatch argMaxAxis: 2) - 1.
+			tBatch := t copyFrom: each to: each + batchSize - 1.
+			accuracyCount := accuracyCount + (p = tBatch) sum ].
+	^ (accuracyCount / x len) asFloat
+]
+
+{ #category : #private }
 DeepLearningFromScratch1Chapter3 >> checkFileNamed: aString1 ifNotDownloadFrom: aString2 [
 	| fr fn |
 	fr := FileSystem workingDirectory / aString1.

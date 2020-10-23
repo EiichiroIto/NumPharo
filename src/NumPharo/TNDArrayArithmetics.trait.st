@@ -120,18 +120,17 @@ TNDArrayArithmetics >> argMaxAxis: anInteger [
 	^ self collect: [ :array | array indexOf: array max ] axis: anInteger
 ]
 
-{ #category : #accessing }
-TNDArrayArithmetics >> col: anInteger [
-	| newArray |
-	self ndim = 2
-		ifFalse: [ self error ].
-	newArray := (1 to: self shape first)
-		collect:
-			[ :each | self arrayAt: (each - 1) * self shape second + anInteger ].
-	^ self class
-		array: newArray asFloatArray
-		shape: {self shape first}
-		dtype: self dtype
+{ #category : #private }
+TNDArrayArithmetics >> col2DArray: anInteger [
+	| newArray index |
+	newArray := self class
+		newArrayDtype: self dtype
+		size: self shape first.
+	index := anInteger.
+	1 to: self shape first do: [ :each | 
+		newArray at: each put: (self arrayAt: index).
+		index := index + self shape second ].
+	^ newArray
 ]
 
 { #category : #private }
@@ -161,7 +160,7 @@ TNDArrayArithmetics >> cos [
 
 { #category : #arithmetic }
 TNDArrayArithmetics >> dot: aNDArray [
-	| rows cols s1 s2 r one another ret |
+	| rows cols one another newDtype newShape newArray count index |
 	one := self ndim = 1
 		ifTrue: [ self
 				withShape:
@@ -174,21 +173,30 @@ TNDArrayArithmetics >> dot: aNDArray [
 					{aNDArray shape first.
 					1} ]
 		ifFalse: [ aNDArray ].
+	one shape second = another shape first
+		ifFalse: [ self error ].
+	count := one shape second.
 	rows := one shape first.
 	cols := another shape second.
-	s1 := WriteStream on: Array new.
+	newShape := Array with: rows with: cols.
+	newDtype := self class coerceArray: self dtype with: aNDArray dtype.
+	newArray := self class newArrayDtype: newDtype size: rows * cols.
+	index := 1.
 	1 to: rows do: [ :row | 
-		s2 := WriteStream on: Array new.
+		| r c sum |
+		r := one row2DArray: row.
 		1 to: cols do: [ :col | 
-			r := ((one row: row) * (another col: col)) sum.
-			s2 nextPut: r ].
-		s1 nextPut: s2 contents ].
-	ret := self class fromArray: s1 contents dtype: self dtype.
-	ret shape first = 1
-		ifTrue: [ ret := ret withShape: {ret shape second} ]
-		ifFalse: [ ret shape second = 1
-				ifTrue: [ ret := ret withShape: {ret shape first} ] ].
-	^ ret
+			c := another col2DArray: col.
+			sum := (1 to: count)
+				inject: 0
+				into: [ :prev :each | (r at: each) * (c at: each) + prev ].
+			newArray at: index put: sum.
+			index := index + 1 ] ].
+	newShape first = 1
+		ifTrue: [ newShape := Array with: newShape second ]
+		ifFalse: [ newShape second = 1
+				ifTrue: [ newShape := Array with: newShape first ] ].
+	^ self class array: newArray shape: newShape dtype: newDtype
 ]
 
 { #category : #arithmetic }
@@ -368,11 +376,12 @@ TNDArrayArithmetics >> roll: anObject1 axes: anObject2 [
 	^ obj
 ]
 
-{ #category : #accessing }
-TNDArrayArithmetics >> row: anInteger [
-	self ndim = 2
-		ifFalse: [ self error ].
-	^ self at: anInteger
+{ #category : #private }
+TNDArrayArithmetics >> row2DArray: anInteger [
+	| pos size |
+	pos := self arrayIndexAt: (Array with: anInteger).
+	size := self itemSizeAxis: 1.
+	^ self array copyFrom: pos to: pos + size - 1
 ]
 
 { #category : #arithmetic }

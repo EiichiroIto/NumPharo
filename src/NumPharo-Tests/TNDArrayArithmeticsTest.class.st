@@ -93,19 +93,14 @@ TNDArrayArithmeticsTest >> testBackslashBackslash [
 ]
 
 { #category : #test }
-TNDArrayArithmeticsTest >> testCol [
+TNDArrayArithmeticsTest >> testCol2DArray [
 	| a r |
 	a := self newArrayFrom: #((1 2) (3 4) (5 6)).
-	r := a col: 1.
-	self assertCollection: r array equals: #(1 3 5) asFloatArray.
-	self assertCollection: r shape equals: #(3).
-	self assert: r dtype equals: #Float.
-	r := a col: 2.
-	self assertCollection: r array equals: #(2 4 6) asFloatArray.
-	self assertCollection: r shape equals: #(3).
-	self assert: r dtype equals: #Float.
-	a := self newArrayFrom: #(1 2 3).
-	self should: [ a col: 1 ] raise: Error
+	r := a col2DArray: 1.
+	self assertCollection: r equals: #(1 3 5) asFloatArray.
+	r := a col2DArray: 2.
+	self assertCollection: r equals: #(2 4 6) asFloatArray.
+	self should: [ a col2DArray: 3 ] raise: Error
 ]
 
 { #category : #test }
@@ -564,23 +559,16 @@ TNDArrayArithmeticsTest >> testRollAxes [
 ]
 
 { #category : #test }
-TNDArrayArithmeticsTest >> testRow [
+TNDArrayArithmeticsTest >> testRow2DArray [
 	| a r |
 	a := self newArrayFrom: #((1 2) (3 4) (5 6)).
-	r := a row: 1.
-	self assertCollection: r array equals: #(1 2) asFloatArray.
-	self assertCollection: r shape equals: #(2).
-	self assert: r dtype equals: #Float.
-	r := a row: 2.
-	self assertCollection: r array equals: #(3 4) asFloatArray.
-	self assertCollection: r shape equals: #(2).
-	self assert: r dtype equals: #Float.
-	r := a row: 3.
-	self assertCollection: r array equals: #(5 6) asFloatArray.
-	self assertCollection: r shape equals: #(2).
-	self assert: r dtype equals: #Float.
-	a := self newArrayFrom: #(1 2 3).
-	self should: [ a row: 1 ] raise: Error
+	r := a row2DArray: 1.
+	self assertCollection: r equals: #(1 2) asFloatArray.
+	r := a row2DArray: 2.
+	self assertCollection: r equals: #(3 4) asFloatArray.
+	r := a row2DArray: 3.
+	self assertCollection: r equals: #(5 6) asFloatArray.
+	self should: [ a row2DArray: 4 ] raise: Error
 ]
 
 { #category : #test }

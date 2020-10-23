@@ -44,6 +44,8 @@ NDArray class >> arrayFrom: from to: to num: anInteger withEndPoint: aBoolean [
 
 { #category : #accessing }
 NDArray class >> coerceArray: aSymbol1 with: aSymbol2 [
+	aSymbol1 = aSymbol2
+		ifTrue: [ ^ aSymbol1 ].
 	^ Coerces at: aSymbol1 at: aSymbol2
 ]
 
@@ -133,6 +135,21 @@ NDArray class >> linspaceFrom: from to: to num: anInteger withEndPoint: aBoolean
 { #category : #utilities }
 NDArray class >> meanSquaredErrorY: y andT: t [
 	^ 0.5 * ((y - t) ** 2) sum
+]
+
+{ #category : #accessing }
+NDArray class >> newArrayDtype: aSymbol size: anInteger [
+	aSymbol = #Float
+		ifTrue: [ ^ FloatArray new: anInteger ].
+	aSymbol = #Byte
+		ifTrue: [ ^ ByteArray new: anInteger ].
+	aSymbol = #Word
+		ifTrue: [ ^ WordArray new: anInteger ].
+	aSymbol = #Integer
+		ifTrue: [ ^ IntegerArray new: anInteger ].
+	aSymbol = #Boolean
+		ifTrue: [ ^ Array new: anInteger ].
+	self error
 ]
 
 { #category : #private }
