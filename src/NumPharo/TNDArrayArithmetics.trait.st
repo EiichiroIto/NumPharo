@@ -122,14 +122,15 @@ TNDArrayArithmetics >> argMaxAxis: anInteger [
 
 { #category : #private }
 TNDArrayArithmetics >> col2DArray: anInteger [
-	| newArray index |
+	| newArray index delta |
 	newArray := self class
 		newArrayDtype: self dtype
 		size: self shape first.
 	index := anInteger.
+	delta := self shape second.
 	1 to: self shape first do: [ :each | 
 		newArray at: each put: (self arrayAt: index).
-		index := index + self shape second ].
+		index := index + delta ].
 	^ newArray
 ]
 
@@ -160,7 +161,7 @@ TNDArrayArithmetics >> cos [
 
 { #category : #arithmetic }
 TNDArrayArithmetics >> dot: aNDArray [
-	| rows cols one another newDtype newShape newArray count index |
+	| rows cols one another newDtype newShape newArray index colArrays rowArrays |
 	one := self ndim = 1
 		ifTrue: [ self
 				withShape:
@@ -175,18 +176,20 @@ TNDArrayArithmetics >> dot: aNDArray [
 		ifFalse: [ aNDArray ].
 	one shape second = another shape first
 		ifFalse: [ self error ].
-	count := one shape second.
 	rows := one shape first.
 	cols := another shape second.
 	newShape := Array with: rows with: cols.
 	newDtype := self class coerceArray: self dtype with: aNDArray dtype.
 	newArray := self class newArrayDtype: newDtype size: rows * cols.
 	index := 1.
+	rowArrays := (1 to: rows) collect: [ :each | one row2DArray: each ].
+	colArrays := (1 to: cols)
+		collect: [ :each | another col2DArray: each ].
 	1 to: rows do: [ :row | 
 		| r c |
-		r := one row2DArray: row.
+		r := rowArrays at: row.
 		1 to: cols do: [ :col | 
-			c := another col2DArray: col.
+			c := colArrays at: col.
 			newArray at: index put: (r dot: c).
 			index := index + 1 ] ].
 	newShape first = 1
