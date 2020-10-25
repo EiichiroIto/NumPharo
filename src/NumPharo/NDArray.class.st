@@ -647,25 +647,9 @@ NDArray >> len [
 	^ self shape first
 ]
 
-{ #category : #modifying }
-NDArray >> modifyAll: aBlock [
-	self array
-		withIndexDo:
-			[ :each :index | self array at: index put: (aBlock cull: each) ]
-]
-
 { #category : #accessing }
 NDArray >> ndim [
 	^ self shape size
-]
-
-{ #category : #private }
-NDArray >> numberArrayFrom: anArray [
-	^ self array asArray
-		collect: [ :each | 
-			each
-				ifTrue: [ 1 ]
-				ifFalse: [ 0 ] ]
 ]
 
 { #category : #private }

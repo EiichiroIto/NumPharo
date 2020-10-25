@@ -65,15 +65,20 @@ TNDArrayArithmetics >> adaptToInteger: rcvr andSend: selector [
 
 { #category : #converting }
 TNDArrayArithmetics >> adaptToNDArray: anObject andCompare: selector [
-	| obj rcvr |
-	self shape = anObject shape
-		ifTrue: [ obj := self.
-			rcvr := anObject ]
-		ifFalse: [ obj := self broadcastTo: anObject.
-			rcvr := anObject broadcastTo: self ].
-	^ rcvr
-		newArrayComparing: [ :x :y | x perform: selector with: y ]
-		with: obj
+	| obj newObj newDtype |
+	obj := self.
+	newDtype := self class coerceArray: self dtype with: anObject dtype.
+	newObj := anObject withDtype: newDtype.
+	self shape ~= anObject shape
+		ifTrue: [ obj := self broadcastTo: newObj.
+			newObj := newObj broadcastTo: self ].
+	newObj
+		privArray:
+			(newObj array asArray
+				with: obj array
+				collect: [ :x :y | x perform: selector with: y ]);
+		privDtype: #Boolean.
+	^ newObj
 ]
 
 { #category : #converting }
@@ -302,20 +307,6 @@ TNDArrayArithmetics >> negated [
 TNDArrayArithmetics >> newArrayComparing: aBlock [
 	^ self class
 		array: (self array asArray collect: aBlock)
-		shape: self shape copy
-		dtype: #Boolean
-]
-
-{ #category : #private }
-TNDArrayArithmetics >> newArrayComparing: aBlock with: aNDArray [
-	| obj dt |
-	self dtype = aNDArray dtype
-		ifTrue: [ dt := self dtype.
-			obj := self ]
-		ifFalse: [ dt := self class coerceArray: self dtype with: aNDArray dtype.
-			obj := self withDtype: dt ].
-	^ self class
-		array: (obj array asArray with: aNDArray array collect: aBlock)
 		shape: self shape copy
 		dtype: #Boolean
 ]
