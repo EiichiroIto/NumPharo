@@ -476,102 +476,78 @@ NDArray >> collect: aBlock [
 	^ s contents
 ]
 
-{ #category : #converting }
+{ #category : #private }
 NDArray >> convertToBoolean [
 	dtype = #Boolean
-		ifTrue: [ ^ self ].
+		ifTrue: [ ^ self copy ].
 	^ self class
 		array: (self array asArray collect: [ :each | (each closeTo: 0) not ])
-		shape: self shape
+		shape: self shape copy
 		dtype: #Boolean
 ]
 
-{ #category : #converting }
+{ #category : #private }
 NDArray >> convertToByte [
 	| newArray |
-	dtype = #Byte
-		ifTrue: [ ^ self ].
-	newArray := nil.
-	(#(#Float #Integer #Word) includes: dtype)
-		ifTrue: [ newArray := self array asArray
-				collect: [ :each | each truncated min: 255 max: 0 ] ].
-	dtype = #Boolean
-		ifTrue: [ newArray := self array asArray
-				collect: [ :each | 
-					each
+	newArray := ByteArray new: self size.
+	self array
+		withIndexDo: [ :each :index | 
+			| num |
+			num := self dtype = #Boolean
+				ifTrue: [ each
 						ifTrue: [ 1 ]
-						ifFalse: [ 0 ] ] ].
-	newArray ifNil: [ self error ].
-	^ self class
-		array: newArray asByteArray
-		shape: self shape
-		dtype: #Byte
+						ifFalse: [ 0 ] ]
+				ifFalse: [ each truncated min: 255 max: 0 ].
+			newArray at: index put: num ].
+	^ self class array: newArray shape: self shape copy dtype: #Byte
 ]
 
-{ #category : #converting }
+{ #category : #private }
 NDArray >> convertToFloat [
 	| newArray |
-	dtype = #Float
-		ifTrue: [ ^ self ].
-	newArray := nil.
-	dtype = #Boolean
-		ifTrue: [ newArray := self array
-				collect: [ :each | 
-					each
+	newArray := FloatArray new: self size.
+	self array
+		withIndexDo: [ :each :index | 
+			| num |
+			num := self dtype = #Boolean
+				ifTrue: [ each
 						ifTrue: [ 1 ]
-						ifFalse: [ 0 ] ] ].
-	(#(#Integer #Byte #Word) includes: dtype)
-		ifTrue: [ newArray := self array ].
-	newArray ifNil: [ self error ].
-	^ self class
-		array: newArray asFloatArray
-		shape: self shape
-		dtype: #Float
+						ifFalse: [ 0 ] ]
+				ifFalse: [ each ].
+			newArray at: index put: num ].
+	^ self class array: newArray shape: self shape copy dtype: #Float
 ]
 
-{ #category : #converting }
+{ #category : #private }
 NDArray >> convertToInteger [
 	| newArray |
-	dtype = #Integer
-		ifTrue: [ ^ self ].
-	newArray := nil.
-	dtype = #Float
-		ifTrue: [ newArray := self array asArray collect: #truncated ].
-	dtype = #Boolean
-		ifTrue: [ newArray := self array asArray
-				collect: [ :each | 
-					each
+	newArray := IntegerArray new: self size.
+	self array
+		withIndexDo: [ :each :index | 
+			| num |
+			num := self dtype = #Boolean
+				ifTrue: [ each
 						ifTrue: [ 1 ]
-						ifFalse: [ 0 ] ] ].
-	(#(#Byte #Word) includes: dtype)
-		ifTrue: [ newArray := self array ].
-	newArray ifNil: [ self error ].
-	^ self class
-		array: newArray asIntegerArray
-		shape: self shape
-		dtype: #Integer
+						ifFalse: [ 0 ] ]
+				ifFalse: [ each truncated ].
+			newArray at: index put: num ].
+	^ self class array: newArray shape: self shape copy dtype: #Integer
 ]
 
-{ #category : #converting }
+{ #category : #private }
 NDArray >> convertToWord [
 	| newArray |
-	dtype = #Word
-		ifTrue: [ ^ self ].
-	newArray := nil.
-	(#(#Float #Integer #Byte) includes: dtype)
-		ifTrue: [ newArray := self array asArray
-				collect: [ :each | each truncated min: 16rFFFF max: 0 ] ].
-	dtype = #Boolean
-		ifTrue: [ newArray := self array asArray
-				collect: [ :each | 
-					each
+	newArray := WordArray new: self size.
+	self array
+		withIndexDo: [ :each :index | 
+			| num |
+			num := self dtype = #Boolean
+				ifTrue: [ each
 						ifTrue: [ 1 ]
-						ifFalse: [ 0 ] ] ].
-	newArray ifNil: [ self error ].
-	^ self class
-		array: newArray asWordArray
-		shape: self shape
-		dtype: #Word
+						ifFalse: [ 0 ] ]
+				ifFalse: [ each truncated min: 16rFFFF max: 0 ].
+			newArray at: index put: num ].
+	^ self class array: newArray shape: self shape copy dtype: #Word
 ]
 
 { #category : #copying }
@@ -666,6 +642,15 @@ NDArray >> modifyAll: aBlock [
 { #category : #accessing }
 NDArray >> ndim [
 	^ self shape size
+]
+
+{ #category : #private }
+NDArray >> numberArrayFrom: anArray [
+	^ self array asArray
+		collect: [ :each | 
+			each
+				ifTrue: [ 1 ]
+				ifFalse: [ 0 ] ]
 ]
 
 { #category : #private }
@@ -781,7 +766,7 @@ NDArray >> size [
 { #category : #converting }
 NDArray >> withDtype: aSymbol [
 	dtype = aSymbol
-		ifTrue: [ ^ self ].
+		ifTrue: [ ^ self copy ].
 	aSymbol = #Float
 		ifTrue: [ ^ self convertToFloat ].
 	aSymbol = #Integer

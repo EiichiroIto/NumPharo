@@ -77,16 +77,19 @@ TNDArrayArithmetics >> adaptToNDArray: anObject andCompare: selector [
 ]
 
 { #category : #converting }
-TNDArrayArithmetics >> adaptToNDArray: anObject andSend: selector [
-	| obj rcvr |
-	self shape = anObject shape
-		ifTrue: [ obj := self.
-			rcvr := anObject ]
-		ifFalse: [ obj := self broadcastTo: anObject.
-			rcvr := anObject broadcastTo: self ].
-	^ rcvr
-		newArrayDoing: [ :x :y | x perform: selector with: y ]
-		with: obj
+TNDArrayArithmetics >> adaptToNDArray: anObject andSend: aSymbol [
+	| obj newDtype newObj selector |
+	obj := self.
+	newDtype := self class coerceArray: anObject dtype with: self dtype.
+	newObj := anObject withDtype: newDtype.
+	self shape ~= newObj shape
+		ifTrue: [ obj := self broadcastTo: newObj.
+			newObj := newObj broadcastTo: self ].
+	selector := (aSymbol isInfix
+		ifTrue: [ aSymbol , '=' ]
+		ifFalse: [ 'inplace' , aSymbol asCamelCase ]) asSymbol.
+	newObj array perform: selector asSymbol with: obj array.
+	^ newObj
 ]
 
 { #category : #converting }
