@@ -7,5 +7,8 @@ Number >> adaptToNDArray: rcvr andCompare: selector [
 
 { #category : #'*NumPharo' }
 Number >> adaptToNDArray: rcvr andSend: selector [
-	^ rcvr newArrayDoing: [ :each | each perform: selector with: self ]
+	| newObj |
+	newObj := rcvr copy.
+	newObj array perform: selector with: self.
+	^ newObj
 ]

@@ -116,7 +116,7 @@ NDArray class >> fromArray: anArray shape: anArray2 dtype: aSymbol [
 	size := self finiteProductOf: anArray2.
 	size = arr size
 		ifFalse: [ self error: 'invalid shape' ].
-	^ self array: arr shape: anArray2 dtype: aSymbol
+	^ self array: arr shape: anArray2 copy dtype: aSymbol
 ]
 
 { #category : #'class initialization' }
@@ -135,6 +135,21 @@ NDArray class >> linspaceFrom: from to: to num: anInteger withEndPoint: aBoolean
 { #category : #utilities }
 NDArray class >> meanSquaredErrorY: y andT: t [
 	^ 0.5 * ((y - t) ** 2) sum
+]
+
+{ #category : #accessing }
+NDArray class >> newArrayDtype: aSymbol [
+	aSymbol = #Float
+		ifTrue: [ ^ FloatArray new ].
+	aSymbol = #Byte
+		ifTrue: [ ^ ByteArray new ].
+	aSymbol = #Word
+		ifTrue: [ ^ WordArray new ].
+	aSymbol = #Integer
+		ifTrue: [ ^ IntegerArray new ].
+	aSymbol = #Boolean
+		ifTrue: [ ^ Array new ].
+	self error
 ]
 
 { #category : #accessing }
@@ -710,7 +725,7 @@ NDArray >> privRoll: anInteger1 axis: anInteger2 [
 			pos := ((each - 1) * blockSize + ((each2 - shift - 1) \\ count2))
 				* itemSize + 1.
 			s nextPutAll: (self wrapCopyFrom: pos size: itemSize) ] ].
-	^ self class array: s contents shape: self shape dtype: self dtype
+	^ self class array: s contents shape: self shape copy dtype: self dtype
 ]
 
 { #category : #private }

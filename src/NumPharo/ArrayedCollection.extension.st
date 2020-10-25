@@ -2,23 +2,32 @@ Extension { #name : #ArrayedCollection }
 
 { #category : #'*NumPharo' }
 ArrayedCollection >> **= other [
-	self
-		withIndexDo:
-			[ :each :index | self at: index put: (each ** (other at: index)) ]
+	self inplace: #** with: other
 ]
 
 { #category : #'*NumPharo' }
 ArrayedCollection >> *= other [
-	self
-		withIndexDo:
-			[ :each :index | self at: index put: (each * (other at: index)) ]
+	self inplace: #* with: other
 ]
 
 { #category : #'*NumPharo' }
 ArrayedCollection >> += other [
-	self
-		withIndexDo:
-			[ :each :index | self at: index put: (each + (other at: index)) ]
+	self inplace: #+ with: other
+]
+
+{ #category : #'*NumPharo' }
+ArrayedCollection >> -= other [
+	self inplace: #- with: other
+]
+
+{ #category : #'*NumPharo' }
+ArrayedCollection >> /= other [
+	self inplace: #/ with: other
+]
+
+{ #category : #'*NumPharo' }
+ArrayedCollection >> \\= other [
+	self inplace: #\\ with: other
 ]
 
 { #category : #'*NumPharo' }
@@ -27,15 +36,22 @@ ArrayedCollection >> asNDArray [
 ]
 
 { #category : #'*NumPharo' }
-ArrayedCollection >> inplaceMax: other [
+ArrayedCollection >> inplace: aSymbol with: other [
+	| block |
+	block := other isNumber
+		ifTrue: [ [ :index | other ] ]
+		ifFalse: [ [ :index | other at: index ] ].
 	self
 		withIndexDo:
-			[ :each :index | self at: index put: (each max: (other at: index)) ]
+			[ :each :index | self at: index put: (each perform: aSymbol with: (block cull: index)) ]
+]
+
+{ #category : #'*NumPharo' }
+ArrayedCollection >> inplaceMax: other [
+	self inplace: #max: with: other
 ]
 
 { #category : #'*NumPharo' }
 ArrayedCollection >> inplaceMin: other [
-	self
-		withIndexDo:
-			[ :each :index | self at: index put: (each min: (other at: index)) ]
+	self inplace: #min: with: other
 ]

@@ -5,27 +5,27 @@ Trait {
 
 { #category : #arithmetic }
 TNDArrayArithmetics >> * other [
-	^ other adaptToNDArray: self andSend: #*
+	^ other adaptToNDArray: self andSend: #*=
 ]
 
 { #category : #arithmetic }
 TNDArrayArithmetics >> ** other [
-	^ other adaptToNDArray: self andSend: #'**'
+	^ other adaptToNDArray: self andSend: #'**='
 ]
 
 { #category : #arithmetic }
 TNDArrayArithmetics >> + other [
-	^ other adaptToNDArray: self andSend: #+
+	^ other adaptToNDArray: self andSend: #+=
 ]
 
 { #category : #arithmetic }
 TNDArrayArithmetics >> - other [
-	^ other adaptToNDArray: self andSend: #-
+	^ other adaptToNDArray: self andSend: #-=
 ]
 
 { #category : #arithmetic }
 TNDArrayArithmetics >> / other [
-	^ other adaptToNDArray: self andSend: #/
+	^ other adaptToNDArray: self andSend: #/=
 ]
 
 { #category : #comparing }
@@ -55,7 +55,7 @@ TNDArrayArithmetics >> >= other [
 
 { #category : #arithmetic }
 TNDArrayArithmetics >> \\ other [
-	^ other adaptToNDArray: self andSend: #\\
+	^ other adaptToNDArray: self andSend: #\\=
 ]
 
 { #category : #converting }
@@ -77,17 +77,14 @@ TNDArrayArithmetics >> adaptToNDArray: anObject andCompare: selector [
 ]
 
 { #category : #converting }
-TNDArrayArithmetics >> adaptToNDArray: anObject andSend: aSymbol [
-	| obj newDtype newObj selector |
+TNDArrayArithmetics >> adaptToNDArray: anObject andSend: selector [
+	| obj newDtype newObj |
 	obj := self.
 	newDtype := self class coerceArray: anObject dtype with: self dtype.
 	newObj := anObject withDtype: newDtype.
 	self shape ~= newObj shape
 		ifTrue: [ obj := self broadcastTo: newObj.
 			newObj := newObj broadcastTo: self ].
-	selector := (aSymbol isInfix
-		ifTrue: [ aSymbol , '=' ]
-		ifFalse: [ 'inplace' , aSymbol asCamelCase ]) asSymbol.
 	newObj array perform: selector asSymbol with: obj array.
 	^ newObj
 ]
@@ -96,7 +93,7 @@ TNDArrayArithmetics >> adaptToNDArray: anObject andSend: aSymbol [
 TNDArrayArithmetics >> adaptToNumber: rcvr andSend: selector [
 	^ self class
 		array: (self array collect: [ :each | rcvr perform: selector with: each ])
-		shape: self shape
+		shape: self shape copy
 		dtype: self dtype
 ]
 
@@ -120,7 +117,10 @@ TNDArrayArithmetics >> argMax [
 TNDArrayArithmetics >> argMaxAxis: anInteger [
 	anInteger = 0
 		ifTrue: [ ^ self argMax ].
-	^ self collect: [ :array | array indexOf: array max ] axis: anInteger
+	^ self
+		collect: [ :array | array indexOf: array max ]
+		axis: anInteger
+		dtype: #Integer
 ]
 
 { #category : #private }
@@ -138,14 +138,14 @@ TNDArrayArithmetics >> col2DArray: anInteger [
 ]
 
 { #category : #private }
-TNDArrayArithmetics >> collect: aBlock axis: anInteger [
+TNDArrayArithmetics >> collect: aBlock axis: anInteger dtype: aSymbol [
 	| newShape items itemSize s s2 |
 	anInteger <= self ndim
 		ifFalse: [ self error ].
 	newShape := self shapeWithoutAxis: anInteger.
 	items := self shape at: anInteger.
 	itemSize := self itemSizeAxis: anInteger.
-	s := WriteStream on: Array new.
+	s := WriteStream on: (self class newArrayDtype: aSymbol).
 	(self argIndexAxis: anInteger)
 		do: [ :each2 | 
 			s2 := WriteStream on: self array class new.
@@ -249,12 +249,15 @@ TNDArrayArithmetics >> max [
 TNDArrayArithmetics >> maxAxis: anInteger [
 	anInteger = 0
 		ifTrue: [ ^ self argMax ].
-	^ self collect: [ :array | array max ] axis: anInteger
+	^ self
+		collect: [ :array | array max ]
+		axis: anInteger
+		dtype: self dtype
 ]
 
 { #category : #arithmetic }
 TNDArrayArithmetics >> maximum: other [
-	^ other adaptToNDArray: self andSend: #max:
+	^ other adaptToNDArray: self andSend: #inplaceMax:
 ]
 
 { #category : #arithmetic }
@@ -268,19 +271,22 @@ TNDArrayArithmetics >> min: min max: max [
 	newArray := self array
 		withIndexCollect:
 			[ :each :index | each min: (min arrayAt: index) max: (max arrayAt: index) ].
-	^ self class array: newArray shape: self shape dtype: self dtype
+	^ self class array: newArray shape: self shape copy dtype: self dtype
 ]
 
 { #category : #arithmetic }
 TNDArrayArithmetics >> minAxis: anInteger [
 	anInteger = 0
 		ifTrue: [ ^ self min ].
-	^ self collect: [ :array | array min ] axis: anInteger
+	^ self
+		collect: [ :array | array min ]
+		axis: anInteger
+		dtype: self dtype
 ]
 
 { #category : #arithmetic }
 TNDArrayArithmetics >> minimum: other [
-	^ other adaptToNDArray: self andSend: #min:
+	^ other adaptToNDArray: self andSend: #inplaceMin:
 ]
 
 { #category : #arithmetic }
@@ -296,7 +302,7 @@ TNDArrayArithmetics >> negated [
 TNDArrayArithmetics >> newArrayComparing: aBlock [
 	^ self class
 		array: (self array asArray collect: aBlock)
-		shape: self shape
+		shape: self shape copy
 		dtype: #Boolean
 ]
 
@@ -310,7 +316,7 @@ TNDArrayArithmetics >> newArrayComparing: aBlock with: aNDArray [
 			obj := self withDtype: dt ].
 	^ self class
 		array: (obj array asArray with: aNDArray array collect: aBlock)
-		shape: self shape
+		shape: self shape copy
 		dtype: #Boolean
 ]
 
@@ -318,22 +324,8 @@ TNDArrayArithmetics >> newArrayComparing: aBlock with: aNDArray [
 TNDArrayArithmetics >> newArrayDoing: aBlock [
 	^ self class
 		array: (self array collect: aBlock)
-		shape: self shape
+		shape: self shape copy
 		dtype: self dtype
-]
-
-{ #category : #private }
-TNDArrayArithmetics >> newArrayDoing: aBlock with: aNDArray [
-	| obj dt |
-	self dtype = aNDArray dtype
-		ifTrue: [ dt := self dtype.
-			obj := self ]
-		ifFalse: [ dt := self class coerceArray: self dtype with: aNDArray dtype.
-			obj := self withDtype: dt ].
-	^ self class
-		array: (obj array with: aNDArray array collect: aBlock)
-		shape: self shape
-		dtype: dt
 ]
 
 { #category : #private }
@@ -359,7 +351,7 @@ TNDArrayArithmetics >> privRoll: anInteger1 axis: anInteger2 [
 			pos := ((each - 1) * blockSize + ((each2 - shift - 1) \\ count2))
 				* itemSize + 1.
 			s nextPutAll: (self wrapCopyFrom: pos size: itemSize) ] ].
-	^ self class array: s contents shape: self shape dtype: self dtype
+	^ self class array: s contents shape: self shape copy dtype: self dtype
 ]
 
 { #category : #converting }
