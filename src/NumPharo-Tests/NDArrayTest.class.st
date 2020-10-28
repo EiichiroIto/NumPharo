@@ -21,12 +21,16 @@ NDArrayTest >> newArrayFrom: anArray [
 NDArrayTest >> testArangeFromToBy [
 	| a |
 	a := NDArray arangeFrom: 1 to: 3 by: 1.
-	self assertCollection: a array equals: #(1 2 3) asFloatArray.
+	self assertCollection: a array equals: #(1 2 3) asIntegerArray.
 	self assertCollection: a shape equals: #(3).
-	self assert: a dtype equals: #Float.
+	self assert: a dtype equals: #Integer.
 	a := NDArray arangeFrom: 1 to: 7 by: 2.
-	self assertCollection: a array equals: #(1 3 5 7) asFloatArray.
+	self assertCollection: a array equals: #(1 3 5 7) asIntegerArray.
 	self assertCollection: a shape equals: #(4).
+	self assert: a dtype equals: #Integer.
+	a := NDArray arangeFrom: 1 to: 2 by: 0.5.
+	self assertCollection: a array equals: #(1.0 1.5 2.0) asFloatArray.
+	self assertCollection: a shape equals: #(3).
 	self assert: a dtype equals: #Float
 ]
 
@@ -549,7 +553,7 @@ NDArrayTest >> testMeshGridOf [
 	self assertCollection: r first shape equals: #(3 2).
 	self
 		assertCollection: r second array
-		equals: #(3 3 4 4 5 5) asFloatArray.
+		equals: #(3 3 4 4 5 5) asIntegerArray.
 	self assertCollection: r second shape equals: #(3 2).
 	z := self newArrayFrom: #(6 7 8 9).
 	r := NDArray
@@ -563,7 +567,7 @@ NDArrayTest >> testMeshGridOf [
 	self assertCollection: r first shape equals: #(3 2 4).
 	self
 		assertCollection: r second array
-		equals: #(3 3 3 3 3 3 3 3 4 4 4 4 4 4 4 4 5 5 5 5 5 5 5 5) asFloatArray.
+		equals: #(3 3 3 3 3 3 3 3 4 4 4 4 4 4 4 4 5 5 5 5 5 5 5 5) asIntegerArray.
 	self assertCollection: r second shape equals: #(3 2 4).
 	self
 		assertCollection: r third array
@@ -586,7 +590,7 @@ NDArrayTest >> testMeshGridOf [
 		assertCollection: r second array
 		equals:
 			#(3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5)
-				asFloatArray.
+				asIntegerArray.
 	self assertCollection: r second shape equals: #(3 2 4 5).
 	self
 		assertCollection: r third array

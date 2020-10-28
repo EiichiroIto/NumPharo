@@ -16,9 +16,7 @@ Class {
 
 { #category : #'instance creation' }
 NDArray class >> arangeFrom: from to: to by: step [
-	| arr |
-	arr := (from to: to by: step) asFloatArray.
-	^ self array: arr shape: (Array with: arr size) dtype: #Float
+	^ self fromArray: (from to: to by: step) asArray
 ]
 
 { #category : #private }
@@ -73,7 +71,7 @@ NDArray class >> fromArray: anArray [
 		ifTrue: [ ^ self fromArray: anArray dtype: #Word ].
 	(anArray allSatisfy: [:each | each isKindOf: Boolean])
 		ifTrue: [ ^ self fromArray: anArray dtype: #Boolean ].
-	^ self fromArray: anArray dtype: #Float
+	^ self fromArray: anArray dtype: anArray dtype
 ]
 
 { #category : #'instance creation' }
@@ -158,15 +156,15 @@ NDArray class >> meshDtypeOf: anArray [
 
 { #category : #'instance creation' }
 NDArray class >> meshGridOf: anArray [
-	| arrays newShape newDtype |
+	| arrays newShape |
 	arrays := self meshArraysOf: anArray.
 	newShape := self meshShapeOf: anArray.
-	newDtype := self meshDtypeOf: anArray.
-	^ (1 to: anArray size)
-		collect: [ :each | 
-			| s |
+	^ anArray
+		withIndexCollect: [ :each :index | 
+			| s newDtype |
+			newDtype := each dtype.
 			s := WriteStream on: (self newArrayDtype: newDtype).
-			self writeMeshGridArrayOf: arrays at: each on: s.
+			self writeMeshGridArrayOf: arrays at: index on: s.
 			self array: s contents shape: newShape dtype: newDtype ]
 ]
 
