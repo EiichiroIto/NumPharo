@@ -137,6 +137,47 @@ NDArray class >> meanSquaredErrorY: y andT: t [
 	^ 0.5 * ((y - t) ** 2) sum
 ]
 
+{ #category : #private }
+NDArray class >> meshArraysOf: anArray [
+	^ anArray
+		collect: [ :each | 
+			each isNDArray
+				ifTrue: [ each array ]
+				ifFalse: [ each ] ]
+]
+
+{ #category : #private }
+NDArray class >> meshDtypeOf: anArray [
+	^ anArray
+		inject: nil
+		into: [ :prev :each | 
+			prev
+				ifNil: [ each dtype ]
+				ifNotNil: [ self coerceArray: prev with: each dtype ] ]
+]
+
+{ #category : #'instance creation' }
+NDArray class >> meshGridOf: anArray [
+	| arrays newShape newDtype |
+	arrays := self meshArraysOf: anArray.
+	newShape := self meshShapeOf: anArray.
+	newDtype := self meshDtypeOf: anArray.
+	^ (1 to: anArray size)
+		collect: [ :each | 
+			| s |
+			s := WriteStream on: (self newArrayDtype: newDtype).
+			self writeMeshGridArrayOf: arrays at: each on: s.
+			self array: s contents shape: newShape dtype: newDtype ]
+]
+
+{ #category : #private }
+NDArray class >> meshShapeOf: anArray [
+	| list |
+	list := anArray collect: [ :each | each size ].
+	list swap: 1 with: 2.
+	^ list
+]
+
 { #category : #accessing }
 NDArray class >> newArrayDtype: aSymbol [
 	aSymbol = #Float
@@ -181,6 +222,21 @@ NDArray class >> ones: anObject [
 	size := self finiteProductOf: shape.
 	arr := IntegerArray new: size withAll: 1.
 	^ self array: arr shape: shape dtype: #Integer
+]
+
+{ #category : #accessing }
+NDArray class >> presumeDtype: anArray [
+	anArray isNDArray
+		ifTrue: [ ^ anArray dtype ].
+	anArray isEmpty
+		ifTrue: [ ^ #Float ].
+	(anArray allSatisfy: [ :each | each = true or: [ each = false ] ])
+		ifTrue: [ ^ #Boolean ].
+	(anArray allSatisfy: [ :each | each isInteger ])
+		ifTrue: [ ^ #Integer ].
+	(anArray allSatisfy: [ :each | each isNumber ])
+		ifTrue: [ ^ #Float ].
+	self error
 ]
 
 { #category : #'instance creation' }
@@ -266,6 +322,35 @@ NDArray class >> stepFunction: x [
 	^ (x > 0) withDtype: #Integer
 ]
 
+{ #category : #private }
+NDArray class >> writeMeshGridArrayOf: anArray at: anInteger on: aStream [
+	| sizes count count2 |
+	sizes := anArray collect: #size.
+	anArray size < 2
+		ifTrue: [ self error ].
+	anInteger = 1
+		ifTrue: [ count := self finiteProductOf: (sizes copyFrom: 3 to: sizes size).
+			sizes second
+				timesRepeat: [ anArray first
+						do: [ :each | count timesRepeat: [ aStream nextPut: each ] ] ].
+			^ self ].
+	anInteger = 2
+		ifTrue: [ count := (self finiteProductOf: sizes) / sizes second.
+			anArray second
+				do: [ :each | count timesRepeat: [ aStream nextPut: each ] ].
+			^ self ].
+	anInteger = anArray size
+		ifTrue: [ count := (self finiteProductOf: sizes) / sizes last.
+			count timesRepeat: [ aStream nextPutAll: anArray last ].
+			^ self ].
+	count := self finiteProductOf: (sizes copyFrom: 1 to: anInteger - 1).
+	count2 := self
+		finiteProductOf: (sizes copyFrom: anInteger + 1 to: sizes size).
+	count
+		timesRepeat: [ (anArray at: anInteger)
+				do: [ :each | count2 timesRepeat: [ aStream nextPut: each ] ] ]
+]
+
 { #category : #'instance creation' }
 NDArray class >> zeros: anObject [
 	| arr size shape |
@@ -273,6 +358,13 @@ NDArray class >> zeros: anObject [
 	size := self finiteProductOf: shape.
 	arr := IntegerArray new: size.
 	^ self array: arr shape: shape dtype: #Integer
+]
+
+{ #category : #'instance creation' }
+NDArray class >> zerosLike: aNDArray [
+	| arr |
+	arr := self newArrayDtype: aNDArray dtype size: aNDArray size.
+	^ self array: arr shape: aNDArray shape copy dtype: aNDArray dtype
 ]
 
 { #category : #accessing }
@@ -375,6 +467,17 @@ NDArray >> at: anArray [
 		array: (array copyFrom: pos to: pos + num - 1)
 		shape: (shape copyFrom: arr size + 1 to: shape size)
 		dtype: dtype
+]
+
+{ #category : #modifying }
+NDArray >> at: anArray put: anObject [
+	| arr pos num |
+	arr := self class normalizedIndex: anArray.
+	pos := self arrayIndexAt: arr.
+	num := self itemSizeAxis: arr size.
+	num = 1
+		ifFalse: [ self shouldBeImplemented ].
+	self arrayAt: pos put: anObject
 ]
 
 { #category : #accessing }

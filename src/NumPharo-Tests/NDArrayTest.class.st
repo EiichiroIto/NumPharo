@@ -501,6 +501,127 @@ NDArrayTest >> testMeanSquaredErrorYAndT [
 ]
 
 { #category : #test }
+NDArrayTest >> testMeshArraysOf [
+	| x y r |
+	x := self newArrayFrom: #(1 2).
+	y := #(3 4 5).
+	r := NDArray
+		meshArraysOf:
+			{x.
+			y}.
+	self assert: r isArray.
+	self assert: r size equals: 2.
+	self assertCollection: r first equals: #(1 2) asFloatArray.
+	self assertCollection: r second equals: #(3 4 5)
+]
+
+{ #category : #test }
+NDArrayTest >> testMeshDtypeOf [
+	| x y r z |
+	x := NDArray ones: #(2).
+	y := NDArray ones: #(3).
+	r := NDArray
+		meshDtypeOf:
+			{x.
+			y}.
+	self assertCollection: r equals: #Integer.
+	z := self newArrayFrom: #(6 7 8 9).
+	r := NDArray
+		meshDtypeOf:
+			{x.
+			y.
+			z}.
+	self assertCollection: r equals: #Float
+]
+
+{ #category : #test }
+NDArrayTest >> testMeshGridOf [
+	| x y r z w |
+	x := self newArrayFrom: #(1 2).
+	y := #(3 4 5).
+	r := NDArray
+		meshGridOf:
+			{x.
+			y}.
+	self
+		assertCollection: r first array
+		equals: #(1 2 1 2 1 2) asFloatArray.
+	self assertCollection: r first shape equals: #(3 2).
+	self
+		assertCollection: r second array
+		equals: #(3 3 4 4 5 5) asFloatArray.
+	self assertCollection: r second shape equals: #(3 2).
+	z := self newArrayFrom: #(6 7 8 9).
+	r := NDArray
+		meshGridOf:
+			{x.
+			y.
+			z}.
+	self
+		assertCollection: r first array
+		equals: #(1 1 1 1 2 2 2 2 1 1 1 1 2 2 2 2 1 1 1 1 2 2 2 2) asFloatArray.
+	self assertCollection: r first shape equals: #(3 2 4).
+	self
+		assertCollection: r second array
+		equals: #(3 3 3 3 3 3 3 3 4 4 4 4 4 4 4 4 5 5 5 5 5 5 5 5) asFloatArray.
+	self assertCollection: r second shape equals: #(3 2 4).
+	self
+		assertCollection: r third array
+		equals: #(6 7 8 9 6 7 8 9 6 7 8 9 6 7 8 9 6 7 8 9 6 7 8 9) asFloatArray.
+	self assertCollection: r third shape equals: #(3 2 4).
+	w := self newArrayFrom: #(10 11 12 13 14).
+	r := NDArray
+		meshGridOf:
+			{x.
+			y.
+			z.
+			w}.
+	self
+		assertCollection: r first array
+		equals:
+			#(1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2)
+				asFloatArray.
+	self assertCollection: r first shape equals: #(3 2 4 5).
+	self
+		assertCollection: r second array
+		equals:
+			#(3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5)
+				asFloatArray.
+	self assertCollection: r second shape equals: #(3 2 4 5).
+	self
+		assertCollection: r third array
+		equals:
+			#(6 6 6 6 6 7 7 7 7 7 8 8 8 8 8 9 9 9 9 9 6 6 6 6 6 7 7 7 7 7 8 8 8 8 8 9 9 9 9 9 6 6 6 6 6 7 7 7 7 7 8 8 8 8 8 9 9 9 9 9 6 6 6 6 6 7 7 7 7 7 8 8 8 8 8 9 9 9 9 9 6 6 6 6 6 7 7 7 7 7 8 8 8 8 8 9 9 9 9 9 6 6 6 6 6 7 7 7 7 7 8 8 8 8 8 9 9 9 9 9)
+				asFloatArray.
+	self assertCollection: r third shape equals: #(3 2 4 5).
+	self
+		assertCollection: r fourth array
+		equals:
+			#(10 11 12 13 14 10 11 12 13 14 10 11 12 13 14 10 11 12 13 14 10 11 12 13 14 10 11 12 13 14 10 11 12 13 14 10 11 12 13 14 10 11 12 13 14 10 11 12 13 14 10 11 12 13 14 10 11 12 13 14 10 11 12 13 14 10 11 12 13 14 10 11 12 13 14 10 11 12 13 14 10 11 12 13 14 10 11 12 13 14 10 11 12 13 14 10 11 12 13 14 10 11 12 13 14 10 11 12 13 14 10 11 12 13 14 10 11 12 13 14)
+				asFloatArray.
+	self assertCollection: r fourth shape equals: #(3 2 4 5)
+]
+
+{ #category : #test }
+NDArrayTest >> testMeshShapeOf [
+	| x y r z |
+	x := self newArrayFrom: #(1 2).
+	y := self newArrayFrom: #(3 4 5).
+	r := NDArray
+		meshShapeOf:
+			{x.
+			y}.
+	self assertCollection: r equals: #(3 2).
+	z := self newArrayFrom: #(6 7 8 9).
+	r := NDArray
+		meshShapeOf:
+			{x.
+			y.
+			z}.
+	self assertCollection: r equals: #(3 2 4)
+]
+
+{ #category : #test }
 NDArrayTest >> testNdim [
 	| a |
 	a := self newArrayFrom: #(0 1).
@@ -531,6 +652,22 @@ NDArrayTest >> testOnes [
 	self assertCollection: a array equals: #(1 1 1 1 1 1) asIntegerArray.
 	self assertCollection: a shape equals: #(2 3).
 	self assert: a dtype equals: #Integer
+]
+
+{ #category : #test }
+NDArrayTest >> testPresumeDtype [
+	| r |
+	r := NDArray presumeDtype: (NDArray ones: #(1)).
+	self assert: r equals: #Integer.
+	r := NDArray presumeDtype: #().
+	self assert: r equals: #Float.
+	r := NDArray presumeDtype: #(1 2 3).
+	self assert: r equals: #Integer.
+	r := NDArray presumeDtype: #(1 2.5 3).
+	self assert: r equals: #Float.
+	r := NDArray presumeDtype: #(true false true).
+	self assert: r equals: #Boolean.
+	self should: [ NDArray presumeDtype: #(true false 1) ] raise: Error
 ]
 
 { #category : #test }
@@ -727,6 +864,196 @@ NDArrayTest >> testWithShape [
 ]
 
 { #category : #test }
+NDArrayTest >> testWriteMeshGridArrayOfAtOn [
+	| x y z w s |
+	x := #(1 2).
+	y := #(3 4 5).
+	s := WriteStream on: Array new.
+	NDArray
+		writeMeshGridArrayOf:
+			{x.
+			y}
+		at: 1
+		on: s.
+	self assertCollection: s contents equals: #(1 2 1 2 1 2).
+	s := WriteStream on: Array new.
+	NDArray
+		writeMeshGridArrayOf:
+			{x.
+			y}
+		at: 2
+		on: s.
+	self assertCollection: s contents equals: #(3 3 4 4 5 5).
+	s := WriteStream on: Array new.
+	z := #(6 7 8 9).
+	NDArray
+		writeMeshGridArrayOf:
+			{x.
+			y.
+			z}
+		at: 1
+		on: s.
+	self
+		assertCollection: s contents
+		equals: #(1 1 1 1 2 2 2 2 1 1 1 1 2 2 2 2 1 1 1 1 2 2 2 2).
+	s := WriteStream on: Array new.
+	NDArray
+		writeMeshGridArrayOf:
+			{x.
+			y.
+			z}
+		at: 2
+		on: s.
+	self
+		assertCollection: s contents
+		equals: #(3 3 3 3 3 3 3 3 4 4 4 4 4 4 4 4 5 5 5 5 5 5 5 5).
+	s := WriteStream on: Array new.
+	NDArray
+		writeMeshGridArrayOf:
+			{x.
+			y.
+			z}
+		at: 3
+		on: s.
+	self
+		assertCollection: s contents
+		equals: #(6 7 8 9 6 7 8 9 6 7 8 9 6 7 8 9 6 7 8 9 6 7 8 9).
+	s := WriteStream on: Array new.
+	w := #(10 11 12 13 14).
+	NDArray
+		writeMeshGridArrayOf:
+			{x.
+			y.
+			z.
+			w}
+		at: 1
+		on: s.
+	self
+		assertCollection: s contents
+		equals:
+			#(1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2).
+	s := WriteStream on: Array new.
+	NDArray
+		writeMeshGridArrayOf:
+			{x.
+			y.
+			z.
+			w}
+		at: 2
+		on: s.
+	self
+		assertCollection: s contents
+		equals:
+			#(3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5).
+	s := WriteStream on: Array new.
+	NDArray
+		writeMeshGridArrayOf:
+			{x.
+			y.
+			z.
+			w}
+		at: 3
+		on: s.
+	self
+		assertCollection: s contents
+		equals:
+			#(6 6 6 6 6 7 7 7 7 7 8 8 8 8 8 9 9 9 9 9 6 6 6 6 6 7 7 7 7 7 8 8 8 8 8 9 9 9 9 9 6 6 6 6 6 7 7 7 7 7 8 8 8 8 8 9 9 9 9 9 6 6 6 6 6 7 7 7 7 7 8 8 8 8 8 9 9 9 9 9 6 6 6 6 6 7 7 7 7 7 8 8 8 8 8 9 9 9 9 9 6 6 6 6 6 7 7 7 7 7 8 8 8 8 8 9 9 9 9 9).
+	s := WriteStream on: Array new.
+	NDArray
+		writeMeshGridArrayOf:
+			{x.
+			y.
+			z.
+			w}
+		at: 4
+		on: s.
+	self
+		assertCollection: s contents
+		equals:
+			#(10 11 12 13 14 10 11 12 13 14 10 11 12 13 14 10 11 12 13 14 10 11 12 13 14 10 11 12 13 14 10 11 12 13 14 10 11 12 13 14 10 11 12 13 14 10 11 12 13 14 10 11 12 13 14 10 11 12 13 14 10 11 12 13 14 10 11 12 13 14 10 11 12 13 14 10 11 12 13 14 10 11 12 13 14 10 11 12 13 14 10 11 12 13 14 10 11 12 13 14 10 11 12 13 14 10 11 12 13 14 10 11 12 13 14 10 11 12 13 14)
+]
+
+{ #category : #test }
+NDArrayTest >> testWriteMeshGridArrayOfAtOn2 [
+	| x y z w v s |
+	x := #(1 2).
+	y := #(3 4 5).
+	z := #(6 7 8 9).
+	w := #(10 11 12 13 14).
+	v := #(15 16 17 18 19 20).
+	s := WriteStream on: Array new.
+	NDArray
+		writeMeshGridArrayOf:
+			{x.
+			y.
+			z.
+			w.
+			v}
+		at: 1
+		on: s.
+	self
+		assertCollection: s contents
+		equals:
+			#(1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2).
+	s := WriteStream on: Array new.
+	NDArray
+		writeMeshGridArrayOf:
+			{x.
+			y.
+			z.
+			w.
+			v}
+		at: 2
+		on: s.
+	self
+		assertCollection: s contents
+		equals:
+			#(3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5).
+	s := WriteStream on: Array new.
+	NDArray
+		writeMeshGridArrayOf:
+			{x.
+			y.
+			z.
+			w.
+			v}
+		at: 3
+		on: s.
+	self
+		assertCollection: s contents
+		equals:
+			#(6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9 9).
+	s := WriteStream on: Array new.
+	NDArray
+		writeMeshGridArrayOf:
+			{x.
+			y.
+			z.
+			w.
+			v}
+		at: 4
+		on: s.
+	self
+		assertCollection: s contents
+		equals:
+			#(10 10 10 10 10 10 11 11 11 11 11 11 12 12 12 12 12 12 13 13 13 13 13 13 14 14 14 14 14 14 10 10 10 10 10 10 11 11 11 11 11 11 12 12 12 12 12 12 13 13 13 13 13 13 14 14 14 14 14 14 10 10 10 10 10 10 11 11 11 11 11 11 12 12 12 12 12 12 13 13 13 13 13 13 14 14 14 14 14 14 10 10 10 10 10 10 11 11 11 11 11 11 12 12 12 12 12 12 13 13 13 13 13 13 14 14 14 14 14 14 10 10 10 10 10 10 11 11 11 11 11 11 12 12 12 12 12 12 13 13 13 13 13 13 14 14 14 14 14 14 10 10 10 10 10 10 11 11 11 11 11 11 12 12 12 12 12 12 13 13 13 13 13 13 14 14 14 14 14 14 10 10 10 10 10 10 11 11 11 11 11 11 12 12 12 12 12 12 13 13 13 13 13 13 14 14 14 14 14 14 10 10 10 10 10 10 11 11 11 11 11 11 12 12 12 12 12 12 13 13 13 13 13 13 14 14 14 14 14 14 10 10 10 10 10 10 11 11 11 11 11 11 12 12 12 12 12 12 13 13 13 13 13 13 14 14 14 14 14 14 10 10 10 10 10 10 11 11 11 11 11 11 12 12 12 12 12 12 13 13 13 13 13 13 14 14 14 14 14 14 10 10 10 10 10 10 11 11 11 11 11 11 12 12 12 12 12 12 13 13 13 13 13 13 14 14 14 14 14 14 10 10 10 10 10 10 11 11 11 11 11 11 12 12 12 12 12 12 13 13 13 13 13 13 14 14 14 14 14 14 10 10 10 10 10 10 11 11 11 11 11 11 12 12 12 12 12 12 13 13 13 13 13 13 14 14 14 14 14 14 10 10 10 10 10 10 11 11 11 11 11 11 12 12 12 12 12 12 13 13 13 13 13 13 14 14 14 14 14 14 10 10 10 10 10 10 11 11 11 11 11 11 12 12 12 12 12 12 13 13 13 13 13 13 14 14 14 14 14 14 10 10 10 10 10 10 11 11 11 11 11 11 12 12 12 12 12 12 13 13 13 13 13 13 14 14 14 14 14 14 10 10 10 10 10 10 11 11 11 11 11 11 12 12 12 12 12 12 13 13 13 13 13 13 14 14 14 14 14 14 10 10 10 10 10 10 11 11 11 11 11 11 12 12 12 12 12 12 13 13 13 13 13 13 14 14 14 14 14 14 10 10 10 10 10 10 11 11 11 11 11 11 12 12 12 12 12 12 13 13 13 13 13 13 14 14 14 14 14 14 10 10 10 10 10 10 11 11 11 11 11 11 12 12 12 12 12 12 13 13 13 13 13 13 14 14 14 14 14 14 10 10 10 10 10 10 11 11 11 11 11 11 12 12 12 12 12 12 13 13 13 13 13 13 14 14 14 14 14 14 10 10 10 10 10 10 11 11 11 11 11 11 12 12 12 12 12 12 13 13 13 13 13 13 14 14 14 14 14 14 10 10 10 10 10 10 11 11 11 11 11 11 12 12 12 12 12 12 13 13 13 13 13 13 14 14 14 14 14 14 10 10 10 10 10 10 11 11 11 11 11 11 12 12 12 12 12 12 13 13 13 13 13 13 14 14 14 14 14 14).
+	s := WriteStream on: Array new.
+	NDArray
+		writeMeshGridArrayOf:
+			{x.
+			y.
+			z.
+			w.
+			v}
+		at: 5
+		on: s.
+	self
+		assertCollection: s contents
+		equals:
+			#(15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20 15 16 17 18 19 20)
+]
+
+{ #category : #test }
 NDArrayTest >> testZeros [
 	| a |
 	a := NDArray zeros: 5.
@@ -737,4 +1064,19 @@ NDArrayTest >> testZeros [
 	self assertCollection: a array equals: #(0 0 0 0 0 0) asIntegerArray.
 	self assertCollection: a shape equals: #(2 3).
 	self assert: a dtype equals: #Integer
+]
+
+{ #category : #test }
+NDArrayTest >> testZerosLike [
+	| a r |
+	a := NDArray fromArray: #(1 2 3 4 5).
+	r := NDArray zerosLike: a.
+	self assertCollection: r array equals: #(0 0 0 0 0) asFloatArray.
+	self assertCollection: r shape equals: #(5).
+	self assert: r dtype equals: #Float.
+	a := NDArray zeros: #(2 3).
+	r := NDArray zerosLike: a.
+	self assertCollection: r array equals: #(0 0 0 0 0 0) asIntegerArray.
+	self assertCollection: r shape equals: #(2 3).
+	self assert: r dtype equals: #Integer
 ]

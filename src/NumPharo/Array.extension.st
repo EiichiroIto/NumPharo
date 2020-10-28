@@ -16,3 +16,8 @@ Array >> asNDArray [
 Array >> atAllInNDArray: aNdArray [
 	^ aNdArray atAllIndexes: self
 ]
+
+{ #category : #'*NumPharo' }
+Array >> dtype [
+	^ NDArray presumeDtype: self
+]
