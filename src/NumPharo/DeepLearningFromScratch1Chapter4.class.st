@@ -149,17 +149,17 @@ DeepLearningFromScratch1Chapter4 >> testChapter4_3_3 [
 	self assert: r closeTo: 7.99999999999119.
 	r := self
 		numericalGradient: [ :v | self function2: v ]
-		atX: (NDArray fromArray: #(3 4)).
+		atX: (NDArray fromArray: #(3 4) dtype: #Float).
 	self assert: r array first closeTo: 5.993843.
 	self assert: r array second closeTo: 8.001327.
 	r := self
 		numericalGradient: [ :v | self function2: v ]
-		atX: (NDArray fromArray: #(0 2)).
+		atX: (NDArray fromArray: #(0 2) dtype: #Float).
 	self assert: r array first closeTo: 0.
 	self assert: r array second closeTo: 3.99827.
 	r := self
 		numericalGradient: [ :v | self function2: v ]
-		atX: (NDArray fromArray: #(3 0)).
+		atX: (NDArray fromArray: #(3 0) dtype: #Float).
 	self assert: r array first closeTo: 5.993843.
 	self assert: r array second closeTo: 0
 ]
