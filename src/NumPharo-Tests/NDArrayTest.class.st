@@ -1073,7 +1073,7 @@ NDArrayTest >> testZeros [
 { #category : #test }
 NDArrayTest >> testZerosLike [
 	| a r |
-	a := NDArray fromArray: #(1 2 3 4 5).
+	a := NDArray fromArray: #(1 2 3 4 5.0).
 	r := NDArray zerosLike: a.
 	self assertCollection: r array equals: #(0 0 0 0 0) asFloatArray.
 	self assertCollection: r shape equals: #(5).

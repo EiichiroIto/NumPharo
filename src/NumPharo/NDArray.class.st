@@ -224,15 +224,17 @@ NDArray class >> ones: anObject [
 
 { #category : #accessing }
 NDArray class >> presumeDtype: anArray [
+	| arr |
 	anArray isNDArray
 		ifTrue: [ ^ anArray dtype ].
-	anArray isEmpty
+	arr := anArray flattened.
+	arr isEmpty
 		ifTrue: [ ^ #Float ].
-	(anArray allSatisfy: [ :each | each = true or: [ each = false ] ])
+	(arr allSatisfy: [ :each | each = true or: [ each = false ] ])
 		ifTrue: [ ^ #Boolean ].
-	(anArray allSatisfy: [ :each | each isInteger ])
+	(arr allSatisfy: [ :each | each isInteger ])
 		ifTrue: [ ^ #Integer ].
-	(anArray allSatisfy: [ :each | each isNumber ])
+	(arr allSatisfy: [ :each | each isNumber ])
 		ifTrue: [ ^ #Float ].
 	self error
 ]

@@ -84,8 +84,8 @@ TNDArrayArithmetics >> adaptToNDArray: anObject andCompare: selector [
 { #category : #converting }
 TNDArrayArithmetics >> adaptToNDArray: anObject andSend: selector [
 	| obj newDtype newObj |
-	obj := self.
 	newDtype := self class coerceArray: anObject dtype with: self dtype.
+	obj := self withDtype: newDtype.
 	newObj := anObject withDtype: newDtype.
 	self shape ~= newObj shape
 		ifTrue: [ obj := self broadcastTo: newObj.
@@ -129,10 +129,10 @@ TNDArrayArithmetics >> argMaxAxis: anInteger [
 ]
 
 { #category : #private }
-TNDArrayArithmetics >> col2DArray: anInteger [
+TNDArrayArithmetics >> col2DArray: anInteger dtype: aSymbol [
 	| newArray index delta |
 	newArray := self class
-		newArrayDtype: self dtype
+		newArrayDtype: aSymbol
 		size: self shape first.
 	index := anInteger.
 	delta := self shape second.
@@ -190,9 +190,10 @@ TNDArrayArithmetics >> dot: aNDArray [
 	newDtype := self class coerceArray: self dtype with: aNDArray dtype.
 	newArray := self class newArrayDtype: newDtype size: rows * cols.
 	index := 1.
-	rowArrays := (1 to: rows) collect: [ :each | one row2DArray: each ].
+	rowArrays := (1 to: rows)
+		collect: [ :each | one row2DArray: each dtype: newDtype ].
 	colArrays := (1 to: cols)
-		collect: [ :each | another col2DArray: each ].
+		collect: [ :each | another col2DArray: each dtype: newDtype ].
 	1 to: rows do: [ :row | 
 		| r c |
 		r := rowArrays at: row.
@@ -363,11 +364,13 @@ TNDArrayArithmetics >> roll: anObject1 axes: anObject2 [
 ]
 
 { #category : #private }
-TNDArrayArithmetics >> row2DArray: anInteger [
-	| pos size |
+TNDArrayArithmetics >> row2DArray: anInteger dtype: aSymbol [
+	| pos size s |
 	pos := self arrayIndexAt: (Array with: anInteger).
 	size := self itemSizeAxis: 1.
-	^ self array copyFrom: pos to: pos + size - 1
+	s := WriteStream on: (self class newArrayDtype: aSymbol).
+	pos to: pos + size - 1 do: [ :each | s nextPut: (self array at: each) ].
+	^ s contents
 ]
 
 { #category : #arithmetic }

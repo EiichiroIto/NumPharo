@@ -158,7 +158,7 @@ DeepLearningFromScratch1Chapter3 >> step323: x [
 { #category : #test }
 DeepLearningFromScratch1Chapter3 >> testChapter3_2_2 [
 	| x y |
-	x := NDArray fromArray: #(-1 1 2).
+	x := NDArray fromArray: #(-1 1 2) dtype: #Float.
 	self assertCollection: x array equals: #(-1 1 2) asFloatArray.
 	self assertCollection: x shape equals: #(3).
 	self assert: x dtype equals: #Float.
@@ -182,7 +182,7 @@ DeepLearningFromScratch1Chapter3 >> testChapter3_2_3 [
 { #category : #test }
 DeepLearningFromScratch1Chapter3 >> testChapter3_2_4 [
 	| x y plt |
-	x := NDArray fromArray: #(-1 1 2).
+	x := NDArray fromArray: #(-1 1 2) dtype: #Float.
 	y := self sigmoid324: x.
 	self assert: y array first closeTo: 0.26894142.
 	self assert: y array second closeTo: 0.73105858.
@@ -227,24 +227,24 @@ DeepLearningFromScratch1Chapter3 >> testChapter3_3_1 [
 	a := NDArray fromArray: #(1 2 3 4).
 	self assert: a ndim equals: 1.
 	self assertCollection: a shape equals: #(4).
-	self assertCollection: a array equals: #(1 2 3 4) asFloatArray.
+	self assertCollection: a array equals: #(1 2 3 4) asIntegerArray.
 	b := NDArray fromArray: #((1 2) (3 4) (5 6)).
 	self assert: b ndim equals: 2.
 	self assertCollection: b shape equals: #(3 2).
-	self assertCollection: b array equals: #(1 2 3 4 5 6) asFloatArray
+	self assertCollection: b array equals: #(1 2 3 4 5 6) asIntegerArray
 ]
 
 { #category : #test }
 DeepLearningFromScratch1Chapter3 >> testChapter3_3_2 [
 	| a b c r |
-	a := NDArray fromArray: #((1 2) (3 4)).
+	a := NDArray fromArray: #((1 2) (3 4)) dtype: #Float.
 	self assertCollection: a shape equals: #(2 2).
-	b := NDArray fromArray: #((5 6) (7 8)).
+	b := NDArray fromArray: #((5 6) (7 8)) dtype: #Float.
 	self assertCollection: b shape equals: #(2 2).
 	r := a dot: b.
 	self assertCollection: r array equals: #(19 22 43 50) asFloatArray.
 	self assertCollection: r shape equals: #(2 2).
-	a := NDArray fromArray: #((1 2 3) (4 5 6)).
+	a := NDArray fromArray: #((1 2 3) (4 5 6)) dtype: #Float.
 	self assertCollection: a shape equals: #(2 3).
 	b := NDArray fromArray: #((1 2) (3 4) (5 6)).
 	self assertCollection: b shape equals: #(3 2).
@@ -259,7 +259,7 @@ DeepLearningFromScratch1Chapter3 >> testChapter3_3_2 [
 	b := NDArray fromArray: #(7 8).
 	self assertCollection: b shape equals: #(2).
 	r := a dot: b.
-	self assertCollection: r array equals: #(23 53 83) asFloatArray.
+	self assertCollection: r array equals: #(23 53 83) asIntegerArray.
 	self assertCollection: r shape equals: #(3)
 ]
 
@@ -271,7 +271,7 @@ DeepLearningFromScratch1Chapter3 >> testChapter3_3_3 [
 	w := NDArray fromArray: #((1 3 5) (2 4 6)).
 	self assertCollection: w shape equals: #(2 3).
 	y := x dot: w.
-	self assertCollection: y array equals: #(5 11 17) asFloatArray
+	self assertCollection: y array equals: #(5 11 17) asIntegerArray
 ]
 
 { #category : #test }

@@ -36,6 +36,14 @@ ArrayedCollection >> asNDArray [
 ]
 
 { #category : #'*NumPharo' }
+ArrayedCollection >> dot: another [
+	| result |
+	result := 0.
+	1 to: self size do: [ :i | result := result + ((self at: i) * (another at: i)) ].
+	^ result
+]
+
+{ #category : #'*NumPharo' }
 ArrayedCollection >> inplace: aSymbol with: other [
 	| block |
 	block := other isNumber

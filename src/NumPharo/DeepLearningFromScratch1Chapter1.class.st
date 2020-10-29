@@ -36,7 +36,7 @@ DeepLearningFromScratch1Chapter1 class >> lenaImageURL [
 { #category : #test }
 DeepLearningFromScratch1Chapter1 >> testChapter1_5_3 [
 	| x y z |
-	x := NDArray fromArray: #(1 2 3).
+	x := NDArray fromArray: #(1 2 3) dtype: #Float.
 	y := NDArray fromArray: #(2 4 6).
 	z := x + y.
 	self assertCollection: z array equals: #(3 6 9) asFloatArray.
@@ -96,9 +96,9 @@ DeepLearningFromScratch1Chapter1 >> testChapter1_5_6 [
 	| x r |
 	x := NDArray fromArray: #(#(51 55) #(14 19) #(0 4)).
 	r := x at: 1.
-	self assertCollection: r array equals: #(51 55) asFloatArray.
+	self assertCollection: r array equals: #(51 55) asIntegerArray.
 	self assertCollection: r shape equals: #(2).
-	self assert: r dtype equals: #Float.
+	self assert: r dtype equals: #Integer.
 	r := x at: (Array with: 1 with: 2).
 	self assert: r equals: 55.
 	x
@@ -109,13 +109,13 @@ DeepLearningFromScratch1Chapter1 >> testChapter1_5_6 [
 	x := x flatten.
 	self
 		assertCollection: x array
-		equals: #(51 55 14 19 0 4) asFloatArray.
+		equals: #(51 55 14 19 0 4) asIntegerArray.
 	self assertCollection: x shape equals: #(6).
-	self assert: x dtype equals: #Float.
+	self assert: x dtype equals: #Integer.
 	r := x atAll: (Array with: 1 with: 3 with: 5).
-	self assertCollection: r array equals: #(51 14 0) asFloatArray.
+	self assertCollection: r array equals: #(51 14 0) asIntegerArray.
 	self assertCollection: r shape equals: #(3).
-	self assert: r dtype equals: #Float.
+	self assert: r dtype equals: #Integer.
 	r := x > 15.
 	self
 		assertCollection: r array
@@ -123,9 +123,9 @@ DeepLearningFromScratch1Chapter1 >> testChapter1_5_6 [
 	self assertCollection: r shape equals: #(6).
 	self assert: r dtype equals: #Boolean.
 	r := x atAll: x > 15.
-	self assertCollection: r array equals: #(51 55 19) asFloatArray.
+	self assertCollection: r array equals: #(51 55 19) asIntegerArray.
 	self assertCollection: r shape equals: #(3).
-	self assert: r dtype equals: #Float
+	self assert: r dtype equals: #Integer
 ]
 
 { #category : #test }
