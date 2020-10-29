@@ -37,7 +37,7 @@ PharoPlotLine >> legendExtentFont: aFont [
 	^ 23 + (aFont widthOfString: self label) @ aFont height
 ]
 
-{ #category : #api }
+{ #category : #private }
 PharoPlotLine >> line: from to: to on: aCanvas [
 	(from includes: nil)
 		ifTrue: [ ^ self ].

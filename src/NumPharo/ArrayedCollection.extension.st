@@ -31,6 +31,11 @@ ArrayedCollection >> \\= other [
 ]
 
 { #category : #'*NumPharo' }
+ArrayedCollection >> asFlatArray [
+	^ self
+]
+
+{ #category : #'*NumPharo' }
 ArrayedCollection >> asNDArray [
 	^ NDArray fromArray: self
 ]

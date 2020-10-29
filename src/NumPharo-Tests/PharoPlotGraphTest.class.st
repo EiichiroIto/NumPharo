@@ -75,21 +75,3 @@ PharoPlotGraphTest >> testShowLegend [
 	g showLegend: true.
 	self assert: g showLegend
 ]
-
-{ #category : #test }
-PharoPlotGraphTest >> testXRange [
-	| p |
-	p := self newPlot.
-	self assertCollection: p xRange equals: #(nil nil).
-	p xRange: #(1 2).
-	self assertCollection: p xRange equals: #(1 2)
-]
-
-{ #category : #test }
-PharoPlotGraphTest >> testYRange [
-	| p |
-	p := self newPlot.
-	self assertCollection: p yRange equals: #(nil nil).
-	p yRange: #(1 2).
-	self assertCollection: p yRange equals: #(1 2)
-]

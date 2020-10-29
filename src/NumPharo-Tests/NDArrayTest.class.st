@@ -121,21 +121,21 @@ NDArrayTest >> testAsArray [
 	| a r |
 	a := self newArrayFrom: #(1 2 3).
 	r := a asArray.
-	self assertCollection: r equals: #(1.0 2.0 3.0) asFloatArray.
+	self assertCollection: r equals: #(1.0 2.0 3.0).
 	a := self newArrayFrom: #(#(1 2 3) #(3 4 5)).
 	r := a asArray.
 	self
 		assertCollection: r
 		equals:
-			{#(1.0 2.0 3.0) asFloatArray.
-			#(3.0 4.0 5.0) asFloatArray}.
+			{#(1.0 2.0 3.0).
+			#(3.0 4.0 5.0)}.
 	a := self newArrayFrom: #(#(#(1)) #(#(3))).
 	r := a asArray.
 	self
 		assertCollection: r
 		equals:
-			{{#(1) asFloatArray}.
-			{#(3) asFloatArray}}
+			{{#(1)}.
+			{#(3)}}
 ]
 
 { #category : #test }

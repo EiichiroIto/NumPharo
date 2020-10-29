@@ -1,30 +1,12 @@
 Class {
 	#name : #PharoPlotGraph,
-	#superclass : #PharoPlotFigure,
+	#superclass : #PharoPlotBaseGraph,
 	#instVars : [
-		'xRange',
-		'yRange',
 		'showLegend',
 		'list'
 	],
 	#category : #'NumPharo-Plot'
 }
-
-{ #category : #private }
-PharoPlotGraph >> actualXRange [
-	| min max |
-	min := self xRange first ifNil: [ self xMin ].
-	max := self xRange second ifNil: [ self xMax ].
-	^ min to: max
-]
-
-{ #category : #private }
-PharoPlotGraph >> actualYRange [
-	| min max |
-	min := self yRange first ifNil: [ self yMin ].
-	max := self yRange second ifNil: [ self yMax ].
-	^ min to: max
-]
 
 { #category : #private }
 PharoPlotGraph >> addData: aDataObject [
@@ -46,8 +28,6 @@ PharoPlotGraph >> addXs: aCollection1 ys: aCollection2 label: aString [
 { #category : #api }
 PharoPlotGraph >> clear [
 	super clear.
-	xRange := Array with: nil with: nil.
-	yRange := Array with: nil with: nil.
 	showLegend := false.
 	list := OrderedCollection new
 ]
@@ -73,7 +53,7 @@ PharoPlotGraph >> drawAll: aDictionary [
 		ifTrue: [ self drawLegend: aDictionary ]
 ]
 
-{ #category : #private }
+{ #category : #drawing }
 PharoPlotGraph >> drawData: aData ranges: anArray rectangle: aRectangle on: aCanvas [
 	^ aData
 		draw: [ :aPoint | 
@@ -91,14 +71,6 @@ PharoPlotGraph >> drawData: aData ranges: anArray rectangle: aRectangle on: aCan
 			Array with: px with: py ]
 		in: aRectangle
 		on: aCanvas
-]
-
-{ #category : #drawing }
-PharoPlotGraph >> drawLabels: aDictionary [
-	self hasXLabel
-		ifTrue: [ self drawXLabel: aDictionary ].
-	self hasYLabel
-		ifTrue: [ self drawYLabel: aDictionary ]
 ]
 
 { #category : #drawing }
@@ -214,16 +186,6 @@ PharoPlotGraph >> xMin [
 	^ (list collect: #xMin) min
 ]
 
-{ #category : #accessing }
-PharoPlotGraph >> xRange [
-	^ xRange
-]
-
-{ #category : #accessing }
-PharoPlotGraph >> xRange: anObject [
-	xRange := anObject
-]
-
 { #category : #private }
 PharoPlotGraph >> yMax [
 	^ (list collect: #yMax) max
@@ -232,14 +194,4 @@ PharoPlotGraph >> yMax [
 { #category : #private }
 PharoPlotGraph >> yMin [
 	^ (list collect: #yMin) min
-]
-
-{ #category : #accessing }
-PharoPlotGraph >> yRange [
-	^ yRange
-]
-
-{ #category : #accessing }
-PharoPlotGraph >> yRange: anObject [
-	yRange := anObject
 ]

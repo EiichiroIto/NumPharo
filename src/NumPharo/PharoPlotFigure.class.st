@@ -299,6 +299,11 @@ PharoPlotFigure >> isLineGraph [
 ]
 
 { #category : #testing }
+PharoPlotFigure >> isQuiverGraph [
+	^ false
+]
+
+{ #category : #testing }
 PharoPlotFigure >> isScatterGraph [
 	^ false
 ]
@@ -422,6 +427,11 @@ PharoPlotFigure >> topLeftMargin [
 			(self hasTitle
 				ifTrue: [ self labelFont height ]
 				ifFalse: [ 0 ]) + 10
+]
+
+{ #category : #private }
+PharoPlotFigure >> unitOfRange: aRange from: aNumber2 to: aNumber3 [
+	^ (aNumber3 - aNumber2) / aRange extent
 ]
 
 { #category : #accessing }

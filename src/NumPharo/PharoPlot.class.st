@@ -132,6 +132,11 @@ PharoPlot >> newLineGraph [
 ]
 
 { #category : #private }
+PharoPlot >> newQuiverGraph [
+	^ PharoPlotQuiverGraph new
+]
+
+{ #category : #private }
 PharoPlot >> newScatterGraph [
 	^ PharoPlotScatterGraph new
 ]
@@ -151,6 +156,19 @@ PharoPlot >> positionAt: anInteger [
 	x := (anInteger - 1) \\ self cols * size x.
 	y := (anInteger - 1) // self cols * size y.
 	^ x @ y
+]
+
+{ #category : #api }
+PharoPlot >> quiverX: xs y: ys u: us v: vs scale: anInteger [
+	self assureSubPlots.
+	current isQuiverGraph
+		ifFalse: [ self replaceBy: self newQuiverGraph ].
+	current
+		addXs: xs asArray
+		ys: ys asArray
+		us: us asArray
+		vs: vs asArray
+		scale: anInteger
 ]
 
 { #category : #private }

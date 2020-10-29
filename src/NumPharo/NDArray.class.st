@@ -395,7 +395,7 @@ NDArray >> arrayIndexAt: anArray [
 { #category : #converting }
 NDArray >> asArray [
 	| list s |
-	list := self array.
+	list := self array asArray.
 	self shape copyWithoutFirst reversed
 		do: [ :size | 
 			s := WriteStream on: Array new.
@@ -422,6 +422,11 @@ NDArray >> asColoredForm [
 		depth: 32
 		fromArray: w contents
 		offset: 0 @ 0
+]
+
+{ #category : #converting }
+NDArray >> asFlatArray [
+	^ self array
 ]
 
 { #category : #converting }
