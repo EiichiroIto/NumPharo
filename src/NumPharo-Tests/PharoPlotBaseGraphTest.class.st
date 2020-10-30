@@ -4,7 +4,7 @@ A PharoPlotBaseGraphTest is a test class for testing the behavior of PharoPlotBa
 Class {
 	#name : #PharoPlotBaseGraphTest,
 	#superclass : #TestCase,
-	#category : #'NumPharo-Tests-Plot'
+	#category : #'NumPharo-Tests'
 }
 
 { #category : #private }

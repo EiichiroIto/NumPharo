@@ -25,8 +25,8 @@ PharoPlotQuiver >> drawVector: anArray on: aCanvas [
 	y := anArray second.
 	(x isNil or: [ y isNil ])
 		ifTrue: [ ^ self ].
-	u := anArray third.
-	v := anArray fourth.
+	u := anArray third * self scale.
+	v := anArray fourth * self scale.
 	(u = 0 or: [ v = 0 ])
 		ifTrue: [ ^ self ].
 	aCanvas
@@ -51,7 +51,7 @@ PharoPlotQuiver >> lineWidth [
 
 { #category : #accessing }
 PharoPlotQuiver >> scale [
-	^ scale
+	^ scale ifNil: [ 1 ]
 ]
 
 { #category : #accessing }

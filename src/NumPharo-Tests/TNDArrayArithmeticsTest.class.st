@@ -277,13 +277,15 @@ TNDArrayArithmeticsTest >> testMax [
 { #category : #test }
 TNDArrayArithmeticsTest >> testMaxAxis [
 	| a r |
-	a := self newArrayFrom: #((1 2) (3 4) (5 6)).
+	a := self newArrayFrom: #((1 2) (3 4) (5 60)).
 	self assertCollection: a shape equals: #(3 2).
+	r := a maxAxis: 0.
+	self assert: r equals: 60.
 	r := a maxAxis: 1.
-	self assertCollection: r array equals: #(5 6) asFloatArray.
+	self assertCollection: r array equals: #(5 60) asFloatArray.
 	self assertCollection: r shape equals: #(2).
 	r := a maxAxis: 2.
-	self assertCollection: r array equals: #(2 4 6) asFloatArray.
+	self assertCollection: r array equals: #(2 4 60) asFloatArray.
 	self assertCollection: r shape equals: #(3).
 	a := self newArrayFrom: #(((1 2) (3 4) (5 6)) ((7 6) (5 4) (3 2))).
 	self assertCollection: a shape equals: #(2 3 2).
@@ -668,6 +670,22 @@ TNDArrayArithmeticsTest >> testSum [
 	self assert: a sum equals: 21.
 	a := self newArrayFrom: #(true false true false true) dtype: #Boolean.
 	self assert: a sum equals: 3
+]
+
+{ #category : #test }
+TNDArrayArithmeticsTest >> testSumAxis [
+	| a r |
+	a := self newArrayFrom: #((1 2 3) (4 5 6)).
+	r := a sumAxis: 0.
+	self assert: r equals: a sum.
+	r := a sumAxis: 1.
+	self assertCollection: r array equals: #(5 7 9) asFloatArray.
+	self assertCollection: r shape equals: #(3).
+	self assert: r dtype equals: #Float.
+	r := a sumAxis: 2.
+	self assertCollection: r array equals: #(6 15) asFloatArray.
+	self assertCollection: r shape equals: #(2).
+	self assert: r dtype equals: #Float
 ]
 
 { #category : #test }
