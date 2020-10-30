@@ -305,6 +305,11 @@ TNDArrayArithmetics >> negated [
 ]
 
 { #category : #private }
+TNDArrayArithmetics >> newArray [
+	^ self class newArrayDtype: self dtype
+]
+
+{ #category : #private }
 TNDArrayArithmetics >> newArrayComparing: aBlock [
 	^ self class
 		array: (self array asArray collect: aBlock)
@@ -318,6 +323,25 @@ TNDArrayArithmetics >> newArrayDoing: aBlock [
 		array: (self array collect: aBlock)
 		shape: self shape copy
 		dtype: self dtype
+]
+
+{ #category : #private }
+TNDArrayArithmetics >> nextIndex: anArray [
+	| newArray |
+	anArray size = self ndim
+		ifFalse: [ self error ].
+	anArray = self shape
+		ifTrue: [ ^ nil ].
+	newArray := anArray copy.
+	1 to: newArray size do: [ :index | 
+		| a b |
+		a := newArray at: index.
+		b := self shape at: index.
+		a < b
+			ifTrue: [ newArray at: index put: a + 1.
+				^ newArray ]
+			ifFalse: [ newArray at: index put: 1 ] ].
+	self error
 ]
 
 { #category : #private }
@@ -385,6 +409,26 @@ TNDArrayArithmetics >> sum [
 		ifTrue: [ (self withDtype: #Integer) array ]
 		ifFalse: [ self array ].
 	^ arr sum
+]
+
+{ #category : #converting }
+TNDArrayArithmetics >> t [
+	| s |
+	self ndim = 1
+		ifTrue: [ ^ self ].
+	s := WriteStream on: self newArray.
+	self transposeOn: s.
+	^ self class array: s contents shape: self shape reversed dtype: self dtype
+]
+
+{ #category : #private }
+TNDArrayArithmetics >> transposeOn: aStream [
+	| arr i |
+	arr := Array new: self ndim withAll: 1.
+	self size
+		timesRepeat: [ i := self arrayIndexAt: arr.
+			aStream nextPut: (self array at: i).
+			arr := self nextIndex: arr ]
 ]
 
 { #category : #accessing }

@@ -871,6 +871,16 @@ NDArray >> size [
 ]
 
 { #category : #converting }
+NDArray >> t [
+	| s |
+	self ndim = 1
+		ifTrue: [ ^ self ].
+	s := WriteStream on: self newArray.
+	self transposeOn: s.
+	^ self class array: s contents shape: self shape reversed dtype: self dtype
+]
+
+{ #category : #converting }
 NDArray >> withDtype: aSymbol [
 	dtype = aSymbol
 		ifTrue: [ ^ self copy ].
