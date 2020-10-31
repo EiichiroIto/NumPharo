@@ -481,8 +481,11 @@ NDArray >> at: anArray put: anObject [
 	pos := self arrayIndexAt: arr.
 	num := self itemSizeAxis: arr size.
 	num = 1
-		ifFalse: [ self shouldBeImplemented ].
-	self arrayAt: pos put: anObject
+		ifTrue: [ ^ self arrayAt: pos put: anObject ].
+	anObject size = num
+		ifFalse: [ self error ].
+	anObject asFlatArray
+		withIndexDo: [ :each :index | self arrayAt: pos + index - 1 put: each ]
 ]
 
 { #category : #accessing }

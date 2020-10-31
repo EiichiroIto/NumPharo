@@ -17,8 +17,10 @@ DeepLearningFromScratch1Chapter4 >> function1: aNumber [
 ]
 
 { #category : #private }
-DeepLearningFromScratch1Chapter4 >> function2: aNumber [
-	^ (aNumber ** 2) sum
+DeepLearningFromScratch1Chapter4 >> function2: aNDArray [
+	^ aNDArray ndim = 1
+		ifTrue: [ (aNDArray ** 2) sum ]
+		ifFalse: [ aNDArray ** 2 sumAxis: 2 ]
 ]
 
 { #category : #private }
@@ -56,6 +58,19 @@ DeepLearningFromScratch1Chapter4 >> numericalGradient: aBlock atX: aNumber [
 		fxh2 := aBlock cull: aNumber.
 		grad at: each put: (fxh1 - fxh2) / (2 * h).
 		aNumber at: each put: tmp ].
+	^ grad
+]
+
+{ #category : #private }
+DeepLearningFromScratch1Chapter4 >> numericalGradient: aBlock ofBatch: aNDArray [
+	| grad |
+	aNDArray ndim = 1
+		ifTrue: [ ^ self numericalGradient: aBlock atX: aNDArray ].
+	grad := NDArray zerosLike: aNDArray.
+	1 to: aNDArray len do: [ :index | 
+		| x |
+		x := aNDArray at: index.
+		grad at: index put: (self numericalGradient: aBlock atX: x) ].
 	^ grad
 ]
 
@@ -162,4 +177,43 @@ DeepLearningFromScratch1Chapter4 >> testChapter4_3_3 [
 		atX: (NDArray fromArray: #(3 0) dtype: #Float).
 	self assert: r array first closeTo: 5.993843.
 	self assert: r array second closeTo: 0
+]
+
+{ #category : #test }
+DeepLearningFromScratch1Chapter4 >> testGradient2d [
+	| x0 x1 x y grid grad plt a |
+	x0 := NDArray arangeFrom: -2 to: 2.4 by: 0.25.
+	x1 := NDArray arangeFrom: -2 to: 2.4 by: 0.25.
+	self assertCollection: x0 shape equals: #(18).
+	self assertCollection: x1 shape equals: #(18).
+	grid := NDArray
+		meshGridOf:
+			{x0.
+			x1}.
+	x := grid first asFlatArray.
+	y := grid second asFlatArray.
+	self assert: x size equals: 324.
+	self assert: y size equals: 324.
+	a := NDArray
+		fromArray:
+			{x.
+			y}
+		dtype: #Float.
+	self assertCollection: a shape equals: #(2 324).
+	grad := (self
+		numericalGradient: [ :v | self function2: v ]
+		ofBatch: a t) t.
+	plt := PharoPlot new.
+	plt extent: 400 @ 400.
+	plt
+		quiverX: x
+		y: y
+		u: (grad at: 1) negated asFlatArray
+		v: (grad at: 2) negated asFlatArray
+		scale: 0.1.
+	plt xLimitFrom: -2 to: 2.
+	plt yLimitFrom: -2 to: 2.
+	plt xLabel: 'x0'.
+	plt yLabel: 'x1'.
+	plt show
 ]

@@ -31,6 +31,11 @@ ArrayedCollection >> \\= other [
 ]
 
 { #category : #'*NumPharo' }
+ArrayedCollection >> argMax [
+	^ self indexOf: self max
+]
+
+{ #category : #'*NumPharo' }
 ArrayedCollection >> asFlatArray [
 	^ self
 ]

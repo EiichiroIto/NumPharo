@@ -376,7 +376,7 @@ PharoPlotFigure >> scalesOf: aRange [
 	t := aRange extent + aRange first.
 	(cur - grid closeTo: t)
 		ifFalse: [ s nextPut: t ].
-	log10 := (aRange extent abs log: 10) rounded.
+	log10 := (aRange extent abs log: 10) truncated.
 	^ s contents
 		collect:
 			[ :each | Array with: each

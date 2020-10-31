@@ -147,7 +147,7 @@ PharoPlotGraph >> setupForm: aForm context: aDictionary [
 			l := self scalesOf: range ]
 		ifFalse: [ l := Array new.
 			range := 0 to: 0 ].
-	range := self expandRange: range.
+	"range := self expandRange: range."
 	aDictionary at: #xRange put: range.
 	aDictionary at: #xScales put: l.
 	self hasPoints
@@ -155,7 +155,7 @@ PharoPlotGraph >> setupForm: aForm context: aDictionary [
 			l := self scalesOf: range ]
 		ifFalse: [ l := Array new.
 			range := 0 to: 0 ].
-	range := self expandRange: range.
+	"range := self expandRange: range."
 	aDictionary at: #yRange put: range.
 	aDictionary at: #yScales put: l.
 	yScaleWidth := self showYAxis

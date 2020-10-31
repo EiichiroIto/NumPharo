@@ -25,13 +25,13 @@ PharoPlotQuiver >> drawVector: anArray on: aCanvas [
 	y := anArray second.
 	(x isNil or: [ y isNil ])
 		ifTrue: [ ^ self ].
+	aCanvas
+		fillRectangle: (Rectangle center: x @ y extent: 2 @ 2)
+		color: self lineColor.
 	u := anArray third * self scale.
 	v := anArray fourth * self scale.
 	(u = 0 or: [ v = 0 ])
 		ifTrue: [ ^ self ].
-	aCanvas
-		fillRectangle: (Rectangle center: x @ y extent: 4 @ 4)
-		color: self lineColor.
 	aCanvas
 		line: x @ y
 		to: x @ y + (u @ v)

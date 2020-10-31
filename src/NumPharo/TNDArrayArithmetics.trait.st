@@ -120,12 +120,7 @@ TNDArrayArithmetics >> argMax [
 
 { #category : #arithmetic }
 TNDArrayArithmetics >> argMaxAxis: anInteger [
-	anInteger = 0
-		ifTrue: [ ^ self argMax ].
-	^ self
-		collect: [ :array | array indexOf: array max ]
-		axis: anInteger
-		dtype: #Integer
+	^ self do: #argMax axis: anInteger dtype: #Integer
 ]
 
 { #category : #private }
@@ -168,13 +163,13 @@ TNDArrayArithmetics >> cos [
 ]
 
 { #category : #arithmetic }
-TNDArrayArithmetics >> do: aSymbol axis: anInteger [
+TNDArrayArithmetics >> do: aSymbol axis: anInteger dtype: aSymbol2 [
 	anInteger = 0
 		ifTrue: [ ^ self perform: aSymbol ].
 	^ self
 		collect: [ :array | array perform: aSymbol ]
 		axis: anInteger
-		dtype: self dtype
+		dtype: aSymbol2
 ]
 
 { #category : #arithmetic }
@@ -263,7 +258,7 @@ TNDArrayArithmetics >> max [
 
 { #category : #arithmetic }
 TNDArrayArithmetics >> maxAxis: anInteger [
-	^ self do: #max axis: anInteger
+	^ self do: #max axis: anInteger dtype: self dtype
 ]
 
 { #category : #arithmetic }
@@ -287,7 +282,7 @@ TNDArrayArithmetics >> min: min max: max [
 
 { #category : #arithmetic }
 TNDArrayArithmetics >> minAxis: anInteger [
-	^ self do: #min axis: anInteger
+	^ self do: #min axis: anInteger dtype: self dtype
 ]
 
 { #category : #arithmetic }
@@ -413,7 +408,7 @@ TNDArrayArithmetics >> sum [
 
 { #category : #arithmetic }
 TNDArrayArithmetics >> sumAxis: anInteger [
-	^ self do: #sum axis: anInteger
+	^ self do: #sum axis: anInteger dtype: self dtype
 ]
 
 { #category : #converting }
