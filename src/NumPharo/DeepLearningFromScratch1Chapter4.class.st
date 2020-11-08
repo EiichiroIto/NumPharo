@@ -34,6 +34,16 @@ DeepLearningFromScratch1Chapter4 >> functionTmp2: x0 [
 ]
 
 { #category : #private }
+DeepLearningFromScratch1Chapter4 >> gradientDescent: aBlock initX: initX lr: lr stepNum: stepNum [
+	| x grad |
+	x := initX.
+	stepNum
+		timesRepeat: [ grad := self numericalGradient: aBlock atX: x.
+			x := x - (lr * grad) ].
+	^ x
+]
+
+{ #category : #private }
 DeepLearningFromScratch1Chapter4 >> meanSquaredErrorY: y andT: t [
 	^ 0.5 * ((y - t) ** 2) sum
 ]
@@ -177,6 +187,33 @@ DeepLearningFromScratch1Chapter4 >> testChapter4_3_3 [
 		atX: (NDArray fromArray: #(3 0) dtype: #Float).
 	self assert: r array first closeTo: 5.993843.
 	self assert: r array second closeTo: 0
+]
+
+{ #category : #test }
+DeepLearningFromScratch1Chapter4 >> testChapter4_4_1 [
+	| initX r |
+	initX := NDArray fromArray: #(-3.0 4.0).
+	r := self
+		gradientDescent: [ :x | self function2: x ]
+		initX: initX
+		lr: 0.1
+		stepNum: 100.
+	self assert: r array first closeTo: -6.108642e-10.
+	self assert: r array second closeTo: 8.15e-10.
+	r := self
+		gradientDescent: [ :x | self function2: x ]
+		initX: initX
+		lr: 10.0
+		stepNum: 100.
+	self assert: r array first closeTo: 23933.890625.
+	self assert: r array second closeTo: -36062.33984375.
+	r := self
+		gradientDescent: [ :x | self function2: x ]
+		initX: initX
+		lr: 1e-10
+		stepNum: 100.
+	self assert: r array first closeTo: -2.99999994.
+	self assert: r array second closeTo: 3.999999992
 ]
 
 { #category : #test }

@@ -9,7 +9,8 @@ Class {
 		'dtype'
 	],
 	#classVars : [
-		'Coerces'
+		'Coerces',
+		'Rand'
 	],
 	#category : #'NumPharo-Core'
 }
@@ -120,7 +121,8 @@ NDArray class >> fromArray: anArray shape: anArray2 dtype: aSymbol [
 { #category : #'class initialization' }
 NDArray class >> initialize [
 	"self initialize"
-	self setupCoerces
+	self setupCoerces.
+	Rand := Random new
 ]
 
 { #category : #'instance creation' }
@@ -206,6 +208,23 @@ NDArray class >> newArrayDtype: aSymbol size: anInteger [
 	self error
 ]
 
+{ #category : #'instance creation' }
+NDArray class >> normalRandom: anObject [
+	| shape array |
+	shape := self normalizedIndex: anObject.
+	array := FloatArray new: (self finiteProductOf: shape).
+	1 to: array size do: [ :each | array at: each put: self normalRandomNumber ].
+	^ self array: array shape: shape dtype: #Float
+]
+
+{ #category : #private }
+NDArray class >> normalRandomNumber [
+	| r |
+	r := 0.0.
+	12 timesRepeat: [ r := r + self uniformRandomNumber ].
+	^ r - 6
+]
+
 { #category : #private }
 NDArray class >> normalizedIndex: anObject [
 	^ anObject isNumber
@@ -241,11 +260,10 @@ NDArray class >> presumeDtype: anArray [
 
 { #category : #'instance creation' }
 NDArray class >> random: anObject [
-	| shape array r |
+	| shape array |
 	shape := self normalizedIndex: anObject.
-	r := Random new.
 	array := FloatArray new: (self finiteProductOf: shape).
-	1 to: array size do: [ :each | array at: each put: r next ].
+	1 to: array size do: [ :each | array at: each put: self uniformRandomNumber ].
 	^ self array: array shape: shape dtype: #Float
 ]
 
@@ -320,6 +338,11 @@ NDArray class >> softMax: a [
 { #category : #utilities }
 NDArray class >> stepFunction: x [
 	^ (x > 0) withDtype: #Integer
+]
+
+{ #category : #private }
+NDArray class >> uniformRandomNumber [
+	^ Rand next
 ]
 
 { #category : #private }
