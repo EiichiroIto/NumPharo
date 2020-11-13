@@ -42,7 +42,7 @@ NDArray class >> arrayFrom: from to: to num: anInteger withEndPoint: aBoolean [
 ]
 
 { #category : #accessing }
-NDArray class >> coerceArray: aSymbol1 with: aSymbol2 [
+NDArray class >> coerceDtype: aSymbol1 with: aSymbol2 [
 	aSymbol1 = aSymbol2
 		ifTrue: [ ^ aSymbol1 ].
 	^ Coerces at: aSymbol1 at: aSymbol2
@@ -153,7 +153,7 @@ NDArray class >> meshDtypeOf: anArray [
 		into: [ :prev :each | 
 			prev
 				ifNil: [ each dtype ]
-				ifNotNil: [ self coerceArray: prev with: each dtype ] ]
+				ifNotNil: [ self coerceDtype: prev with: each dtype ] ]
 ]
 
 { #category : #'instance creation' }
@@ -390,6 +390,37 @@ NDArray class >> zerosLike: aNDArray [
 	^ self array: arr shape: aNDArray shape copy dtype: aNDArray dtype
 ]
 
+{ #category : #converting }
+NDArray >> adaptToNDArray: anObject andCompare: selector [
+	| obj newObj newDtype |
+	obj := self.
+	newDtype := self class coerceDtype: self dtype with: anObject dtype.
+	newObj := anObject withDtype: newDtype.
+	self shape ~= anObject shape
+		ifTrue: [ obj := self broadcastTo: newObj.
+			newObj := newObj broadcastTo: self ].
+	newObj
+		privArray:
+			(newObj array asArray
+				with: obj array
+				collect: [ :x :y | x perform: selector with: y ]);
+		privDtype: #Boolean.
+	^ newObj
+]
+
+{ #category : #converting }
+NDArray >> adaptToNDArray: anObject andSend: selector [
+	| obj newDtype newObj |
+	newDtype := self class coerceDtype: anObject dtype with: self dtype.
+	obj := self withDtype: newDtype.
+	newObj := anObject withDtype: newDtype.
+	self shape ~= newObj shape
+		ifTrue: [ obj := self broadcastTo: newObj.
+			newObj := newObj broadcastTo: self ].
+	newObj array perform: selector asSymbol with: obj array.
+	^ newObj
+]
+
 { #category : #accessing }
 NDArray >> array [
 	^ array
@@ -503,6 +534,7 @@ NDArray >> at: anArray put: anObject [
 	arr := self class normalizedIndex: anArray.
 	pos := self arrayIndexAt: arr.
 	num := self itemSizeAxis: arr size.
+	self coerceDtype: anObject dtype.
 	num = 1
 		ifTrue: [ ^ self arrayAt: pos put: anObject ].
 	anObject size = num
@@ -617,6 +649,28 @@ NDArray >> broadcastToShape: anArray [
 	^ self class array: newArray shape: newShape dtype: self dtype
 ]
 
+{ #category : #private }
+NDArray >> coerceDtype: aSymbol [
+	| newDtype newArray |
+	newDtype := self class coerceDtype: self dtype with: aSymbol.
+	newDtype = self dtype
+		ifTrue: [ ^ self ].
+	newArray := nil.
+	newDtype = #Boolean
+		ifTrue: [ newArray := self convertToBoolean ].
+	newDtype = #Byte
+		ifTrue: [ newArray := self convertToByte ].
+	newDtype = #Float
+		ifTrue: [ newArray := self convertToFloat ].
+	newDtype = #Integer
+		ifTrue: [ newArray := self convertToInteger ].
+	newDtype = #Word
+		ifTrue: [ newArray := self convertToWord ].
+	newArray ifNil: [ self error ].
+	array := newArray.
+	dtype := newDtype
+]
+
 { #category : #enumerating }
 NDArray >> collect: aBlock [
 	| s |
@@ -628,11 +682,8 @@ NDArray >> collect: aBlock [
 { #category : #private }
 NDArray >> convertToBoolean [
 	dtype = #Boolean
-		ifTrue: [ ^ self copy ].
-	^ self class
-		array: (self array asArray collect: [ :each | (each closeTo: 0) not ])
-		shape: self shape copy
-		dtype: #Boolean
+		ifTrue: [ ^ array copy ].
+	^ self array asArray collect: [ :each | (each closeTo: 0) not ]
 ]
 
 { #category : #private }
@@ -648,7 +699,7 @@ NDArray >> convertToByte [
 						ifFalse: [ 0 ] ]
 				ifFalse: [ each truncated min: 255 max: 0 ].
 			newArray at: index put: num ].
-	^ self class array: newArray shape: self shape copy dtype: #Byte
+	^ newArray
 ]
 
 { #category : #private }
@@ -664,7 +715,7 @@ NDArray >> convertToFloat [
 						ifFalse: [ 0 ] ]
 				ifFalse: [ each ].
 			newArray at: index put: num ].
-	^ self class array: newArray shape: self shape copy dtype: #Float
+	^ newArray
 ]
 
 { #category : #private }
@@ -680,7 +731,7 @@ NDArray >> convertToInteger [
 						ifFalse: [ 0 ] ]
 				ifFalse: [ each truncated ].
 			newArray at: index put: num ].
-	^ self class array: newArray shape: self shape copy dtype: #Integer
+	^ newArray
 ]
 
 { #category : #private }
@@ -696,7 +747,7 @@ NDArray >> convertToWord [
 						ifFalse: [ 0 ] ]
 				ifFalse: [ each truncated min: 16rFFFF max: 0 ].
 			newArray at: index put: num ].
-	^ self class array: newArray shape: self shape copy dtype: #Word
+	^ newArray
 ]
 
 { #category : #copying }
@@ -732,6 +783,47 @@ NDArray >> copyWithNdim: anInteger [
 { #category : #enumerating }
 NDArray >> do: aBlock [
 	1 to: self shape first do: [ :each | aBlock cull: (self at: each) ]
+]
+
+{ #category : #arithmetic }
+NDArray >> dot: aNDArray [
+	| rows cols one another newDtype newShape newArray index colArrays rowArrays |
+	one := self ndim = 1
+		ifTrue: [ self
+				withShape:
+					{1.
+					aNDArray shape first} ]
+		ifFalse: [ self ].
+	another := aNDArray ndim = 1
+		ifTrue: [ aNDArray
+				withShape:
+					{aNDArray shape first.
+					1} ]
+		ifFalse: [ aNDArray ].
+	one shape second = another shape first
+		ifFalse: [ self error ].
+	rows := one shape first.
+	cols := another shape second.
+	newShape := Array with: rows with: cols.
+	newDtype := self class coerceDtype: self dtype with: aNDArray dtype.
+	newArray := self class newArrayDtype: newDtype size: rows * cols.
+	index := 1.
+	rowArrays := (1 to: rows)
+		collect: [ :each | one row2DArray: each dtype: newDtype ].
+	colArrays := (1 to: cols)
+		collect: [ :each | another col2DArray: each dtype: newDtype ].
+	1 to: rows do: [ :row | 
+		| r c |
+		r := rowArrays at: row.
+		1 to: cols do: [ :col | 
+			c := colArrays at: col.
+			newArray at: index put: (r dot: c).
+			index := index + 1 ] ].
+	newShape first = 1
+		ifTrue: [ newShape := Array with: newShape second ]
+		ifFalse: [ newShape second = 1
+				ifTrue: [ newShape := Array with: newShape first ] ].
+	^ self class array: newArray shape: newShape dtype: newDtype
 ]
 
 { #category : #accessing }
@@ -908,19 +1000,22 @@ NDArray >> t [
 
 { #category : #converting }
 NDArray >> withDtype: aSymbol [
+	| newArray |
 	dtype = aSymbol
 		ifTrue: [ ^ self copy ].
+	newArray := nil.
 	aSymbol = #Float
-		ifTrue: [ ^ self convertToFloat ].
+		ifTrue: [ newArray := self convertToFloat ].
 	aSymbol = #Integer
-		ifTrue: [ ^ self convertToInteger ].
+		ifTrue: [ newArray := self convertToInteger ].
 	aSymbol = #Byte
-		ifTrue: [ ^ self convertToByte ].
+		ifTrue: [ newArray := self convertToByte ].
 	aSymbol = #Word
-		ifTrue: [ ^ self convertToWord ].
+		ifTrue: [ newArray := self convertToWord ].
 	aSymbol = #Boolean
-		ifTrue: [ ^ self convertToBoolean ].
-	self error
+		ifTrue: [ newArray := self convertToBoolean ].
+	newArray ifNil: [ self error ].
+	^ self class array: newArray shape: self shape copy dtype: aSymbol
 ]
 
 { #category : #converting }

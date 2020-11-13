@@ -291,13 +291,27 @@ NDArrayTest >> testBroadcastToShape [
 ]
 
 { #category : #test }
+NDArrayTest >> testCoerceDtype [
+	| a r |
+	a := self newArrayFrom: #(1 2 3).
+	self assert: a dtype equals: #Float.
+	r := a coerceDtype: #Float.
+	self assert: a array identicalTo: r array.
+	r := a coerceDtype: #Integer.
+	self assert: a array identicalTo: r array.
+	a := a withDtype: #Integer.
+	self assert: a dtype equals: #Integer.
+	r := a coerceDtype: #Float.
+	self assert: r dtype equals: #Float.
+	self assertCollection: r array equals: #(1 2 3) asFloatArray
+]
+
+{ #category : #test }
 NDArrayTest >> testConvertToBoolean [
 	| a r |
 	a := NDArray arangeFrom: -1 to: 2 by: 1.
 	r := a convertToBoolean.
-	self assertCollection: r array equals: { true. false. true. true }.
-	self assertCollection: r shape equals: #(4).
-	self assertCollection: r dtype equals: #Boolean.
+	self assertCollection: r equals: { true. false. true. true }.
 	a := NDArray fromArray: { true. false. true }.
 	r := a convertToBoolean.
 	self assert: r ~~ a
@@ -308,12 +322,10 @@ NDArrayTest >> testConvertToByte [
 	| a r |
 	a := self newArrayFrom: #(100 200 300 400 -50).
 	r := a convertToByte.
-	self assertCollection: r array equals: #[100 200 255 255 0].
-	self assert: r dtype equals: #Byte.
+	self assertCollection: r equals: #[100 200 255 255 0].
 	a := NDArray fromArray: #(true false true) dtype: #Boolean.
 	r := a convertToByte.
-	self assertCollection: r array equals: #[1 0 1].
-	self assert: r dtype equals: #Byte
+	self assertCollection: r equals: #[1 0 1]
 ]
 
 { #category : #test }
@@ -324,14 +336,10 @@ NDArrayTest >> testConvertToFloat [
 	self assert: r ~~ a.
 	a := NDArray fromArray: {true. false}.
 	r := a convertToFloat.
-	self assertCollection: r array equals: #(1 0) asFloatArray.
-	self assertCollection: r shape equals: #(2).
-	self assert: r dtype equals: #Float.
+	self assertCollection: r equals: #(1 0) asFloatArray.
 	a := NDArray fromArray: #(1 2) asIntegerArray.
 	r := a convertToFloat.
-	self assertCollection: r array equals: #(1 2) asFloatArray.
-	self assertCollection: r shape equals: #(2).
-	self assert: r dtype equals: #Float
+	self assertCollection: r equals: #(1 2) asFloatArray
 ]
 
 { #category : #test }
@@ -339,19 +347,13 @@ NDArrayTest >> testConvertToInteger [
 	| a r |
 	a := NDArray arangeFrom: -1 to: 2 by: 0.5.
 	r := a convertToInteger.
-	self assertCollection: r array equals: #(-1 0 0 0 1 1 2) asIntegerArray.
-	self assertCollection: r shape equals: #(7).
-	self assert: r dtype equals: #Integer.
+	self assertCollection: r equals: #(-1 0 0 0 1 1 2) asIntegerArray.
 	a := NDArray fromArray: {true. false}.
 	r := a convertToInteger.
-	self assertCollection: r array equals: #(1 0) asIntegerArray.
-	self assertCollection: r shape equals: #(2).
-	self assert: r dtype equals: #Integer.
+	self assertCollection: r equals: #(1 0) asIntegerArray.
 	a := NDArray fromArray: #(1 2 3) asIntegerArray.
 	r := a convertToInteger.
-	self assertCollection: r array equals: #(1 2 3) asIntegerArray.
-	self assertCollection: r shape equals: #(3).
-	self assert: r dtype equals: #Integer
+	self assertCollection: r equals: #(1 2 3) asIntegerArray
 ]
 
 { #category : #test }
@@ -360,13 +362,11 @@ NDArrayTest >> testConvertToWord [
 	a := self newArrayFrom: #(10000 30000 60000 80000 -50).
 	r := a convertToWord.
 	self
-		assertCollection: r array
+		assertCollection: r
 		equals: #(10000 30000 60000 65535 0) asWordArray.
-	self assert: r dtype equals: #Word.
 	a := NDArray fromArray: #(true false true) dtype: #Boolean.
 	r := a convertToWord.
-	self assertCollection: r array equals: #(1 0 1) asWordArray.
-	self assert: r dtype equals: #Word
+	self assertCollection: r equals: #(1 0 1) asWordArray
 ]
 
 { #category : #test }

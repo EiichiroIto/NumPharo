@@ -67,7 +67,7 @@ TNDArrayArithmetics >> adaptToInteger: rcvr andSend: selector [
 TNDArrayArithmetics >> adaptToNDArray: anObject andCompare: selector [
 	| obj newObj newDtype |
 	obj := self.
-	newDtype := self class coerceArray: self dtype with: anObject dtype.
+	newDtype := self class coerceDtype: self dtype with: anObject dtype.
 	newObj := anObject withDtype: newDtype.
 	self shape ~= anObject shape
 		ifTrue: [ obj := self broadcastTo: newObj.
@@ -84,7 +84,7 @@ TNDArrayArithmetics >> adaptToNDArray: anObject andCompare: selector [
 { #category : #converting }
 TNDArrayArithmetics >> adaptToNDArray: anObject andSend: selector [
 	| obj newDtype newObj |
-	newDtype := self class coerceArray: anObject dtype with: self dtype.
+	newDtype := self class coerceDtype: anObject dtype with: self dtype.
 	obj := self withDtype: newDtype.
 	newObj := anObject withDtype: newDtype.
 	self shape ~= newObj shape
@@ -192,7 +192,7 @@ TNDArrayArithmetics >> dot: aNDArray [
 	rows := one shape first.
 	cols := another shape second.
 	newShape := Array with: rows with: cols.
-	newDtype := self class coerceArray: self dtype with: aNDArray dtype.
+	newDtype := self class coerceDtype: self dtype with: aNDArray dtype.
 	newArray := self class newArrayDtype: newDtype size: rows * cols.
 	index := 1.
 	rowArrays := (1 to: rows)

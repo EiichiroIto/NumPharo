@@ -217,6 +217,16 @@ DeepLearningFromScratch1Chapter4 >> testChapter4_4_1 [
 ]
 
 { #category : #test }
+DeepLearningFromScratch1Chapter4 >> testChapter4_5_1 [
+	| net |
+	net := TwoLayerNet new inputSize: 784 hiddenSize: 100 outputSize: 10 .
+	self assertCollection: (net paramAt: #W1) shape equals: #(784 100).
+	self assertCollection: (net paramAt: #b1) shape equals: #(100).
+	self assertCollection: (net paramAt: #W2) shape equals: #(100 10).
+	self assertCollection: (net paramAt: #b2) shape equals: #(10).
+]
+
+{ #category : #test }
 DeepLearningFromScratch1Chapter4 >> testGradient2d [
 	| x0 x1 x y grid grad plt a |
 	x0 := NDArray arangeFrom: -2 to: 2.4 by: 0.25.
