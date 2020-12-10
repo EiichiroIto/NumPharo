@@ -48,6 +48,28 @@ NDArray class >> coerceDtype: aSymbol1 with: aSymbol2 [
 	^ Coerces at: aSymbol1 at: aSymbol2
 ]
 
+{ #category : #private }
+NDArray class >> comprehension: anArray [
+	| sizes num result itemSize itemCount pos |
+	sizes := anArray collect: #size.
+	num := self finiteProductOf: sizes.
+	result := (1 to: num) collect: [ :each | Array new: anArray size ].
+	anArray
+		withIndexDo: [ :each1 :index1 | 
+			itemSize := self finiteProductOf: (sizes copyWithoutIndex: index1).
+			itemCount := self
+				finiteProductOf: (sizes copyFrom: index1 + 1 to: sizes size).
+			pos := 1.
+			itemSize / itemCount
+				timesRepeat: [ each1
+						withIndexDo: [ :each2 :index2 | 
+							"pos := (index2 - 1) * itemSize + 1."
+							itemCount
+								timesRepeat: [ (result at: pos) at: index1 put: each2.
+									pos := pos + 1 ] ] ] ].
+	^ result
+]
+
 { #category : #utilities }
 NDArray class >> crossEntropyErrorY: y andT: t [
 	| delta |
@@ -480,7 +502,7 @@ NDArray >> asColoredForm [
 
 { #category : #converting }
 NDArray >> asFlatArray [
-	^ self array
+	^ self array asArray
 ]
 
 { #category : #converting }
@@ -514,6 +536,11 @@ NDArray >> asGrayScale [
 		offset: 0 @ 0
 ]
 
+{ #category : #converting }
+NDArray >> asNDArray [
+	^ self
+]
+
 { #category : #accessing }
 NDArray >> at: anArray [
 	| arr pos num |
@@ -539,18 +566,22 @@ NDArray >> at: anArray put: anObject [
 		ifTrue: [ ^ self arrayAt: pos put: anObject ].
 	anObject size = num
 		ifFalse: [ self error ].
-	anObject asFlatArray
+	anObject array
 		withIndexDo: [ :each :index | self arrayAt: pos + index - 1 put: each ]
 ]
 
 { #category : #accessing }
 NDArray >> atAll: anObject [
-	^ anObject atAllInNDArray: self
+	| indexes |
+	indexes := anObject asNDArray.
+	^ indexes dtype = #Boolean
+		ifTrue: [ self atAllBooleans: indexes ]
+		ifFalse: [ self atAllIndexes: indexes ]
 ]
 
 { #category : #modifying }
 NDArray >> atAll: anObject put: anObject2 [
-	self shouldBeImplemented
+	anObject do: [ :each | self at: each put: anObject2 ]
 ]
 
 { #category : #private }
@@ -589,13 +620,6 @@ NDArray >> atAllFlatBooleans: aBooleanArray [
 ]
 
 { #category : #private }
-NDArray >> atAllInNDArray: aNdArray [
-	self dtype = #Boolean
-		ifTrue: [ ^ aNdArray atAllBooleans: self array ].
-	^ aNdArray atAllIndexes: self array
-]
-
-{ #category : #private }
 NDArray >> atAllIndexes: anArray [
 	| s c |
 	c := 0.
@@ -608,6 +632,11 @@ NDArray >> atAllIndexes: anArray [
 		array: s contents
 		shape: (Array with: c) , self shape copyWithoutFirst
 		dtype: self dtype
+]
+
+{ #category : #private }
+NDArray >> atAllPut: anObject indexes: anArray [
+	self shouldBeImplemented
 ]
 
 { #category : #converting }
@@ -832,6 +861,11 @@ NDArray >> dtype [
 ]
 
 { #category : #accessing }
+NDArray >> extent [
+	^ self shape first @ self shape second
+]
+
+{ #category : #accessing }
 NDArray >> flatten [
 	^ self class
 		array: self array copy
@@ -910,32 +944,6 @@ NDArray >> privArray: anArray [
 { #category : #private }
 NDArray >> privDtype: aSymbol [
 	dtype := aSymbol
-]
-
-{ #category : #private }
-NDArray >> privRoll: anInteger1 axis: anInteger2 [
-	| shift s count1 count2 itemSize blockSize |
-	anInteger2 <= self ndim
-		ifFalse: [ self error ].
-	count1 := 1.
-	count2 := self size.
-	shift := anInteger1.
-	itemSize := 1.
-	anInteger2 > 0
-		ifTrue: [ count1 := self class
-				finiteProductOf: (self shape copyFrom: 1 to: anInteger2 - 1).
-			count2 := self shape at: anInteger2.
-			shift := anInteger1 \\ count2.
-			itemSize := self itemSizeAxis: anInteger2 ].
-	blockSize := self size // count1.
-	s := WriteStream on: self array class new.
-	1 to: count1 do: [ :each | 
-		1 to: count2 do: [ :each2 | 
-			| pos |
-			pos := ((each - 1) * blockSize + ((each2 - shift - 1) \\ count2))
-				* itemSize + 1.
-			s nextPutAll: (self wrapCopyFrom: pos size: itemSize) ] ].
-	^ self class array: s contents shape: self shape copy dtype: self dtype
 ]
 
 { #category : #private }

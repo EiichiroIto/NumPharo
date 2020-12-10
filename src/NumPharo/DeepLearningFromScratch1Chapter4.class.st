@@ -237,8 +237,8 @@ DeepLearningFromScratch1Chapter4 >> testGradient2d [
 		meshGridOf:
 			{x0.
 			x1}.
-	x := grid first asFlatArray.
-	y := grid second asFlatArray.
+	x := grid first array.
+	y := grid second array.
 	self assert: x size equals: 324.
 	self assert: y size equals: 324.
 	a := NDArray
@@ -255,8 +255,8 @@ DeepLearningFromScratch1Chapter4 >> testGradient2d [
 	plt
 		quiverX: x
 		y: y
-		u: (grad at: 1) negated asFlatArray
-		v: (grad at: 2) negated asFlatArray
+		u: (grad at: 1) negated array
+		v: (grad at: 2) negated array
 		scale: 0.1.
 	plt xLimitFrom: -2 to: 2.
 	plt yLimitFrom: -2 to: 2.

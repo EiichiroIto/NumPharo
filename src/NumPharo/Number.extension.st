@@ -12,3 +12,8 @@ Number >> adaptToNDArray: rcvr andSend: selector [
 	newObj array perform: selector with: self.
 	^ newObj
 ]
+
+{ #category : #'*NumPharo' }
+Number >> asNDIndexes [
+	^ Array with: self
+]

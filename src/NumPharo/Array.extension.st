@@ -13,11 +13,22 @@ Array >> asNDArray [
 ]
 
 { #category : #'*NumPharo' }
-Array >> atAllInNDArray: aNdArray [
-	^ aNdArray atAllIndexes: self
+Array >> asNDIndexes [
+	self isFlatArray ifTrue: [ ^ self asNDArray ].
+	self shouldBeImplemented
+]
+
+{ #category : #'*NumPharo' }
+Array >> comprehension [
+	^ NDArray comprehension: self
 ]
 
 { #category : #'*NumPharo' }
 Array >> dtype [
 	^ NDArray presumeDtype: self
+]
+
+{ #category : #'*NumPharo' }
+Array >> isFlatArray [
+	^ self allSatisfy: [ :each | each isCollection not ]
 ]

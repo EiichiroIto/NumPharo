@@ -779,22 +779,56 @@ TNDArrayArithmeticsTest >> testWhere [
 ]
 
 { #category : #test }
-TNDArrayArithmeticsTest >> testWrapCopyFromSize [
-	| a |
-	a := self newArrayFrom: #(1 2 3 4 5 6 7 8).
-	self
-		assertCollection: (a wrapCopyFrom: 2 size: 4)
-		equals: #(2 3 4 5) asFloatArray.
-	self
-		assertCollection: (a wrapCopyFrom: 6 size: 4)
-		equals: #(6 7 8 1) asFloatArray.
-	self
-		assertCollection: (a wrapCopyFrom: 8 size: 4)
-		equals: #(8 1 2 3) asFloatArray.
-	self
-		assertCollection: (a wrapCopyFrom: 9 size: 4)
-		equals: #(1 2 3 4) asFloatArray.
-	self
-		assertCollection: (a wrapCopyFrom: -1 size: 4)
-		equals: #(7 8 1 2) asFloatArray
+TNDArrayArithmeticsTest >> testWrapCopyFromSizeOnAt [
+	| a arr |
+	a := #(1 2 3 4 5 6 7 8).
+	arr := Array new: 4.
+	a
+		wrapCopyFrom: 2
+		size: 4
+		on: arr
+		at: 1.
+	self assertCollection: arr equals: #(2 3 4 5).
+	arr := Array new: 4.
+	a
+		wrapCopyFrom: 6
+		size: 4
+		on: arr
+		at: 1.
+	self assertCollection: arr equals: #(6 7 8 1).
+	arr := Array new: 4.
+	a
+		wrapCopyFrom: 8
+		size: 4
+		on: arr
+		at: 1.
+	self assertCollection: arr equals: #(8 1 2 3).
+	arr := Array new: 4.
+	a
+		wrapCopyFrom: 9
+		size: 4
+		on: arr
+		at: 1.
+	self assertCollection: arr equals: #(1 2 3 4).
+	arr := Array new: 4.
+	a
+		wrapCopyFrom: -1
+		size: 4
+		on: arr
+		at: 1.
+	self assertCollection: arr equals: #(7 8 1 2).
+	arr := Array new: 6.
+	a
+		wrapCopyFrom: 2
+		size: 4
+		on: arr
+		at: 2.
+	self assertCollection: arr equals: #(nil 2 3 4 5 nil).
+	arr := Array new: 6.
+	a
+		wrapCopyFrom: -1
+		size: 4
+		on: arr
+		at: 2.
+	self assertCollection: arr equals: #(nil 7 8 1 2 nil)
 ]

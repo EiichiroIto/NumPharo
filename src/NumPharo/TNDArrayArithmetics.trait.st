@@ -341,7 +341,7 @@ TNDArrayArithmetics >> nextIndex: anArray [
 
 { #category : #private }
 TNDArrayArithmetics >> privRoll: anInteger1 axis: anInteger2 [
-	| shift s count1 count2 itemSize blockSize |
+	| shift count1 count2 itemSize blockSize arr dst |
 	anInteger2 <= self ndim
 		ifFalse: [ self error ].
 	count1 := 1.
@@ -355,14 +355,20 @@ TNDArrayArithmetics >> privRoll: anInteger1 axis: anInteger2 [
 			shift := anInteger1 \\ count2.
 			itemSize := self itemSizeAxis: anInteger2 ].
 	blockSize := self size // count1.
-	s := WriteStream on: self array class new.
+	arr := self array class new: count1 * count2 * itemSize.
+	dst := 1.
 	1 to: count1 do: [ :each | 
 		1 to: count2 do: [ :each2 | 
 			| pos |
 			pos := ((each - 1) * blockSize + ((each2 - shift - 1) \\ count2))
 				* itemSize + 1.
-			s nextPutAll: (self wrapCopyFrom: pos size: itemSize) ] ].
-	^ self class array: s contents shape: self shape copy dtype: self dtype
+			self array
+				wrapCopyFrom: pos
+				size: itemSize
+				on: arr
+				at: dst.
+			dst := dst + itemSize ] ].
+	^ self class array: arr shape: self shape copy dtype: self dtype
 ]
 
 { #category : #converting }
@@ -444,21 +450,6 @@ TNDArrayArithmetics >> where [
 					withIndexDo: [ :each2 :index2 | (result at: index2) add: each2 ] ] ].
 	^ result
 		collect: [ :each | self class array: each asIntegerArray shape: {each size} dtype: #Integer ]
-]
-
-{ #category : #private }
-TNDArrayArithmetics >> wrapCopyFrom: anInteger1 size: anInteger2 [
-	| start end size s |
-	size := self array size.
-	start := (anInteger1 - 1) \\ size + 1.
-	end := start + anInteger2 - 1.
-	end <= size
-		ifTrue: [ ^ self array copyFrom: start to: end ].
-	s := WriteStream on: self array class new.
-	anInteger2
-		timesRepeat: [ s nextPut: (self array atWrap: start).
-			start := start + 1 ].
-	^ s contents
 ]
 
 { #category : #comparing }

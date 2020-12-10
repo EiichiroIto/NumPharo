@@ -231,18 +231,6 @@ NDArrayTest >> testAtAllBooleans [
 ]
 
 { #category : #test }
-NDArrayTest >> testAtAllInNDArray [
-	| a b r |
-	a := self newArrayFrom: #(10 20 30 40 50).
-	b := NDArray fromArray: {true . false . true . false . false} dtype: #Boolean.
-	r := b atAllInNDArray: a.
-	self assertCollection: r array equals: #(10 30) asFloatArray.
-	b := self newArrayFrom: #(4 1 2).
-	r := b atAllInNDArray: a.
-	self assertCollection: r array equals: #(40 10 20) asFloatArray
-]
-
-{ #category : #test }
 NDArrayTest >> testAtAllIndexes [
 	| a r |
 	a := self newArrayFrom: #(10 20 30 40 50).
@@ -304,6 +292,24 @@ NDArrayTest >> testCoerceDtype [
 	r := a coerceDtype: #Float.
 	self assert: r dtype equals: #Float.
 	self assertCollection: r array equals: #(1 2 3) asFloatArray
+]
+
+{ #category : #test }
+NDArrayTest >> testComprehension [
+	| r |
+	r := NDArray comprehension: #(#(1) #(2 3 4)).
+	self assertCollection: r equals: #(#(1 2) #(1 3) #(1 4)).
+	r := NDArray comprehension: #(#(1 2) #(3 4)).
+	self assertCollection: r equals: #(#(1 3) #(1 4) #(2 3) #(2 4)).
+	r := NDArray comprehension: #(#(1 2 3) #(4 5 6)).
+	self
+		assertCollection: r
+		equals: #(#(1 4) #(1 5) #(1 6) #(2 4) #(2 5) #(2 6) #(3 4) #(3 5) #(3 6)).
+	r := NDArray comprehension: #(#(1 2) #(3 4 5) #(6 7)).
+	self
+		assertCollection: r
+		equals:
+			#(#(1 3 6) #(1 3 7) #(1 4 6) #(1 4 7) #(1 5 6) #(1 5 7) #(2 3 6) #(2 3 7) #(2 4 6) #(2 4 7) #(2 5 6) #(2 5 7))
 ]
 
 { #category : #test }
