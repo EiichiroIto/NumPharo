@@ -70,6 +70,26 @@ GrayScott class >> example4 [
 	gif close
 ]
 
+{ #category : #examples }
+GrayScott class >> example5 [
+	| gif |
+	gif := PharoRecorder new openFileNamed: 'grayScott5.gif'.
+	gif extent: 512 @ 512.
+	gif frameDelay: 20.
+	self
+		f: 0.022
+		k: 0.051
+		times: 1000
+		withDoing: [ :gs | 
+			gs
+				uAtAll:
+					{(100 to: 110).
+					(100 to: 110)} comprehension
+				put: 0.
+			gif writeForm: gs form ].
+	gif close
+]
+
 { #category : #private }
 GrayScott class >> f: aFloat k: aFloat2 times: anInteger3 fileNamed: aString4 [
 	| gs gif |
@@ -153,7 +173,7 @@ GrayScott >> form [
 { #category : #private }
 GrayScott >> formOf: aNDArray [
 	| bitmap |
-	bitmap := Bitmap newFrom: (aNDArray asFlatArray collect: [ :each | (Color gray: each) pixelValueForDepth: 32 ]).
+	bitmap := Bitmap newFrom: (aNDArray asFlatArray collect: [ :each | (Color gray: (each min: 1 max: 0)) pixelValueForDepth: 32 ]).
 	^ Form extent: aNDArray extent depth: 32 bits: bitmap
 ]
 
@@ -231,6 +251,11 @@ GrayScott >> square: anInteger [
 { #category : #accessing }
 GrayScott >> u [
 	^ u
+]
+
+{ #category : #api }
+GrayScott >> uAtAll: anArray put: aNumber [
+	u atAll: anArray put: aNumber
 ]
 
 { #category : #accessing }

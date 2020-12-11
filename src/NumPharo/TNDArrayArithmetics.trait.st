@@ -140,22 +140,23 @@ TNDArrayArithmetics >> col2DArray: anInteger dtype: aSymbol [
 
 { #category : #private }
 TNDArrayArithmetics >> collect: aBlock axis: anInteger dtype: aSymbol [
-	| newShape items itemSize s s2 |
+	| newShape items itemSize arr arr2 indexes |
 	anInteger <= self ndim
 		ifFalse: [ self error ].
 	newShape := self shapeWithoutAxis: anInteger.
 	items := self shape at: anInteger.
 	itemSize := self itemSizeAxis: anInteger.
-	s := WriteStream on: (self class newArrayDtype: aSymbol).
-	(self argIndexAxis: anInteger)
-		do: [ :each2 | 
-			s2 := WriteStream on: self array class new.
+	indexes := self argIndexAxis: anInteger.
+	arr := self class newArrayDtype: aSymbol size: indexes size.
+	indexes
+		withIndexDo: [ :each2 :index | 
+			arr2 := self newArraySize: items.
 			1 to: items do: [ :each | 
 				| pos |
 				pos := each2 + ((each - 1) * itemSize).
-				s2 nextPut: (self arrayAt: pos) ].
-			s nextPut: (aBlock cull: s2 contents) ].
-	^ self class array: s contents shape: newShape
+				arr2 at: each put: (self arrayAt: pos) ].
+			arr at: index put: (aBlock cull: arr2) ].
+	^ self class array: arr shape: newShape
 ]
 
 { #category : #arithmetic }
@@ -301,11 +302,6 @@ TNDArrayArithmetics >> negated [
 ]
 
 { #category : #private }
-TNDArrayArithmetics >> newArray [
-	^ self class newArrayDtype: self dtype
-]
-
-{ #category : #private }
 TNDArrayArithmetics >> newArrayComparing: aBlock [
 	^ self class
 		array: (self array asArray collect: aBlock)
@@ -320,6 +316,11 @@ TNDArrayArithmetics >> newArrayDoing: aBlock [
 ]
 
 { #category : #private }
+TNDArrayArithmetics >> newArraySize: anInteger [
+	^ self class newArrayDtype: self dtype size: anInteger
+]
+
+{ #category : #private }
 TNDArrayArithmetics >> nextIndex: anArray [
 	| newArray |
 	anArray size = self ndim
@@ -327,14 +328,14 @@ TNDArrayArithmetics >> nextIndex: anArray [
 	anArray = self shape
 		ifTrue: [ ^ nil ].
 	newArray := anArray copy.
-	1 to: newArray size do: [ :index | 
-		| a b |
-		a := newArray at: index.
-		b := self shape at: index.
-		a < b
-			ifTrue: [ newArray at: index put: a + 1.
-				^ newArray ]
-			ifFalse: [ newArray at: index put: 1 ] ].
+	newArray
+		withIndexDo: [ :each :index | 
+			| b |
+			b := self shape at: index.
+			each < b
+				ifTrue: [ newArray at: index put: each + 1.
+					^ newArray ]
+				ifFalse: [ newArray at: index put: 1 ] ].
 	self error
 ]
 
@@ -389,12 +390,12 @@ TNDArrayArithmetics >> roll: anObject1 axes: anObject2 [
 
 { #category : #private }
 TNDArrayArithmetics >> row2DArray: anInteger dtype: aSymbol [
-	| pos size s |
+	| pos size arr |
 	pos := self arrayIndexAt: (Array with: anInteger).
 	size := self itemSizeAxis: 1.
-	s := WriteStream on: (self class newArrayDtype: aSymbol).
-	pos to: pos + size - 1 do: [ :each | s nextPut: (self array at: each) ].
-	^ s contents
+	arr := self class newArrayDtype: aSymbol size: size.
+	1 to: size do: [ :each | arr at: each put: (self array at: pos + each - 1) ].
+	^ arr
 ]
 
 { #category : #arithmetic }
@@ -418,22 +419,16 @@ TNDArrayArithmetics >> sumAxis: anInteger [
 
 { #category : #converting }
 TNDArrayArithmetics >> t [
-	| s |
+	| arr arr2 i |
 	self ndim = 1
 		ifTrue: [ ^ self ].
-	s := WriteStream on: self newArray.
-	self transposeOn: s.
-	^ self class array: s contents shape: self shape reversed
-]
-
-{ #category : #private }
-TNDArrayArithmetics >> transposeOn: aStream [
-	| arr i |
+	arr2 := self newArraySize: self size.
 	arr := Array new: self ndim withAll: 1.
-	self size
-		timesRepeat: [ i := self arrayIndexAt: arr.
-			aStream nextPut: (self array at: i).
-			arr := self nextIndex: arr ]
+	1 to: self size do: [ :each | 
+		i := self arrayIndexAt: arr.
+		arr2 at: each put: (self array at: i).
+		arr := self nextIndex: arr ].
+	^ self class array: arr2 shape: self shape reversed
 ]
 
 { #category : #accessing }
