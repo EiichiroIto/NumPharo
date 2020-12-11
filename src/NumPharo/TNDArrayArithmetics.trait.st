@@ -76,8 +76,7 @@ TNDArrayArithmetics >> adaptToNDArray: anObject andCompare: selector [
 		privArray:
 			(newObj array asArray
 				with: obj array
-				collect: [ :x :y | x perform: selector with: y ]);
-		privDtype: #Boolean.
+				collect: [ :x :y | x perform: selector with: y ]).
 	^ newObj
 ]
 
@@ -96,10 +95,12 @@ TNDArrayArithmetics >> adaptToNDArray: anObject andSend: selector [
 
 { #category : #converting }
 TNDArrayArithmetics >> adaptToNumber: rcvr andSend: selector [
+	| arr |
+	arr := self array species new: self array size withAll: rcvr.
+	arr perform: (selector, '=') asSymbol with: self array.
 	^ self class
-		array: (self array collect: [ :each | rcvr perform: selector with: each ])
+		array: arr
 		shape: self shape copy
-		dtype: self dtype
 ]
 
 { #category : #private }
@@ -154,7 +155,7 @@ TNDArrayArithmetics >> collect: aBlock axis: anInteger dtype: aSymbol [
 				pos := each2 + ((each - 1) * itemSize).
 				s2 nextPut: (self arrayAt: pos) ].
 			s nextPut: (aBlock cull: s2 contents) ].
-	^ self class array: s contents shape: newShape dtype: self dtype
+	^ self class array: s contents shape: newShape
 ]
 
 { #category : #arithmetic }
@@ -210,7 +211,7 @@ TNDArrayArithmetics >> dot: aNDArray [
 		ifTrue: [ newShape := Array with: newShape second ]
 		ifFalse: [ newShape second = 1
 				ifTrue: [ newShape := Array with: newShape first ] ].
-	^ self class array: newArray shape: newShape dtype: newDtype
+	^ self class array: newArray shape: newShape
 ]
 
 { #category : #arithmetic }
@@ -277,7 +278,7 @@ TNDArrayArithmetics >> min: min max: max [
 	newArray := self array
 		withIndexCollect:
 			[ :each :index | each min: (min arrayAt: index) max: (max arrayAt: index) ].
-	^ self class array: newArray shape: self shape copy dtype: self dtype
+	^ self class array: newArray shape: self shape copy
 ]
 
 { #category : #arithmetic }
@@ -309,7 +310,6 @@ TNDArrayArithmetics >> newArrayComparing: aBlock [
 	^ self class
 		array: (self array asArray collect: aBlock)
 		shape: self shape copy
-		dtype: #Boolean
 ]
 
 { #category : #private }
@@ -317,7 +317,6 @@ TNDArrayArithmetics >> newArrayDoing: aBlock [
 	^ self class
 		array: (self array collect: aBlock)
 		shape: self shape copy
-		dtype: self dtype
 ]
 
 { #category : #private }
@@ -368,7 +367,7 @@ TNDArrayArithmetics >> privRoll: anInteger1 axis: anInteger2 [
 				on: arr
 				at: dst.
 			dst := dst + itemSize ] ].
-	^ self class array: arr shape: self shape copy dtype: self dtype
+	^ self class array: arr shape: self shape copy
 ]
 
 { #category : #converting }
@@ -424,7 +423,7 @@ TNDArrayArithmetics >> t [
 		ifTrue: [ ^ self ].
 	s := WriteStream on: self newArray.
 	self transposeOn: s.
-	^ self class array: s contents shape: self shape reversed dtype: self dtype
+	^ self class array: s contents shape: self shape reversed
 ]
 
 { #category : #private }
@@ -449,7 +448,7 @@ TNDArrayArithmetics >> where [
 				index
 					withIndexDo: [ :each2 :index2 | (result at: index2) add: each2 ] ] ].
 	^ result
-		collect: [ :each | self class array: each asIntegerArray shape: {each size} dtype: #Integer ]
+		collect: [ :each | self class array: each asIntegerArray shape: {each size} ]
 ]
 
 { #category : #comparing }

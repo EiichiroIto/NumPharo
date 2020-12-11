@@ -5,8 +5,7 @@ Class {
 	#classTraits : 'TNDArrayArithmetics classTrait',
 	#instVars : [
 		'shape',
-		'array',
-		'dtype'
+		'array'
 	],
 	#classVars : [
 		'Coerces',
@@ -21,11 +20,10 @@ NDArray class >> arangeFrom: from to: to by: step [
 ]
 
 { #category : #private }
-NDArray class >> array: anArray1 shape: anArray2 dtype: aSymbol [
+NDArray class >> array: anArray1 shape: anArray2 [
 	^ self basicNew
 		privArray: anArray1;
-		privShape: anArray2;
-		privDtype: aSymbol
+		privShape: anArray2
 ]
 
 { #category : #private }
@@ -116,7 +114,7 @@ NDArray class >> fromArray: anArray dtype: aSymbol [
 	size := self finiteProductOf: shape.
 	size = arr size
 		ifFalse: [ self error: 'invalid shape' ].
-	^ self array: arr shape: shape dtype: aSymbol
+	^ self array: arr shape: shape
 ]
 
 { #category : #'instance creation' }
@@ -137,7 +135,7 @@ NDArray class >> fromArray: anArray shape: anArray2 dtype: aSymbol [
 	size := self finiteProductOf: anArray2.
 	size = arr size
 		ifFalse: [ self error: 'invalid shape' ].
-	^ self array: arr shape: anArray2 copy dtype: aSymbol
+	^ self array: arr shape: anArray2 copy
 ]
 
 { #category : #'class initialization' }
@@ -151,7 +149,7 @@ NDArray class >> initialize [
 NDArray class >> linspaceFrom: from to: to num: anInteger withEndPoint: aBoolean [
 	| arr |
 	arr := self arrayFrom: from to: to num: anInteger withEndPoint: aBoolean.
-	^ self array: arr shape: (Array with: arr size) dtype: #Float
+	^ self array: arr shape: (Array with: arr size)
 ]
 
 { #category : #utilities }
@@ -189,7 +187,7 @@ NDArray class >> meshGridOf: anArray [
 			newDtype := each dtype.
 			s := WriteStream on: (self newArrayDtype: newDtype).
 			self writeMeshGridArrayOf: arrays at: index on: s.
-			self array: s contents shape: newShape dtype: newDtype ]
+			self array: s contents shape: newShape ]
 ]
 
 { #category : #private }
@@ -236,7 +234,7 @@ NDArray class >> normalRandom: anObject [
 	shape := self normalizedIndex: anObject.
 	array := FloatArray new: (self finiteProductOf: shape).
 	1 to: array size do: [ :each | array at: each put: self normalRandomNumber ].
-	^ self array: array shape: shape dtype: #Float
+	^ self array: array shape: shape
 ]
 
 { #category : #private }
@@ -260,7 +258,7 @@ NDArray class >> ones: anObject [
 	shape := self normalizedIndex: anObject.
 	size := self finiteProductOf: shape.
 	arr := IntegerArray new: size withAll: 1.
-	^ self array: arr shape: shape dtype: #Integer
+	^ self array: arr shape: shape
 ]
 
 { #category : #accessing }
@@ -286,7 +284,7 @@ NDArray class >> random: anObject [
 	shape := self normalizedIndex: anObject.
 	array := FloatArray new: (self finiteProductOf: shape).
 	1 to: array size do: [ :each | array at: each put: self uniformRandomNumber ].
-	^ self array: array shape: shape dtype: #Float
+	^ self array: array shape: shape
 ]
 
 { #category : #'instance creation' }
@@ -402,45 +400,14 @@ NDArray class >> zeros: anObject [
 	shape := self normalizedIndex: anObject.
 	size := self finiteProductOf: shape.
 	arr := IntegerArray new: size.
-	^ self array: arr shape: shape dtype: #Integer
+	^ self array: arr shape: shape
 ]
 
 { #category : #'instance creation' }
 NDArray class >> zerosLike: aNDArray [
 	| arr |
 	arr := self newArrayDtype: aNDArray dtype size: aNDArray size.
-	^ self array: arr shape: aNDArray shape copy dtype: aNDArray dtype
-]
-
-{ #category : #converting }
-NDArray >> adaptToNDArray: anObject andCompare: selector [
-	| obj newObj newDtype |
-	obj := self.
-	newDtype := self class coerceDtype: self dtype with: anObject dtype.
-	newObj := anObject withDtype: newDtype.
-	self shape ~= anObject shape
-		ifTrue: [ obj := self broadcastTo: newObj.
-			newObj := newObj broadcastTo: self ].
-	newObj
-		privArray:
-			(newObj array asArray
-				with: obj array
-				collect: [ :x :y | x perform: selector with: y ]);
-		privDtype: #Boolean.
-	^ newObj
-]
-
-{ #category : #converting }
-NDArray >> adaptToNDArray: anObject andSend: selector [
-	| obj newDtype newObj |
-	newDtype := self class coerceDtype: anObject dtype with: self dtype.
-	obj := self withDtype: newDtype.
-	newObj := anObject withDtype: newDtype.
-	self shape ~= newObj shape
-		ifTrue: [ obj := self broadcastTo: newObj.
-			newObj := newObj broadcastTo: self ].
-	newObj array perform: selector asSymbol with: obj array.
-	^ newObj
+	^ self array: arr shape: aNDArray shape copy
 ]
 
 { #category : #accessing }
@@ -552,7 +519,6 @@ NDArray >> at: anArray [
 	^ self class
 		array: (array copyFrom: pos to: pos + num - 1)
 		shape: (shape copyFrom: arr size + 1 to: shape size)
-		dtype: dtype
 ]
 
 { #category : #modifying }
@@ -598,7 +564,6 @@ NDArray >> atAllBooleans: aBooleanArray [
 	^ self class
 		array: s contents
 		shape: {s contents size}
-		dtype: self dtype
 ]
 
 { #category : #private }
@@ -616,7 +581,6 @@ NDArray >> atAllFlatBooleans: aBooleanArray [
 	^ self class
 		array: s contents
 		shape: (Array with: c) , self shape copyWithoutFirst
-		dtype: self dtype
 ]
 
 { #category : #private }
@@ -631,12 +595,6 @@ NDArray >> atAllIndexes: anArray [
 	^ self class
 		array: s contents
 		shape: (Array with: c) , self shape copyWithoutFirst
-		dtype: self dtype
-]
-
-{ #category : #private }
-NDArray >> atAllPut: anObject indexes: anArray [
-	self shouldBeImplemented
 ]
 
 { #category : #converting }
@@ -675,7 +633,7 @@ NDArray >> broadcastToShape: anArray [
 					r2
 						timesRepeat: [ s nextPutAll: (newArray copyFrom: pos to: pos + itemSize - 1) ] ].
 				newArray := s contents ] ].
-	^ self class array: newArray shape: newShape dtype: self dtype
+	^ self class array: newArray shape: newShape
 ]
 
 { #category : #private }
@@ -696,8 +654,7 @@ NDArray >> coerceDtype: aSymbol [
 	newDtype = #Word
 		ifTrue: [ newArray := self convertToWord ].
 	newArray ifNil: [ self error ].
-	array := newArray.
-	dtype := newDtype
+	array := newArray
 ]
 
 { #category : #enumerating }
@@ -710,7 +667,7 @@ NDArray >> collect: aBlock [
 
 { #category : #private }
 NDArray >> convertToBoolean [
-	dtype = #Boolean
+	self dtype = #Boolean
 		ifTrue: [ ^ array copy ].
 	^ self array asArray collect: [ :each | (each closeTo: 0) not ]
 ]
@@ -784,7 +741,6 @@ NDArray >> copy [
 	^ self class
 		array: self array copy
 		shape: self shape copy
-		dtype: self dtype
 ]
 
 { #category : #copying }
@@ -798,7 +754,6 @@ NDArray >> copyFrom: anInteger1 to: anInteger2 [
 	^ self class
 		array: newArray
 		shape: (Array with: anInteger2 - anInteger1 + 1) , s
-		dtype: self dtype
 ]
 
 { #category : #copying }
@@ -806,7 +761,6 @@ NDArray >> copyWithNdim: anInteger [
 	^ self class
 		array: self array copy
 		shape: (self shapeWithNdim: anInteger)
-		dtype: self dtype
 ]
 
 { #category : #enumerating }
@@ -814,50 +768,9 @@ NDArray >> do: aBlock [
 	1 to: self shape first do: [ :each | aBlock cull: (self at: each) ]
 ]
 
-{ #category : #arithmetic }
-NDArray >> dot: aNDArray [
-	| rows cols one another newDtype newShape newArray index colArrays rowArrays |
-	one := self ndim = 1
-		ifTrue: [ self
-				withShape:
-					{1.
-					aNDArray shape first} ]
-		ifFalse: [ self ].
-	another := aNDArray ndim = 1
-		ifTrue: [ aNDArray
-				withShape:
-					{aNDArray shape first.
-					1} ]
-		ifFalse: [ aNDArray ].
-	one shape second = another shape first
-		ifFalse: [ self error ].
-	rows := one shape first.
-	cols := another shape second.
-	newShape := Array with: rows with: cols.
-	newDtype := self class coerceDtype: self dtype with: aNDArray dtype.
-	newArray := self class newArrayDtype: newDtype size: rows * cols.
-	index := 1.
-	rowArrays := (1 to: rows)
-		collect: [ :each | one row2DArray: each dtype: newDtype ].
-	colArrays := (1 to: cols)
-		collect: [ :each | another col2DArray: each dtype: newDtype ].
-	1 to: rows do: [ :row | 
-		| r c |
-		r := rowArrays at: row.
-		1 to: cols do: [ :col | 
-			c := colArrays at: col.
-			newArray at: index put: (r dot: c).
-			index := index + 1 ] ].
-	newShape first = 1
-		ifTrue: [ newShape := Array with: newShape second ]
-		ifFalse: [ newShape second = 1
-				ifTrue: [ newShape := Array with: newShape first ] ].
-	^ self class array: newArray shape: newShape dtype: newDtype
-]
-
 { #category : #accessing }
 NDArray >> dtype [
-	^ dtype
+	^ self array dtype
 ]
 
 { #category : #accessing }
@@ -870,7 +783,6 @@ NDArray >> flatten [
 	^ self class
 		array: self array copy
 		shape: (Array with: (self class finiteProductOf: self shape))
-		dtype: self dtype
 ]
 
 { #category : #accessing }
@@ -883,13 +795,6 @@ NDArray >> indexAt: anInteger [
 		r nextPut: (v // a) + 1.
 		v := v \\ a ].
 	^ r contents
-]
-
-{ #category : #initialization }
-NDArray >> initialize [
-	shape := Array new.
-	dtype := nil.
-	array := Array new
 ]
 
 { #category : #testing }
@@ -932,18 +837,13 @@ NDArray >> printOn: aStream [
 	shape printElementsOn: aStream.
 	aStream
 		nextPutAll: ',dtype=';
-		nextPutAll: dtype asString;
+		nextPutAll: self dtype asString;
 		nextPut: $]
 ]
 
 { #category : #private }
 NDArray >> privArray: anArray [
 	array := anArray
-]
-
-{ #category : #private }
-NDArray >> privDtype: aSymbol [
-	dtype := aSymbol
 ]
 
 { #category : #private }
@@ -997,19 +897,9 @@ NDArray >> size [
 ]
 
 { #category : #converting }
-NDArray >> t [
-	| s |
-	self ndim = 1
-		ifTrue: [ ^ self ].
-	s := WriteStream on: self newArray.
-	self transposeOn: s.
-	^ self class array: s contents shape: self shape reversed dtype: self dtype
-]
-
-{ #category : #converting }
 NDArray >> withDtype: aSymbol [
 	| newArray |
-	dtype = aSymbol
+	self dtype = aSymbol
 		ifTrue: [ ^ self copy ].
 	newArray := nil.
 	aSymbol = #Float
@@ -1023,7 +913,7 @@ NDArray >> withDtype: aSymbol [
 	aSymbol = #Boolean
 		ifTrue: [ newArray := self convertToBoolean ].
 	newArray ifNil: [ self error ].
-	^ self class array: newArray shape: self shape copy dtype: aSymbol
+	^ self class array: newArray shape: self shape copy
 ]
 
 { #category : #converting }
@@ -1035,5 +925,5 @@ NDArray >> withShape: anArray [
 	(self class finiteProductOf: self shape)
 		= (self class finiteProductOf: newShape)
 		ifFalse: [ self error ].
-	^ self class array: self array copy shape: newShape dtype: self dtype
+	^ self class array: self array copy shape: newShape
 ]

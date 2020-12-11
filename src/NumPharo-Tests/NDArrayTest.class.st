@@ -8,11 +8,6 @@ Class {
 }
 
 { #category : #private }
-NDArrayTest >> newArray [
-	^ NDArray basicNew
-]
-
-{ #category : #private }
 NDArrayTest >> newArrayFrom: anArray [
 	^ NDArray fromArray: anArray dtype: #Float
 ]
@@ -37,11 +32,10 @@ NDArrayTest >> testArangeFromToBy [
 { #category : #test }
 NDArrayTest >> testArray [
 	| a |
-	a := self newArray.
-	self assert: a array isNil.
-	a initialize.
-	self assert: a array isArray.
-	self assert: a array isEmpty
+	a := self newArrayFrom: #(1 2 3).
+	self assertCollection: a array equals: #(1 2 3) asFloatArray.
+	a := self newArrayFrom: #(4 5 6).
+	self assertCollection: a array equals: #(4 5 6) asFloatArray
 ]
 
 { #category : #test }
@@ -106,11 +100,11 @@ NDArrayTest >> testArrayIndexAt [
 ]
 
 { #category : #test }
-NDArrayTest >> testArrayShapeDtype [
+NDArrayTest >> testArrayShape [
 	| arr shape a |
 	arr := #(1 2 3).
 	shape := #(4 5 6).
-	a := NDArray array: arr shape: shape dtype: #Integer.
+	a := NDArray array: arr shape: shape.
 	self assert: a array equals: arr.
 	self assert: a shape equals: shape.
 	self assert: a dtype equals: #Integer
@@ -401,10 +395,10 @@ NDArrayTest >> testCrossEntropyErrorYAndT [
 { #category : #test }
 NDArrayTest >> testDtype [
 	| a |
-	a := self newArray.
-	self assert: a dtype isNil.
-	a initialize.
-	self assert: a dtype isNil
+	a := self newArrayFrom: #(1 2 3).
+	self assert: a dtype equals: #Float.
+	a := NDArray fromArray: #(1 2 3) dtype: #Integer.
+	self assert: a dtype equals: #Integer
 ]
 
 { #category : #test }
@@ -451,18 +445,9 @@ NDArrayTest >> testFromArrayDtype [
 ]
 
 { #category : #test }
-NDArrayTest >> testInitialize [
-	| a |
-	a := self newArray initialize.
-	self assert: a array isArray.
-	self assert: a shape isArray.
-	self assert: a dtype isNil
-]
-
-{ #category : #test }
 NDArrayTest >> testIsNDArray [
 	| n |
-	n := self newArray.
+	n := self newArrayFrom: #(1 2 3).
 	self assert: n isNDArray.
 	self deny: 1 isNDArray
 ]
@@ -699,26 +684,17 @@ NDArrayTest >> testPresumeShape [
 { #category : #test }
 NDArrayTest >> testPrivArray [
 	| a |
-	a := self newArray.
-	self assert: a array isNil.
-	a privArray: #(1 2 3).
-	self assertCollection: a array equals: #(1 2 3)
-]
-
-{ #category : #test }
-NDArrayTest >> testPrivDtype [
-	| a |
-	a := self newArray.
-	self assert: a dtype isNil.
-	a privDtype: #Float.
-	self assertCollection: a dtype equals: #Float
+	a := self newArrayFrom: #(1 2 3).
+	self assertCollection: a array equals: #(1 2 3) asFloatArray.
+	a privArray: #(4 5 6).
+	self assertCollection: a array equals: #(4 5 6)
 ]
 
 { #category : #test }
 NDArrayTest >> testPrivShape [
 	| a |
-	a := self newArray.
-	self assert: a shape isNil.
+	a := self newArrayFrom: #(1 2 3).
+	self assertCollection: a shape equals: #(3).
 	a privShape: #(1 2 3).
 	self assertCollection: a shape equals: #(1 2 3)
 ]
@@ -758,11 +734,10 @@ NDArrayTest >> testRawAt [
 { #category : #test }
 NDArrayTest >> testShape [
 	| a |
-	a := self newArray.
-	self assert: a shape isNil.
-	a initialize.
-	self assert: a shape isArray.
-	self assert: a shape isEmpty
+	a := self newArrayFrom: #(1 2 3).
+	self assertCollection: a shape equals: #(3).
+	a := self newArrayFrom: #((1) (2) (3)).
+	self assertCollection: a shape equals: #(3 1)
 ]
 
 { #category : #test }

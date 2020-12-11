@@ -56,6 +56,20 @@ PharoPlotSample class >> example11 [
 	^ plt
 ]
 
+{ #category : #'as yet unclassified' }
+PharoPlotSample class >> example12 [
+	| x y plt |
+	x := NDArray
+		linspaceFrom: 0
+		to: 2 * Float pi
+		num: 100
+		withEndPoint: false.
+	y := x sin.
+	plt := PharoPlot new.
+	plt plotX: x y: y label: ''.
+	plt show
+]
+
 { #category : #examples }
 PharoPlotSample class >> example2 [
 	| x y plt |

@@ -18,78 +18,59 @@ Class {
 
 { #category : #examples }
 GrayScott class >> example1 [
-	| gs gif |
-	gs := self new.
-	gs
-		grid: 256;
-		square: 20.
-	gs setup.
-	gs
-		f: 0.04;
-		k: 0.06.
-	gs
-		dx: 0.01;
-		dt: 1;
-		du: 2e-5;
-		dv: 1e-5.
+	| gif |
 	gif := PharoRecorder new openFileNamed: 'grayScott1.gif'.
 	gif extent: 512 @ 512.
-	500
-		timesRepeat: [ gs loop.
-			gif writeForm: gs form ].
+	self
+		f: 0.04
+		k: 0.06
+		times: 1000
+		withDoing: [ :gs | gif writeForm: gs form ].
 	gif close
 ]
 
 { #category : #examples }
 GrayScott class >> example2 [
-	| gs gif |
-	gs := self new.
-	gs
-		grid: 256;
-		square: 20.
-	gs setup.
-	gs
-		f: 0.035;
-		k: 0.065.
-	gs
-		dx: 0.01;
-		dt: 1;
-		du: 2e-5;
-		dv: 1e-5.
+	| gif |
 	gif := PharoRecorder new openFileNamed: 'grayScott2.gif'.
-	gif frameDelay: 20.
-	1000
-		timesRepeat: [ gs loop.
-			gif writeForm: gs form ].
+	gif extent: 512 @ 512.
+	self
+		f: 0.035
+		k: 0.065
+		times: 1000
+		withDoing: [ :gs | gif writeForm: gs form ].
 	gif close
 ]
 
 { #category : #examples }
 GrayScott class >> example3 [
-	| gs gif |
-	gs := self new.
-	gs
-		grid: 256;
-		square: 20.
-	gs setup.
-	gs
-		f: 0.012;
-		k: 0.05.
-	gs
-		dx: 0.01;
-		dt: 1;
-		du: 2e-5;
-		dv: 1e-5.
+	| gif |
 	gif := PharoRecorder new openFileNamed: 'grayScott3.gif'.
-	gif frameDelay: 20.
-	1000
-		timesRepeat: [ gs loop.
-			gif writeForm: gs form ].
+	gif extent: 512 @ 512.
+	self
+		f: 0.012
+		k: 0.05
+		times: 1000
+		withDoing: [ :gs | gif writeForm: gs form ].
 	gif close
 ]
 
 { #category : #examples }
 GrayScott class >> example4 [
+	| gif |
+	gif := PharoRecorder new openFileNamed: 'grayScott4.gif'.
+	gif extent: 512 @ 512.
+	gif frameDelay: 20.
+	self
+		f: 0.022
+		k: 0.051
+		times: 1000
+		withDoing: [ :gs | gif writeForm: gs form ].
+	gif close
+]
+
+{ #category : #private }
+GrayScott class >> f: aFloat k: aFloat2 times: anInteger3 fileNamed: aString4 [
 	| gs gif |
 	gs := self new.
 	gs
@@ -97,19 +78,40 @@ GrayScott class >> example4 [
 		square: 20.
 	gs setup.
 	gs
-		f: 0.022;
-		k: 0.051.
+		f: aFloat;
+		k: aFloat2.
 	gs
 		dx: 0.01;
 		dt: 1;
 		du: 2e-5;
 		dv: 1e-5.
-	gif := PharoRecorder new openFileNamed: 'grayScott4.gif'.
-	gif frameDelay: 20.
-	1000
+	gif := PharoRecorder new openFileNamed: aString4.
+	gif extent: 512 @ 512.
+	anInteger3
 		timesRepeat: [ gs loop.
 			gif writeForm: gs form ].
 	gif close
+]
+
+{ #category : #private }
+GrayScott class >> f: aFloat k: aFloat2 times: anInteger3 withDoing: aBlock4 [
+	| gs |
+	gs := self new.
+	gs
+		grid: 256;
+		square: 20.
+	gs setup.
+	gs
+		f: aFloat;
+		k: aFloat2.
+	gs
+		dx: 0.01;
+		dt: 1;
+		du: 2e-5;
+		dv: 1e-5.
+	anInteger3
+		timesRepeat: [ gs loop.
+			aBlock4 cull: gs ]
 ]
 
 { #category : #accessing }
