@@ -198,7 +198,7 @@ DeepLearningFromScratch1Chapter4 >> testChapter4_4_1 [
 		initX: initX
 		lr: 0.1
 		stepNum: 100.
-	self assert: r array first closeTo: -6.108642e-10.
+	self assert: r array first closeTo: -6.11e-10.
 	self assert: r array second closeTo: 8.15e-10.
 	r := self
 		gradientDescent: [ :x | self function2: x ]
