@@ -34,6 +34,7 @@ GrayScott class >> example2 [
 	| gif |
 	gif := PharoRecorder new openFileNamed: 'grayScott2.gif'.
 	gif extent: 512 @ 512.
+	gif frameDelay: 20.
 	self
 		f: 0.035
 		k: 0.065

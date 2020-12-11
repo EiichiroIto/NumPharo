@@ -101,11 +101,6 @@ DeepLearningFromScratch1Chapter1 >> testChapter1_5_6 [
 	self assert: r dtype equals: #Integer.
 	r := x at: (Array with: 1 with: 2).
 	self assert: r equals: 55.
-	x
-		do: [ :each | 
-			Transcript
-				cr;
-				show: each ].
 	x := x flatten.
 	self
 		assertCollection: x array
