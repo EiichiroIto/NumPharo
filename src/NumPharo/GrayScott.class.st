@@ -16,16 +16,23 @@ Class {
 	#category : #'NumPharo-Demo'
 }
 
+{ #category : #'instance creation' }
+GrayScott class >> amorphous [
+	^ self 	f: 0.04 k: 0.06
+]
+
+{ #category : #'instance creation' }
+GrayScott class >> bubbles [
+	^ self f: 0.012 k: 0.05
+]
+
 { #category : #examples }
 GrayScott class >> example1 [
 	| gif |
 	gif := PharoRecorder new openFileNamed: 'grayScott1.gif'.
 	gif extent: 512 @ 512.
-	self
-		f: 0.04
-		k: 0.06
-		times: 1000
-		withDoing: [ :gs | gif writeForm: gs form ].
+	self amorphous
+		in: [ :gs | 1000 timesRepeat: [ gif writeForm: gs form ] ].
 	gif close
 ]
 
@@ -35,11 +42,8 @@ GrayScott class >> example2 [
 	gif := PharoRecorder new openFileNamed: 'grayScott2.gif'.
 	gif extent: 512 @ 512.
 	gif frameDelay: 20.
-	self
-		f: 0.035
-		k: 0.065
-		times: 1000
-		withDoing: [ :gs | gif writeForm: gs form ].
+	self spot
+		in: [ :gs | 1000 timesRepeat: [ gif writeForm: gs form ] ].
 	gif close
 ]
 
@@ -48,11 +52,8 @@ GrayScott class >> example3 [
 	| gif |
 	gif := PharoRecorder new openFileNamed: 'grayScott3.gif'.
 	gif extent: 512 @ 512.
-	self
-		f: 0.012
-		k: 0.05
-		times: 1000
-		withDoing: [ :gs | gif writeForm: gs form ].
+	self bubbles
+		in: [ :gs | 1000 timesRepeat: [ gif writeForm: gs form ] ].
 	gif close
 ]
 
@@ -62,11 +63,8 @@ GrayScott class >> example4 [
 	gif := PharoRecorder new openFileNamed: 'grayScott4.gif'.
 	gif extent: 512 @ 512.
 	gif frameDelay: 20.
-	self
-		f: 0.022
-		k: 0.051
-		times: 1000
-		withDoing: [ :gs | gif writeForm: gs form ].
+	self stripe
+		in: [ :gs | 1000 timesRepeat: [ gif writeForm: gs form ] ].
 	gif close
 ]
 
@@ -76,63 +74,36 @@ GrayScott class >> example5 [
 	gif := PharoRecorder new openFileNamed: 'grayScott5.gif'.
 	gif extent: 512 @ 512.
 	gif frameDelay: 20.
-	self
-		f: 0.022
-		k: 0.051
-		times: 1000
-		withDoing: [ :gs | 
-			gs
-				uAtAll:
-					{(100 to: 110).
-					(100 to: 110)} comprehension
-				put: 0.
-			gif writeForm: gs form ].
+	self waves
+		in: [ :gs | 1000 timesRepeat: [ gif writeForm: gs form ] ].
 	gif close
 ]
 
 { #category : #private }
-GrayScott class >> f: aFloat k: aFloat2 times: anInteger3 fileNamed: aString4 [
-	| gs gif |
-	gs := self new.
-	gs
+GrayScott class >> f: aFloat k: aFloat2 [
+	^ self new
+		setDefaultParameters;
 		grid: 256;
-		square: 20.
-	gs setup.
-	gs
+		square: 20;
+		setup;
 		f: aFloat;
-		k: aFloat2.
-	gs
-		dx: 0.01;
-		dt: 1;
-		du: 2e-5;
-		dv: 1e-5.
-	gif := PharoRecorder new openFileNamed: aString4.
-	gif extent: 512 @ 512.
-	anInteger3
-		timesRepeat: [ gs loop.
-			gif writeForm: gs form ].
-	gif close
+		k: aFloat2;
+		yourself
 ]
 
-{ #category : #private }
-GrayScott class >> f: aFloat k: aFloat2 times: anInteger3 withDoing: aBlock4 [
-	| gs |
-	gs := self new.
-	gs
-		grid: 256;
-		square: 20.
-	gs setup.
-	gs
-		f: aFloat;
-		k: aFloat2.
-	gs
-		dx: 0.01;
-		dt: 1;
-		du: 2e-5;
-		dv: 1e-5.
-	anInteger3
-		timesRepeat: [ gs loop.
-			aBlock4 cull: gs ]
+{ #category : #'instance creation' }
+GrayScott class >> spot [
+	^ self f: 0.035 k: 0.065
+]
+
+{ #category : #'instance creation' }
+GrayScott class >> stripe [
+	^ self f: 0.04 k: 0.06
+]
+
+{ #category : #'instance creation' }
+GrayScott class >> waves [
+	^ self f: 0.025 k: 0.05
 ]
 
 { #category : #accessing }
@@ -216,6 +187,15 @@ GrayScott >> loop [
 			dvdt := dv * laplacianV + (u * v * v) - ((f + k) * v).
 			u := u + (dt * dudt).
 			v := v + (dt * dvdt) ]
+]
+
+{ #category : #api }
+GrayScott >> setDefaultParameters [
+	self
+		dx: 0.01;
+		dt: 1;
+		du: 2e-5;
+		dv: 1e-5
 ]
 
 { #category : #api }
