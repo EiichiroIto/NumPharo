@@ -138,6 +138,15 @@ NDArray class >> fromArray: anArray shape: anArray2 dtype: aSymbol [
 	^ self array: arr shape: anArray2 copy
 ]
 
+{ #category : #'instance creation' }
+NDArray class >> full: anObject withAll: aNumber dtype: aSymbol [
+	| arr shape size |
+	shape := self normalizedIndex: anObject.
+	size := self finiteProductOf: shape.
+	arr := self newArrayDtype: aSymbol size: size withAll: aNumber.
+	^ self array: arr shape: shape
+]
+
 { #category : #'class initialization' }
 NDArray class >> initialize [
 	"self initialize"
@@ -228,13 +237,19 @@ NDArray class >> newArrayDtype: aSymbol size: anInteger [
 	self error
 ]
 
-{ #category : #'instance creation' }
-NDArray class >> normalRandom: anObject [
-	| shape array |
-	shape := self normalizedIndex: anObject.
-	array := FloatArray new: (self finiteProductOf: shape).
-	1 to: array size do: [ :each | array at: each put: self normalRandomNumber ].
-	^ self array: array shape: shape
+{ #category : #accessing }
+NDArray class >> newArrayDtype: aSymbol size: anInteger withAll: aNumber [
+	aSymbol = #Float
+		ifTrue: [ ^ FloatArray new: anInteger withAll: aNumber ].
+	aSymbol = #Byte
+		ifTrue: [ ^ ByteArray new: anInteger withAll: aNumber ].
+	aSymbol = #Word
+		ifTrue: [ ^ WordArray new: anInteger withAll: aNumber ].
+	aSymbol = #Integer
+		ifTrue: [ ^ IntegerArray new: anInteger withAll: aNumber ].
+	aSymbol = #Boolean
+		ifTrue: [ ^ Array new: anInteger withAll: aNumber ].
+	self error
 ]
 
 { #category : #private }
@@ -249,16 +264,12 @@ NDArray class >> normalRandomNumber [
 NDArray class >> normalizedIndex: anObject [
 	^ anObject isNumber
 		ifTrue: [ Array with: anObject asInteger ]
-		ifFalse: [ anObject asArray ]
+		ifFalse: [ anObject copy asArray ]
 ]
 
 { #category : #'instance creation' }
-NDArray class >> ones: anObject [
-	| arr size shape |
-	shape := self normalizedIndex: anObject.
-	size := self finiteProductOf: shape.
-	arr := IntegerArray new: size withAll: 1.
-	^ self array: arr shape: shape
+NDArray class >> ones: anObject dtype: aSymbol [
+	^ self full: anObject withAll: 1 dtype: aSymbol
 ]
 
 { #category : #accessing }
@@ -278,12 +289,12 @@ NDArray class >> presumeDtype: anArray [
 	self error
 ]
 
-{ #category : #'instance creation' }
-NDArray class >> random: anObject [
+{ #category : #private }
+NDArray class >> random: anObject generateEach: aBlock [
 	| shape array |
 	shape := self normalizedIndex: anObject.
 	array := FloatArray new: (self finiteProductOf: shape).
-	1 to: array size do: [ :each | array at: each put: self uniformRandomNumber ].
+	1 to: array size do: [ :each | array at: each put: aBlock value ].
 	^ self array: array shape: shape
 ]
 
@@ -296,6 +307,31 @@ NDArray class >> randomChoice: anInteger from: aCollection [
 	^ self
 		fromArray: (list shuffled copyFrom: 1 to: anInteger)
 		dtype: #Integer
+]
+
+{ #category : #'instance creation' }
+NDArray class >> randomNormal: anObject [
+	^ self random: anObject generateEach: [ self normalRandomNumber ]
+]
+
+{ #category : #'instance creation' }
+NDArray class >> randomNormal: anObject mean: aNumber2 std: aNumber3 [
+	^ self
+		random: anObject
+		generateEach: [ self normalRandomNumber * aNumber3 + aNumber2 ]
+]
+
+{ #category : #'instance creation' }
+NDArray class >> randomUniform: anObject [
+	^ self random: anObject generateEach: [ self uniformRandomNumber ]
+]
+
+{ #category : #'instance creation' }
+NDArray class >> randomUniform: anObject from: anInteger2 to: anInteger3 [
+	^ self
+		random: anObject
+		generateEach:
+			[ anInteger2 + ((anInteger3 - anInteger2) * self uniformRandomNumber) ]
 ]
 
 { #category : #utilities }
@@ -395,11 +431,11 @@ NDArray class >> writeMeshGridArrayOf: anArray at: anInteger on: aStream [
 ]
 
 { #category : #'instance creation' }
-NDArray class >> zeros: anObject [
-	| arr size shape |
+NDArray class >> zeros: anObject dtype: aSymbol [
+	| arr shape size |
 	shape := self normalizedIndex: anObject.
 	size := self finiteProductOf: shape.
-	arr := IntegerArray new: size.
+	arr := self newArrayDtype: aSymbol size: size.
 	^ self array: arr shape: shape
 ]
 
@@ -783,18 +819,6 @@ NDArray >> flatten [
 	^ self class
 		array: self array copy
 		shape: (Array with: (self class finiteProductOf: self shape))
-]
-
-{ #category : #accessing }
-NDArray >> indexAt: anInteger [
-	| r v a |
-	v := anInteger - 1.
-	r := WriteStream on: Array new.
-	1 to: self ndim do: [ :each | 
-		a := self itemSizeAxis: each.
-		r nextPut: (v // a) + 1.
-		v := v \\ a ].
-	^ r contents
 ]
 
 { #category : #testing }

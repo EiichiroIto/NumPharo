@@ -50,8 +50,8 @@ PharoPlotTest >> testCols [
 	p := self newPlot.
 	self assert: p cols equals: 1.
 	p
-		plotX: (NDArray zeros: #(1))
-		y: (NDArray zeros: #(1))
+		plotX: (NDArray zeros: #(1) dtype: #Integer)
+		y: (NDArray zeros: #(1) dtype: #Integer)
 		label: 'abc'.
 	self assert: p cols equals: 1.
 	p cols: 9.
@@ -67,8 +67,8 @@ PharoPlotTest >> testCurrent [
 	p := self newPlot.
 	self assert: p current isNil.
 	p
-		plotX: (NDArray zeros: #(1))
-		y: (NDArray zeros: #(1))
+		plotX: (NDArray zeros: #(1) dtype: #Integer)
+		y: (NDArray zeros: #(1) dtype: #Integer)
 		label: 'abc'.
 	self assert: p current notNil
 ]
@@ -147,8 +147,8 @@ PharoPlotTest >> testRows [
 	p := self newPlot.
 	self assert: p rows equals: 1.
 	p
-		plotX: (NDArray zeros: #(1))
-		y: (NDArray zeros: #(1))
+		plotX: (NDArray zeros: #(1) dtype: #Integer)
+		y: (NDArray zeros: #(1) dtype: #Integer)
 		label: 'abc'.
 	self assert: p rows equals: 1.
 	p rows: 9.

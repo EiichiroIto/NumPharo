@@ -90,7 +90,7 @@ NDArrayTest >> testArrayFromToNumWithEndPoint [
 { #category : #test }
 NDArrayTest >> testArrayIndexAt [
 	| a |
-	a := NDArray ones: #(3 2 3).
+	a := NDArray ones: #(3 2 3) dtype: #Integer.
 	self assert: (a arrayIndexAt: #(1)) equals: 1.
 	self assert: (a arrayIndexAt: #(2)) equals: 7.
 	self assert: (a arrayIndexAt: #(3)) equals: 13.
@@ -445,6 +445,15 @@ NDArrayTest >> testFromArrayDtype [
 ]
 
 { #category : #test }
+NDArrayTest >> testFullWithAllDtype [
+	| r |
+	r := NDArray full: #(2 3) withAll: 2 dtype: #Integer.
+	self assertCollection: r array equals: #(2 2 2 2 2 2) asIntegerArray.
+	self assertCollection: r shape equals: #(2 3).
+	self assert: r dtype equals: #Integer
+]
+
+{ #category : #test }
 NDArrayTest >> testIsNDArray [
 	| n |
 	n := self newArrayFrom: #(1 2 3).
@@ -513,8 +522,8 @@ NDArrayTest >> testMeshArraysOf [
 { #category : #test }
 NDArrayTest >> testMeshDtypeOf [
 	| x y r z |
-	x := NDArray ones: #(2).
-	y := NDArray ones: #(3).
+	x := NDArray ones: #(2) dtype: #Integer.
+	y := NDArray ones: #(3) dtype: #Integer.
 	r := NDArray
 		meshDtypeOf:
 			{x.
@@ -637,22 +646,22 @@ NDArrayTest >> testNormalizedIndex [
 ]
 
 { #category : #test }
-NDArrayTest >> testOnes [
+NDArrayTest >> testOnesDtype [
 	| a |
-	a := NDArray ones: 5.
+	a := NDArray ones: 5 dtype: #Integer.
 	self assertCollection: a array equals: #(1 1 1 1 1) asIntegerArray.
 	self assertCollection: a shape equals: #(5).
 	self assert: a dtype equals: #Integer.
-	a := NDArray ones: #(2 3).
-	self assertCollection: a array equals: #(1 1 1 1 1 1) asIntegerArray.
+	a := NDArray ones: #(2 3) dtype: #Float.
+	self assertCollection: a array equals: #(1 1 1 1 1 1) asFloatArray.
 	self assertCollection: a shape equals: #(2 3).
-	self assert: a dtype equals: #Integer
+	self assert: a dtype equals: #Float
 ]
 
 { #category : #test }
 NDArrayTest >> testPresumeDtype [
 	| r |
-	r := NDArray presumeDtype: (NDArray ones: #(1)).
+	r := NDArray presumeDtype: (NDArray ones: #(1) dtype: #Integer).
 	self assert: r equals: #Integer.
 	r := NDArray presumeDtype: #().
 	self assert: r equals: #Float.
@@ -715,6 +724,40 @@ NDArrayTest >> testRandomChoiceFrom [
 ]
 
 { #category : #test }
+NDArrayTest >> testRandomNormal [
+	| a |
+	a := NDArray randomNormal: 10000.
+	self assert: a average abs < 0.1.
+	self assert: (a std - 1) abs < 0.1
+]
+
+{ #category : #test }
+NDArrayTest >> testRandomNormalMeanStd [
+	| a |
+	a := NDArray randomNormal: 10000 mean: 5 std: 2.
+	self assert: (a average - 5) abs < 0.1.
+	self assert: (a std - 2) abs < 0.1
+]
+
+{ #category : #test }
+NDArrayTest >> testRandomUniform [
+	| r |
+	100
+		timesRepeat: [ r := NDArray randomUniform: 10.
+			self assert: ((r >= 0) array allSatisfy: [ :each | each ]).
+			self assert: ((r < 1) array allSatisfy: [ :each | each ]) ]
+]
+
+{ #category : #test }
+NDArrayTest >> testRandomUniformFromTo [
+	| r |
+	100
+		timesRepeat: [ r := NDArray randomUniform: 10 from: 5 to: 8.
+			self assert: ((r >= 5) array allSatisfy: [ :each | each ]).
+			self assert: ((r < 8) array allSatisfy: [ :each | each ]) ]
+]
+
+{ #category : #test }
 NDArrayTest >> testRawAt [
 	| a r |
 	a := self newArrayFrom: #(10 20 30).
@@ -754,7 +797,7 @@ NDArrayTest >> testShapeOf [
 { #category : #test }
 NDArrayTest >> testShapeWithNdim [
 	| a s |
-	a := NDArray ones: #(2 3).
+	a := NDArray ones: #(2 3) dtype: #Integer.
 	self assertCollection: a shape equals: #(2 3).
 	s := a shapeWithNdim: 5.
 	self assertCollection: s equals: #(1 1 1 2 3)
@@ -1039,16 +1082,16 @@ NDArrayTest >> testWriteMeshGridArrayOfAtOn2 [
 ]
 
 { #category : #test }
-NDArrayTest >> testZeros [
+NDArrayTest >> testZerosDtype [
 	| a |
-	a := NDArray zeros: 5.
+	a := NDArray zeros: 5 dtype: #Integer.
 	self assertCollection: a array equals: #(0 0 0 0 0) asIntegerArray.
 	self assertCollection: a shape equals: #(5).
 	self assert: a dtype equals: #Integer.
-	a := NDArray zeros: #(2 3).
-	self assertCollection: a array equals: #(0 0 0 0 0 0) asIntegerArray.
+	a := NDArray zeros: #(2 3) dtype: #Float.
+	self assertCollection: a array equals: #(0 0 0 0 0 0) asFloatArray.
 	self assertCollection: a shape equals: #(2 3).
-	self assert: a dtype equals: #Integer
+	self assert: a dtype equals: #Float
 ]
 
 { #category : #test }
@@ -1059,7 +1102,7 @@ NDArrayTest >> testZerosLike [
 	self assertCollection: r array equals: #(0 0 0 0 0) asFloatArray.
 	self assertCollection: r shape equals: #(5).
 	self assert: r dtype equals: #Float.
-	a := NDArray zeros: #(2 3).
+	a := NDArray zeros: #(2 3) dtype: #Integer.
 	r := NDArray zerosLike: a.
 	self assertCollection: r array equals: #(0 0 0 0 0 0) asIntegerArray.
 	self assertCollection: r shape equals: #(2 3).

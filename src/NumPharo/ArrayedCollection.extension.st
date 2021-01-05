@@ -80,6 +80,11 @@ ArrayedCollection >> isFlatArray [
 ]
 
 { #category : #'*NumPharo' }
+ArrayedCollection >> std [
+	^ (self - self average) squared average sqrt
+]
+
+{ #category : #'*NumPharo' }
 ArrayedCollection >> wrapCopyFrom: anInteger1 size: anInteger2 on: aCollection3 at: anInteger4 [
 	| start end |
 	start := (anInteger1 - 1) \\ self size + 1.

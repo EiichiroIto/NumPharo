@@ -1,5 +1,5 @@
 Class {
-	#name : #PharoRecorder,
+	#name : #AnimatedGifRecorder,
 	#superclass : #Object,
 	#instVars : [
 		'writer',
@@ -10,7 +10,7 @@ Class {
 }
 
 { #category : #api }
-PharoRecorder >> close [
+AnimatedGifRecorder >> close [
 	self isOpen
 		ifFalse: [ ^ self ].
 	writer close.
@@ -18,32 +18,32 @@ PharoRecorder >> close [
 ]
 
 { #category : #private }
-PharoRecorder >> defaultFrameDelay [
+AnimatedGifRecorder >> defaultFrameDelay [
 	^ 10
 ]
 
 { #category : #accessing }
-PharoRecorder >> extent [
+AnimatedGifRecorder >> extent [
 	^ extent
 ]
 
 { #category : #accessing }
-PharoRecorder >> extent: aPoint [
+AnimatedGifRecorder >> extent: aPoint [
 	extent := aPoint
 ]
 
 { #category : #accessing }
-PharoRecorder >> frameDelay [
+AnimatedGifRecorder >> frameDelay [
 	^ frameDelay ifNil: [ self defaultFrameDelay ]
 ]
 
 { #category : #accessing }
-PharoRecorder >> frameDelay: anInteger [
+AnimatedGifRecorder >> frameDelay: anInteger [
 	frameDelay := anInteger
 ]
 
 { #category : #private }
-PharoRecorder >> frameFromForm: aForm [
+AnimatedGifRecorder >> frameFromForm: aForm [
 	| form |
 	form := extent
 		ifNil: [ aForm ]
@@ -55,19 +55,19 @@ PharoRecorder >> frameFromForm: aForm [
 ]
 
 { #category : #testing }
-PharoRecorder >> isOpen [
+AnimatedGifRecorder >> isOpen [
 	^ writer notNil
 ]
 
 { #category : #api }
-PharoRecorder >> openFileNamed: aString [
+AnimatedGifRecorder >> openFileNamed: aString [
 	self close.
 	writer := GIFReadWriter on: aString asFileReference binaryWriteStream.
 	^ self
 ]
 
 { #category : #api }
-PharoRecorder >> writeForm: aForm [
+AnimatedGifRecorder >> writeForm: aForm [
 	| frame |
 	self isOpen
 		ifFalse: [ ^ self ].

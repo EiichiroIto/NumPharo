@@ -29,7 +29,7 @@ GrayScott class >> bubbles [
 { #category : #examples }
 GrayScott class >> example1 [
 	| gif |
-	gif := PharoRecorder new openFileNamed: 'grayScott1.gif'.
+	gif := AnimatedGifRecorder new openFileNamed: 'grayScott1.gif'.
 	gif extent: 512 @ 512.
 	self amorphous
 		in: [ :gs | 1000 timesRepeat: [ gif writeForm: gs form ] ].
@@ -39,7 +39,7 @@ GrayScott class >> example1 [
 { #category : #examples }
 GrayScott class >> example2 [
 	| gif |
-	gif := PharoRecorder new openFileNamed: 'grayScott2.gif'.
+	gif := AnimatedGifRecorder new openFileNamed: 'grayScott2.gif'.
 	gif extent: 512 @ 512.
 	gif frameDelay: 20.
 	self spot
@@ -50,7 +50,7 @@ GrayScott class >> example2 [
 { #category : #examples }
 GrayScott class >> example3 [
 	| gif |
-	gif := PharoRecorder new openFileNamed: 'grayScott3.gif'.
+	gif := AnimatedGifRecorder new openFileNamed: 'grayScott3.gif'.
 	gif extent: 512 @ 512.
 	self bubbles
 		in: [ :gs | 1000 timesRepeat: [ gif writeForm: gs form ] ].
@@ -60,7 +60,7 @@ GrayScott class >> example3 [
 { #category : #examples }
 GrayScott class >> example4 [
 	| gif |
-	gif := PharoRecorder new openFileNamed: 'grayScott4.gif'.
+	gif := AnimatedGifRecorder new openFileNamed: 'grayScott4.gif'.
 	gif extent: 512 @ 512.
 	gif frameDelay: 20.
 	self stripe
@@ -71,7 +71,7 @@ GrayScott class >> example4 [
 { #category : #examples }
 GrayScott class >> example5 [
 	| gif |
-	gif := PharoRecorder new openFileNamed: 'grayScott5.gif'.
+	gif := AnimatedGifRecorder new openFileNamed: 'grayScott5.gif'.
 	gif extent: 512 @ 512.
 	gif frameDelay: 20.
 	self waves
@@ -202,8 +202,8 @@ GrayScott >> setDefaultParameters [
 GrayScott >> setup [
 	| shape |
 	shape := Array with: grid with: grid.
-	u := NDArray ones: shape.
-	v := NDArray zeros: shape.
+	u := NDArray ones: shape dtype: #Float.
+	v := NDArray zeros: shape dtype: #Float.
 	u
 		atAll:
 			{(grid // 2 - (square // 2) to: grid // 2 + (square // 2)).
@@ -214,8 +214,8 @@ GrayScott >> setup [
 			{(grid // 2 - (square // 2) to: grid // 2 + (square // 2)).
 			(grid // 2 - (square // 2) to: grid // 2 + (square // 2))} comprehension
 		put: 0.25.
-	u := (u + ((NDArray random: shape) * 0.1)) minimum: 1.
-	v := (v + ((NDArray random: shape) * 0.1)) minimum: 1
+	u := (u + ((NDArray randomUniform: shape) * 0.1)) minimum: 1.
+	v := (v + ((NDArray randomUniform: shape) * 0.1)) minimum: 1
 ]
 
 { #category : #accessing }
