@@ -381,6 +381,14 @@ TNDArrayArithmetics >> newArraySize: anInteger [
 ]
 
 { #category : #converting }
+TNDArrayArithmetics >> omitBefore: anInteger after: anInteger2 [
+	^ NDPadder new
+		before: anInteger;
+		after: anInteger2;
+		omit: self
+]
+
+{ #category : #converting }
 TNDArrayArithmetics >> padBefore: anInteger after: anInteger2 [
 	^ NDPadder new
 		before: anInteger;

@@ -459,6 +459,20 @@ TNDArrayArithmeticsTest >> testNegated [
 ]
 
 { #category : #test }
+TNDArrayArithmeticsTest >> testOmitBeforeAfter [
+	| a r |
+	a := self newArrayFrom: #(1 2 3 4 5 6).
+	r := a omitBefore: 1 after: 2.
+	self assertCollection: r array equals: #(2 3 4) asFloatArray.
+	self assertCollection: r shape equals: #(3).
+	a := self
+		newArrayFrom: #(#(1 1 2 3 3) #(1 1 2 3 3) #(4 4 5 6 6) #(7 7 8 9 9) #(7 7 8 9 9)).
+	r := a omitBefore: 1 after: 1.
+	self assertCollection: r array equals: #(1 2 3 4 5 6 7 8 9) asFloatArray.
+	self assertCollection: r shape equals: #(3 3)
+]
+
+{ #category : #test }
 TNDArrayArithmeticsTest >> testPadBeforeAfter [
 	| a r |
 	a := self newArrayFrom: #(#(1 2 3) #(4 5 6) #(7 8 9)).
