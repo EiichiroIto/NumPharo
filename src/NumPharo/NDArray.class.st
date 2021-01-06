@@ -334,6 +334,11 @@ NDArray class >> randomUniform: anObject from: anInteger2 to: anInteger3 [
 			[ anInteger2 + ((anInteger3 - anInteger2) * self uniformRandomNumber) ]
 ]
 
+{ #category : #private }
+NDArray class >> randomUniformFrom: anInteger to: anInteger2 [
+	^ anInteger + ((anInteger2 - anInteger) * self uniformRandomNumber)
+]
+
 { #category : #utilities }
 NDArray class >> relu: x [
 	^ x min: x max: 0

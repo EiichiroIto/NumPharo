@@ -181,14 +181,7 @@ TNDArrayArithmetics >> digitize: aNDArray right: aBoolean [
 	self array
 		withIndexDo: [ :each :index | 
 			| r |
-			r := aNDArray array
-				findBinaryIndex: [ :a | each - a ]
-				ifNone: [ :a | a negated ].
-			r := r > 0
-				ifTrue: [ aBoolean
-						ifTrue: [ r - 1 ]
-						ifFalse: [ r ] ]
-				ifFalse: [ r negated ].
+			r := each digitize: aNDArray right: aBoolean.
 			arr at: index put: r ].
 	^ self class array: arr shape: self shape
 ]

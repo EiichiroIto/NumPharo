@@ -143,19 +143,19 @@ TNDArrayArithmeticsTest >> testDigitizeRight [
 	a := self newArrayFrom: #(0.2 6.4 3.0 1.6).
 	bins := self newArrayFrom: #(0.0 1.0 2.5 4.0 10.0).
 	r := a digitize: bins right: false.
-	self assertCollection: r array equals: #(1 4 3 2) asIntegerArray.
+	self assertCollection: r array equals: #(2 5 4 3) asIntegerArray.
 	a := self newArrayFrom: #(1.2 10.0 12.4 15.5 20.0).
 	bins := self newArrayFrom: #(0 5 10 15 20).
 	r := a digitize: bins right: false.
-	self assertCollection: r array equals: #(1 3 3 4 5) asIntegerArray.
+	self assertCollection: r array equals: #(2 4 4 5 6) asIntegerArray.
 	r := a digitize: bins right: true.
-	self assertCollection: r array equals: #(1 2 3 4 4) asIntegerArray.
+	self assertCollection: r array equals: #(2 3 4 5 5) asIntegerArray.
 	a := self newArrayFrom: #(20 77 23 -50 -18 -80 -17 45 66 83).
 	bins := self newArrayFrom: #(-50 -10 0 10 50).
 	r := a digitize: bins right: false.
 	self
 		assertCollection: r array
-		equals: #(4 5 4 1 1 0 1 4 5 5) asIntegerArray
+		equals: #(5 6 5 2 2 1 2 5 6 6) asIntegerArray
 ]
 
 { #category : #test }

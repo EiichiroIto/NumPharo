@@ -15,7 +15,10 @@ Class {
 		'address',
 		'instanceId',
 		'response',
-		'done'
+		'done',
+		'observation',
+		'reward',
+		'info'
 	],
 	#category : #'NumPharo-Gym'
 }
@@ -98,6 +101,16 @@ OpenAIGymClient >> getActionSpaceSample [
 ]
 
 { #category : #accessing }
+OpenAIGymClient >> info [
+	^ info
+]
+
+{ #category : #accessing }
+OpenAIGymClient >> info: aDictionary [
+	info := aDictionary
+]
+
+{ #category : #accessing }
 OpenAIGymClient >> instanceId [
 	^ instanceId
 ]
@@ -105,6 +118,16 @@ OpenAIGymClient >> instanceId [
 { #category : #accessing }
 OpenAIGymClient >> instanceId: aString [
 	instanceId := aString
+]
+
+{ #category : #accessing }
+OpenAIGymClient >> observation [
+	^ observation
+]
+
+{ #category : #accessing }
+OpenAIGymClient >> observation: anArray [
+	observation := anArray
 ]
 
 { #category : #private }
@@ -120,6 +143,7 @@ OpenAIGymClient >> post: aString text: aString2 [
 { #category : #api }
 OpenAIGymClient >> reset [
 	| url |
+	done := nil.
 	url := self address , '/v1/envs/' , self instanceId  , '/reset/'.
 	self post: url text: ''.
 	^ self responseData at: 'observation'
@@ -138,6 +162,16 @@ OpenAIGymClient >> response: aResponse [
 { #category : #private }
 OpenAIGymClient >> responseData [
 	^ 	STON fromString: self response entity string
+]
+
+{ #category : #accessing }
+OpenAIGymClient >> reward [
+	^ reward
+]
+
+{ #category : #accessing }
+OpenAIGymClient >> reward: anInteger [
+	reward := anInteger
 ]
 
 { #category : #api }
@@ -160,7 +194,7 @@ OpenAIGymClient >> startMonitorForce: aBoolean1 resume: aBoolean2 videoCallable:
 
 { #category : #api }
 OpenAIGymClient >> step: anObject render: aBoolean2 [
-	| url raw dict observation reward info |
+	| url raw dict |
 	self done
 		ifTrue: [ self error: 'cannot step, already done' ].
 	url := self address , '/v1/envs/' , self instanceId , '/step/'.
@@ -168,13 +202,8 @@ OpenAIGymClient >> step: anObject render: aBoolean2 [
 	('render' -> aBoolean2)} asDictionary.
 	self post: url json: (STON toJsonString: raw).
 	dict := self responseData.
-	observation := dict at: 'observation'.
-	reward := dict at: 'reward'.
+	self observation: (dict at: 'observation').
+	self reward: (dict at: 'reward').
 	self done: (dict at: 'done').
-	info := dict at: 'info'.
-	^ Array
-		with: observation
-		with: reward
-		with: done
-		with: info
+	self info: (dict at: 'info')
 ]

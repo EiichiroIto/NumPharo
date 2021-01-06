@@ -17,3 +17,17 @@ Number >> adaptToNDArray: rcvr andSend: selector [
 Number >> asNDIndexes [
 	^ Array with: self
 ]
+
+{ #category : #'*NumPharo' }
+Number >> digitize: aNDArray right: aBoolean [
+	| r |
+	r := aNDArray array
+		findBinaryIndex: [ :a | self - a ]
+		ifNone: [ :a | a negated ].
+	r := r > 0
+		ifTrue: [ aBoolean
+				ifTrue: [ r - 1 ]
+				ifFalse: [ r ] ]
+		ifFalse: [ r negated ].
+	^ r + 1
+]
