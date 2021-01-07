@@ -4,36 +4,24 @@ Class {
 	#instVars : [
 		'bins',
 		'qTable',
-		'gym'
+		'state',
+		'action',
+		'episode',
+		'steps',
+		'total',
+		'last100'
 	],
 	#category : #'NumPharo-Gym'
 }
 
-{ #category : #private }
-CartPoleQ class >> createGym [
-	| gym |
-	gym := OpenAIGymClient new address: 'http://127.0.0.1:5000'.
-	gym createEnv: 'CartPole-v0'.
-	gym startMonitorForce: true resume: false videoCallable: false.
-	^ gym
+{ #category : #accessing }
+CartPoleQ >> action [
+	^ action
 ]
 
-{ #category : #examples }
-CartPoleQ class >> example1 [
-	| c total p x y |
-	c := self new.
-	c setupBins.
-	c setupQTable.
-	c gym: self createGym.
-	total := c training: 2000 render: false.
-	c gym close.
-	p := PharoPlot new.
-	p extent: 1000 @ 200.
-	y := NDArray fromArray: total.
-	x := NDArray arangeFrom: 1 to: y size by: 1.
-	p plotX: x y: y label: ''.
-	p show.
-	^ c
+{ #category : #accessing }
+CartPoleQ >> action: anObject [
+	action := anObject
 ]
 
 { #category : #private }
@@ -52,8 +40,8 @@ CartPoleQ >> bins [
 ]
 
 { #category : #accessing }
-CartPoleQ >> bins: anArray [
-	bins := anArray
+CartPoleQ >> bins: anObject [
+	bins := anObject
 ]
 
 { #category : #private }
@@ -68,6 +56,29 @@ CartPoleQ >> binsMin: aFloat max: aFloat2 num: anInteger [
 ]
 
 { #category : #private }
+CartPoleQ >> changeEpisode [
+	self total add: self steps.
+	self last100 add: self steps.
+	self last100 size > 100
+		ifTrue: [ self last100 removeFirst ].
+	Transcript
+		show: 'episode=';
+		show: self episode;
+		show: ' steps=';
+		show: self steps;
+		show: ' average=';
+		show: self last100 average asFloat;
+		cr.
+	self steps: 0.
+	self episode: self episode + 1
+]
+
+{ #category : #private }
+CartPoleQ >> defaultAction [
+	^ self numActions atRandom
+]
+
+{ #category : #private }
 CartPoleQ >> digitize: anArray [
 	| a |
 	a := anArray
@@ -78,21 +89,14 @@ CartPoleQ >> digitize: anArray [
 	^ a sum + 1
 ]
 
-{ #category : #api }
-CartPoleQ >> executeRender: aBoolean [
-	| observation state action count |
-	observation := self gym reset.
-	state := self digitize: observation.
-	action := self actionFor: state.
-	count := 0.
-	[ self gym done ]
-		whileFalse: [ | ret |
-			self gym step: action - 1 render: aBoolean.
-			ret := self nextFromObservation: self gym observation episode: 1000.
-			state := ret first.
-			action := ret second.
-			count := count + 1 ].
-	^ count
+{ #category : #accessing }
+CartPoleQ >> episode [
+	^ episode
+]
+
+{ #category : #accessing }
+CartPoleQ >> episode: anObject [
+	episode := anObject
 ]
 
 { #category : #constants }
@@ -100,14 +104,24 @@ CartPoleQ >> gamma [
 	^ 0.99
 ]
 
-{ #category : #accessing }
-CartPoleQ >> gym [
-	^ gym
+{ #category : #initialization }
+CartPoleQ >> initialize [
+	self episode: 1.
+	self steps: 0.
+	self total: OrderedCollection new.
+	self last100: OrderedCollection new.
+	self setupBins.
+	self setupQTable
 ]
 
 { #category : #accessing }
-CartPoleQ >> gym: aGym [
-	gym := aGym
+CartPoleQ >> last100 [
+	^ last100
+]
+
+{ #category : #accessing }
+CartPoleQ >> last100: anObject [
+	last100 := anObject
 ]
 
 { #category : #constants }
@@ -116,10 +130,10 @@ CartPoleQ >> maxNumberOfSteps [
 ]
 
 { #category : #private }
-CartPoleQ >> nextFromObservation: anArray episode: anInteger2 [
+CartPoleQ >> nextFromObservation: anArray [
 	| nextState epsilon nextAction |
 	nextState := self digitize: anArray.
-	epsilon := 0.5 * (0.99 ** anInteger2).
+	epsilon := 0.5 * (0.99 ** self episode).
 	nextAction := (epsilon <= (NDArray randomUniformFrom: 0 to: 1))
 		ifTrue: [ self actionFor: nextState ]
 		ifFalse: [ (1 to: 2) atRandom ].
@@ -142,8 +156,8 @@ CartPoleQ >> qTable [
 ]
 
 { #category : #accessing }
-CartPoleQ >> qTable: aNDArray [
-	qTable := aNDArray
+CartPoleQ >> qTable: anObject [
+	qTable := anObject
 ]
 
 { #category : #private }
@@ -165,9 +179,10 @@ CartPoleQ >> qValueAtState: anInteger action: anInteger2 put: aFloat3 [
 
 { #category : #private }
 CartPoleQ >> setupBins [
-	bins := #(#(-2.4 2.4 4) #(-3.0 3.0 4) #(-0.5 0.5 4) #(-2.0 2.0 4))
-		collect:
-			[ :each | self binsMin: each first max: each second num: each third ]
+	self
+		bins:
+			(#(#(-2.4 2.4 4) #(-3.0 3.0 4) #(-0.5 0.5 4) #(-2.0 2.0 4))
+				collect: [ :each | self binsMin: each first max: each second num: each third ])
 ]
 
 { #category : #private }
@@ -176,49 +191,58 @@ CartPoleQ >> setupQTable [
 	size := Array
 		with: self numObservations ** self numObservations
 		with: self numActions.
-	qTable := NDArray randomUniform: size from: -1 to: 1
+	self qTable: (NDArray randomUniform: size from: -1 to: 1)
+]
+
+{ #category : #accessing }
+CartPoleQ >> state [
+	^ state
+]
+
+{ #category : #accessing }
+CartPoleQ >> state: anObject [
+	state := anObject
+]
+
+{ #category : #accessing }
+CartPoleQ >> steps [
+	^ steps
+]
+
+{ #category : #accessing }
+CartPoleQ >> steps: anObject [
+	steps := anObject
+]
+
+{ #category : #accessing }
+CartPoleQ >> total [
+	^ total
+]
+
+{ #category : #accessing }
+CartPoleQ >> total: anObject [
+	total := anObject
 ]
 
 { #category : #api }
-CartPoleQ >> training: anInteger render: aBoolean2 [
-	| last100 r total |
-	last100 := OrderedCollection new.
-	total := OrderedCollection new.
-	0 to: anInteger do: [ :each | 
-		r := self trainingEpisode: each render: aBoolean2.
-		total add: r.
-		last100 add: r.
-		last100 size > 100
-			ifTrue: [ last100 removeFirst ].
-		last100 average >= 200
-			ifTrue: [ ^ total asArray ] ].
-	^ total asArray
-]
-
-{ #category : #private }
-CartPoleQ >> trainingEpisode: anInteger render: aBoolean2 [
-	| observation state action |
-	observation := self gym reset.
-	state := self digitize: observation.
-	action := self actionFor: state.
-	1 to: self maxNumberOfSteps do: [ :each | 
-		| reward ret v1 v2 |
-		self gym step: action - 1 render: aBoolean2.
-		reward := self gym reward.
-		self gym done
-			ifTrue: [ reward := reward - 200 ].
-		ret := self
-			nextFromObservation: self gym observation
-			episode: anInteger.
-		v1 := (1 - self alpha) * (self qValueAtState: state action: action).
-		v2 := self alpha
-			*
-				(self gamma * (self qValueAtState: ret first action: ret second)
-					+ reward).
-		self qValueAtState: state action: action put: v1 + v2.
-		state := ret first.
-		action := ret second.
-		self gym done
-			ifTrue: [ ^ each ] ].
-	^ self maxNumberOfSteps + 1
+CartPoleQ >> update: anArray reward: anInteger done: aBoolean [
+	| reward pair v1 v2 |
+	pair := self nextFromObservation: anArray.
+	reward := aBoolean
+		ifTrue: [ anInteger - 200 ]
+		ifFalse: [ anInteger ].
+	(self state notNil and: [ self action notNil ])
+		ifTrue: [ v1 := (1 - self alpha)
+				* (self qValueAtState: self state action: self action).
+			v2 := self alpha
+				*
+					(self gamma * (self qValueAtState: pair first action: pair second)
+						+ reward).
+			self qValueAtState: self state action: self action put: v1 + v2 ].
+	self state: pair first.
+	self action: pair second.
+	self steps: self steps + 1.
+	aBoolean
+		ifTrue: [ self changeEpisode ].
+	^ self action - 1
 ]

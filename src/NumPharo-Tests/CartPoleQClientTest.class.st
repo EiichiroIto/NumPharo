@@ -1,25 +1,19 @@
+"
+A CartPoleQTest is a test class for testing the behavior of CartPoleQ
+"
 Class {
-	#name : #CartPoleQTest,
+	#name : #CartPoleQClientTest,
 	#superclass : #TestCase,
 	#category : #'NumPharo-Tests'
 }
 
 { #category : #private }
-CartPoleQTest >> newCartPole [
-	^ CartPoleQ new
+CartPoleQClientTest >> newCartPole [
+	^ CartPoleQClient new
 ]
 
 { #category : #test }
-CartPoleQTest >> testAction [
-	| c |
-	c := self newCartPole.
-	self assert: c action isNil.
-	c action: 123.
-	self assert: c action equals: 123
-]
-
-{ #category : #test }
-CartPoleQTest >> testActionFor [
+CartPoleQClientTest >> testActionFor [
 	| c a |
 	c := self newCartPole.
 	a := NDArray zeros: #(256 2) dtype: #Integer.
@@ -33,24 +27,23 @@ CartPoleQTest >> testActionFor [
 ]
 
 { #category : #test }
-CartPoleQTest >> testAlpha [
+CartPoleQClientTest >> testAlpha [
 	| c |
 	c := self newCartPole.
 	self assert: c alpha isFloat
 ]
 
 { #category : #test }
-CartPoleQTest >> testBins [
+CartPoleQClientTest >> testBins [
 	| c |
 	c := self newCartPole.
-	self assert: c bins isArray.
-	self assert: c bins size equals: 4.
+	self assert: c bins isNil.
 	c bins: #(1 2 3 4).
 	self assertCollection: c bins equals: #(1 2 3 4)
 ]
 
 { #category : #test }
-CartPoleQTest >> testBinsMinMaxNum [
+CartPoleQClientTest >> testBinsMinMaxNum [
 	| c r |
 	c := self newCartPole.
 	r := c binsMin: 1 max: 5 num: 4.
@@ -58,7 +51,7 @@ CartPoleQTest >> testBinsMinMaxNum [
 ]
 
 { #category : #test }
-CartPoleQTest >> testDigitize [
+CartPoleQClientTest >> testDigitize [
 	| c |
 	c := self newCartPole.
 	c setupBins.
@@ -70,64 +63,54 @@ CartPoleQTest >> testDigitize [
 ]
 
 { #category : #test }
-CartPoleQTest >> testEpisode [
-	| c |
-	c := self newCartPole.
-	self assert: c episode equals: 1.
-	c episode: 123.
-	self assert: c episode equals: 123
-]
-
-{ #category : #test }
-CartPoleQTest >> testGamma [
+CartPoleQClientTest >> testGamma [
 	| c |
 	c := self newCartPole.
 	self assert: c gamma isFloat
 ]
 
 { #category : #test }
-CartPoleQTest >> testLast100 [
+CartPoleQClientTest >> testGym [
 	| c |
 	c := self newCartPole.
-	self assert: c last100 isCollection.
-	self assert: c last100 isEmpty.
-	c last100: #(1 2 3 4).
-	self assertCollection: c last100 equals: #(1 2 3 4)
+	self assert: c gym isNil.
+	c gym: OpenAIGymClient new.
+	self assert: (c gym isKindOf: OpenAIGymClient)
 ]
 
 { #category : #test }
-CartPoleQTest >> testMaxNumberOfSteps [
+CartPoleQClientTest >> testMaxNumberOfSteps [
 	| c |
 	c := self newCartPole.
 	self assert: c maxNumberOfSteps isInteger
 ]
 
 { #category : #test }
-CartPoleQTest >> testNumActions [
+CartPoleQClientTest >> testNumActions [
 	| c |
 	c := self newCartPole.
 	self assert: c numActions isInteger
 ]
 
 { #category : #test }
-CartPoleQTest >> testNumObservations [
+CartPoleQClientTest >> testNumObservations [
 	| c |
 	c := self newCartPole.
 	self assert: c numObservations isInteger
 ]
 
 { #category : #test }
-CartPoleQTest >> testQTable [
+CartPoleQClientTest >> testQTable [
 	| c a |
 	c := self newCartPole.
-	self assert: c qTable isNDArray.
+	self assert: c qTable isNil.
 	a := NDArray fromArray: #(1 2 3 4).
 	c qTable: a.
 	self assert: c qTable identicalTo: a
 ]
 
 { #category : #test }
-CartPoleQTest >> testQValueAtStateAction [
+CartPoleQClientTest >> testQValueAtStateAction [
 	| c a |
 	c := self newCartPole.
 	a := NDArray zeros: #(256 2) dtype: #Integer.
@@ -143,7 +126,7 @@ CartPoleQTest >> testQValueAtStateAction [
 ]
 
 { #category : #test }
-CartPoleQTest >> testQValueAtStateActionPut [
+CartPoleQClientTest >> testQValueAtStateActionPut [
 	| c a |
 	c := self newCartPole.
 	a := NDArray zeros: #(256 2) dtype: #Integer.
@@ -159,55 +142,23 @@ CartPoleQTest >> testQValueAtStateActionPut [
 ]
 
 { #category : #test }
-CartPoleQTest >> testSetupBins [
+CartPoleQClientTest >> testSetupBins [
 	| c |
 	c := self newCartPole.
+	self assert: c bins isNil.
+	c setupBins.
 	self assert: c bins isArray.
 	self assert: c bins size equals: 4.
 	c bins do: [ :each | self assert: each isNDArray ]
 ]
 
 { #category : #test }
-CartPoleQTest >> testSetupQTable [
+CartPoleQClientTest >> testSetupQTable [
 	| c |
 	c := self newCartPole.
+	self assert: c qTable isNil.
+	c setupQTable.
 	self assert: c qTable isNDArray.
 	self assertCollection: c qTable shape equals: #(256 2).
 	self assert: c qTable dtype equals: #Float
-]
-
-{ #category : #test }
-CartPoleQTest >> testState [
-	| c |
-	c := self newCartPole.
-	self assert: c state isNil.
-	c state: 123.
-	self assert: c state equals: 123
-]
-
-{ #category : #test }
-CartPoleQTest >> testSteps [
-	| c |
-	c := self newCartPole.
-	self assert: c steps equals: 0.
-	c steps: 123.
-	self assert: c steps equals: 123
-]
-
-{ #category : #test }
-CartPoleQTest >> testTotal [
-	| c |
-	c := self newCartPole.
-	self assert: c total isCollection.
-	self assert: c total isEmpty.
-	c total: #(1 2 3 4).
-	self assertCollection: c total equals: #(1 2 3 4)
-]
-
-{ #category : #test }
-CartPoleQTest >> testUpdateRewardDone [
-	| c r |
-	c := self newCartPole.
-	r := c update: #(1 2 3 4) reward: 10 done: false.
-	
 ]
