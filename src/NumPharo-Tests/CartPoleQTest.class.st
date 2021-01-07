@@ -10,29 +10,6 @@ CartPoleQTest >> newCartPole [
 ]
 
 { #category : #test }
-CartPoleQTest >> testAction [
-	| c |
-	c := self newCartPole.
-	self assert: c action isNil.
-	c action: 123.
-	self assert: c action equals: 123
-]
-
-{ #category : #test }
-CartPoleQTest >> testActionFor [
-	| c a |
-	c := self newCartPole.
-	a := NDArray zeros: #(256 2) dtype: #Integer.
-	c qTable: a.
-	a at: #(1 1) put: 10.
-	a at: #(1 2) put: 20.
-	a at: #(2 1) put: 30.
-	a at: #(2 2) put: 20.
-	self assert: (c actionFor: 1) equals: 2.
-	self assert: (c actionFor: 2) equals: 1
-]
-
-{ #category : #test }
 CartPoleQTest >> testAlpha [
 	| c |
 	c := self newCartPole.
@@ -40,59 +17,10 @@ CartPoleQTest >> testAlpha [
 ]
 
 { #category : #test }
-CartPoleQTest >> testBins [
-	| c |
-	c := self newCartPole.
-	self assert: c bins isArray.
-	self assert: c bins size equals: 4.
-	c bins: #(1 2 3 4).
-	self assertCollection: c bins equals: #(1 2 3 4)
-]
-
-{ #category : #test }
-CartPoleQTest >> testBinsMinMaxNum [
-	| c r |
-	c := self newCartPole.
-	r := c binsMin: 1 max: 5 num: 4.
-	self assertCollection: r array equals: #(2 3 4) asFloatArray
-]
-
-{ #category : #test }
-CartPoleQTest >> testDigitize [
-	| c |
-	c := self newCartPole.
-	c setupBins.
-	self assert: (c digitize: #(-5 -5 -5 -5)) equals: 1.
-	self assert: (c digitize: #(5 5 5 5)) equals: 256.
-	self assert: (c digitize: #(-5 -1 -5 -5)) equals: 5.
-	self assert: (c digitize: #(-5 -5 -0.1 -5)) equals: 17.
-	self assert: (c digitize: #(-5 -5 -5 -0.5)) equals: 65
-]
-
-{ #category : #test }
-CartPoleQTest >> testEpisode [
-	| c |
-	c := self newCartPole.
-	self assert: c episode equals: 1.
-	c episode: 123.
-	self assert: c episode equals: 123
-]
-
-{ #category : #test }
 CartPoleQTest >> testGamma [
 	| c |
 	c := self newCartPole.
 	self assert: c gamma isFloat
-]
-
-{ #category : #test }
-CartPoleQTest >> testLast100 [
-	| c |
-	c := self newCartPole.
-	self assert: c last100 isCollection.
-	self assert: c last100 isEmpty.
-	c last100: #(1 2 3 4).
-	self assertCollection: c last100 equals: #(1 2 3 4)
 ]
 
 { #category : #test }
@@ -117,48 +45,6 @@ CartPoleQTest >> testNumObservations [
 ]
 
 { #category : #test }
-CartPoleQTest >> testQTable [
-	| c a |
-	c := self newCartPole.
-	self assert: c qTable isNDArray.
-	a := NDArray fromArray: #(1 2 3 4).
-	c qTable: a.
-	self assert: c qTable identicalTo: a
-]
-
-{ #category : #test }
-CartPoleQTest >> testQValueAtStateAction [
-	| c a |
-	c := self newCartPole.
-	a := NDArray zeros: #(256 2) dtype: #Integer.
-	c qTable: a.
-	a at: #(1 1) put: 10.
-	a at: #(1 2) put: 20.
-	a at: #(2 1) put: 30.
-	a at: #(2 2) put: 20.
-	self assert: (c qValueAtState: 1 action: 1) equals: 10.
-	self assert: (c qValueAtState: 1 action: 2) equals: 20.
-	self assert: (c qValueAtState: 2 action: 1) equals: 30.
-	self assert: (c qValueAtState: 2 action: 2) equals: 20
-]
-
-{ #category : #test }
-CartPoleQTest >> testQValueAtStateActionPut [
-	| c a |
-	c := self newCartPole.
-	a := NDArray zeros: #(256 2) dtype: #Integer.
-	c qTable: a.
-	c qValueAtState: 1 action: 1 put: 10.
-	c qValueAtState: 1 action: 2 put: 20.
-	c qValueAtState: 2 action: 1 put: 30.
-	c qValueAtState: 2 action: 2 put: 20.
-	self assert: (a at: #(1 1)) equals: 10.
-	self assert: (a at: #(1 2)) equals: 20.
-	self assert: (a at: #(2 1)) equals: 30.
-	self assert: (a at: #(2 2)) equals: 20
-]
-
-{ #category : #test }
 CartPoleQTest >> testSetupBins [
 	| c |
 	c := self newCartPole.
@@ -174,34 +60,6 @@ CartPoleQTest >> testSetupQTable [
 	self assert: c qTable isNDArray.
 	self assertCollection: c qTable shape equals: #(256 2).
 	self assert: c qTable dtype equals: #Float
-]
-
-{ #category : #test }
-CartPoleQTest >> testState [
-	| c |
-	c := self newCartPole.
-	self assert: c state isNil.
-	c state: 123.
-	self assert: c state equals: 123
-]
-
-{ #category : #test }
-CartPoleQTest >> testSteps [
-	| c |
-	c := self newCartPole.
-	self assert: c steps equals: 0.
-	c steps: 123.
-	self assert: c steps equals: 123
-]
-
-{ #category : #test }
-CartPoleQTest >> testTotal [
-	| c |
-	c := self newCartPole.
-	self assert: c total isCollection.
-	self assert: c total isEmpty.
-	c total: #(1 2 3 4).
-	self assertCollection: c total equals: #(1 2 3 4)
 ]
 
 { #category : #test }
