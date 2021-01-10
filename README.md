@@ -20,7 +20,7 @@ For now, I implemented some alternative tools like this:
 ```
 Metacello new
     baseline: 'NumPharo';
-    repository: 'github://EiichiroIto/NumPharo/src';
+    repository: 'github://EiichiroIto/NumPharo:main/src';
     load.
 ```
 
