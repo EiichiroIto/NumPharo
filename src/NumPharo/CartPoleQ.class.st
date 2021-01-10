@@ -1,45 +1,45 @@
 Class {
 	#name : #CartPoleQ,
 	#superclass : #QLearning,
+	#traits : 'TCartPole',
+	#classTraits : 'TCartPole classTrait',
 	#category : #'NumPharo-Gym'
 }
+
+{ #category : #examples }
+CartPoleQ class >> example1 [
+	| s r |
+	s := LearningService new engine: CartPoleQ new.
+	s start.
+	[ r := ZnEasy
+		post: 'http://127.0.0.1:5001/new'
+		data: (ZnEntity json: '{"actions":2,"observations":4}').
+	Transcript
+		show: r contents;
+		cr.
+	r := ZnEasy
+		post: 'http://127.0.0.1:5001/action'
+		data: (ZnEntity json: '{"reward":1,"done":false,"observation":[-1,-2,0,0]}').
+	Transcript
+		show: r contents;
+		cr.
+	r := ZnEasy
+		post: 'http://127.0.0.1:5001/action'
+		data: (ZnEntity json: '{"reward":1,"done":true,"observation":[-1,-2,0,0]}').
+	Transcript
+		show: r contents;
+		cr ]
+		ensure: [ s stop ]
+]
 
 { #category : #constants }
 CartPoleQ >> alpha [
 	^ 0.2
 ]
 
-{ #category : #private }
-CartPoleQ >> changeEpisode [
-	total add: steps.
-	last100 add: steps.
-	last100 size > 100
-		ifTrue: [ last100 removeFirst ].
-	Transcript
-		show: 'episode=';
-		show: episode;
-		show: ' steps=';
-		show: steps;
-		show: ' average=';
-		show: last100 average asFloat;
-		cr.
-	steps := 0.
-	episode := episode + 1
-]
-
-{ #category : #private }
-CartPoleQ >> defaultAction [
-	^ self numActions atRandom
-]
-
 { #category : #constants }
 CartPoleQ >> gamma [
 	^ 0.99
-]
-
-{ #category : #constants }
-CartPoleQ >> maxNumberOfSteps [
-	^ 200
 ]
 
 { #category : #private }
@@ -49,18 +49,8 @@ CartPoleQ >> nextFromObservation: anArray [
 	epsilon := 0.5 * (0.99 ** episode).
 	nextAction := (epsilon <= (NDArray randomUniformFrom: 0 to: 1))
 		ifTrue: [ self actionFor: nextState ]
-		ifFalse: [ (1 to: 2) atRandom ].
+		ifFalse: [ self defaultAction ].
 	^ Array with: nextState with: nextAction
-]
-
-{ #category : #constants }
-CartPoleQ >> numActions [
-	^ 2
-]
-
-{ #category : #constants }
-CartPoleQ >> numObservations [
-	^ 4
 ]
 
 { #category : #private }
@@ -84,7 +74,7 @@ CartPoleQ >> update: anArray reward: anInteger done: aBoolean [
 	| reward pair v1 v2 |
 	pair := self nextFromObservation: anArray.
 	reward := aBoolean
-		ifTrue: [ anInteger - 200 ]
+		ifTrue: [ anInteger - self maxNumberOfSteps ]
 		ifFalse: [ anInteger ].
 	(state notNil and: [ action notNil ])
 		ifTrue: [ v1 := (1 - self alpha)
@@ -99,5 +89,5 @@ CartPoleQ >> update: anArray reward: anInteger done: aBoolean [
 	steps := steps + 1.
 	aBoolean
 		ifTrue: [ self changeEpisode ].
-	^ action - 1
+	^ action
 ]

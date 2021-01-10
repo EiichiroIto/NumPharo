@@ -41,11 +41,6 @@ ArrayedCollection >> asFlatArray [
 ]
 
 { #category : #'*NumPharo' }
-ArrayedCollection >> asNDArray [
-	^ NDArray fromArray: self
-]
-
-{ #category : #'*NumPharo' }
 ArrayedCollection >> dot: another [
 	| result |
 	result := 0.

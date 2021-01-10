@@ -8,14 +8,14 @@ Class {
 }
 
 { #category : #private }
-QLearningTest >> newQLearning [
+QLearningTest >> newLearning [
 	^ QLearning new
 ]
 
 { #category : #test }
 QLearningTest >> testAction [
 	| c |
-	c := self newQLearning.
+	c := self newLearning.
 	self assert: c action isNil.
 	c action: 123.
 	self assert: c action equals: 123
@@ -24,7 +24,7 @@ QLearningTest >> testAction [
 { #category : #test }
 QLearningTest >> testActionFor [
 	| c a |
-	c := self newQLearning.
+	c := self newLearning.
 	a := NDArray zeros: #(256 2) dtype: #Integer.
 	c qTable: a.
 	a at: #(1 1) put: 10.
@@ -38,7 +38,7 @@ QLearningTest >> testActionFor [
 { #category : #test }
 QLearningTest >> testBins [
 	| c |
-	c := self newQLearning.
+	c := self newLearning.
 	self assert: c bins isNil.
 	c bins: #(1 2 3 4).
 	self assertCollection: c bins equals: #(1 2 3 4)
@@ -47,15 +47,39 @@ QLearningTest >> testBins [
 { #category : #test }
 QLearningTest >> testBinsMinMaxNum [
 	| c r |
-	c := self newQLearning.
+	c := self newLearning.
 	r := c binsMin: 1 max: 5 num: 4.
 	self assertCollection: r array equals: #(2 3 4) asFloatArray
 ]
 
 { #category : #test }
+QLearningTest >> testChangeEpisode [
+	| l |
+	l := self newLearning.
+	l steps: 10.
+	l episode: 20.
+	l total: #(1 2 3) asOrderedCollection.
+	l recents: #(4 5 6) asOrderedCollection.
+	l changeEpisode.
+	self assert: l steps equals: 0.
+	self assert: l episode equals: 21.
+	self
+		assertCollection: l total
+		equals: #(1 2 3 10) asOrderedCollection.
+	self
+		assertCollection: l recents
+		equals: #(4 5 6 10) asOrderedCollection.
+	l steps: 123.
+	l recents: (Array new: 100 withAll: 99) asOrderedCollection.
+	l changeEpisode.
+	self assert: l recents last equals: 123.
+	1 to: 99 do: [ :each | self assert: (l recents at: each) equals: 99 ]
+]
+
+{ #category : #test }
 QLearningTest >> testDigitize [
 	| c |
-	c := self newQLearning.
+	c := self newLearning.
 	c
 		bins:
 			(#(#(-2.4 2.4 4) #(-3.0 3.0 4) #(-0.5 0.5 4) #(-2.0 2.0 4))
@@ -68,28 +92,9 @@ QLearningTest >> testDigitize [
 ]
 
 { #category : #test }
-QLearningTest >> testEpisode [
-	| c |
-	c := self newQLearning.
-	self assert: c episode equals: 1.
-	c episode: 123.
-	self assert: c episode equals: 123
-]
-
-{ #category : #test }
-QLearningTest >> testLast100 [
-	| c |
-	c := self newQLearning.
-	self assert: c last100 isCollection.
-	self assert: c last100 isEmpty.
-	c last100: #(1 2 3 4).
-	self assertCollection: c last100 equals: #(1 2 3 4)
-]
-
-{ #category : #test }
 QLearningTest >> testQTable [
 	| c a |
-	c := self newQLearning.
+	c := self newLearning.
 	self assert: c qTable isNil.
 	a := NDArray fromArray: #(1 2 3 4).
 	c qTable: a.
@@ -99,7 +104,7 @@ QLearningTest >> testQTable [
 { #category : #test }
 QLearningTest >> testQValueAtStateAction [
 	| c a |
-	c := self newQLearning.
+	c := self newLearning.
 	a := NDArray zeros: #(256 2) dtype: #Integer.
 	c qTable: a.
 	a at: #(1 1) put: 10.
@@ -115,7 +120,7 @@ QLearningTest >> testQValueAtStateAction [
 { #category : #test }
 QLearningTest >> testQValueAtStateActionPut [
 	| c a |
-	c := self newQLearning.
+	c := self newLearning.
 	a := NDArray zeros: #(256 2) dtype: #Integer.
 	c qTable: a.
 	c qValueAtState: 1 action: 1 put: 10.
@@ -131,27 +136,8 @@ QLearningTest >> testQValueAtStateActionPut [
 { #category : #test }
 QLearningTest >> testState [
 	| c |
-	c := self newQLearning.
+	c := self newLearning.
 	self assert: c state isNil.
 	c state: 123.
 	self assert: c state equals: 123
-]
-
-{ #category : #test }
-QLearningTest >> testSteps [
-	| c |
-	c := self newQLearning.
-	self assert: c steps equals: 0.
-	c steps: 123.
-	self assert: c steps equals: 123
-]
-
-{ #category : #test }
-QLearningTest >> testTotal [
-	| c |
-	c := self newQLearning.
-	self assert: c total isCollection.
-	self assert: c total isEmpty.
-	c total: #(1 2 3 4).
-	self assertCollection: c total equals: #(1 2 3 4)
 ]

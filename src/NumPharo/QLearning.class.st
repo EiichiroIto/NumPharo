@@ -1,15 +1,11 @@
 Class {
 	#name : #QLearning,
-	#superclass : #Object,
+	#superclass : #RLearning,
 	#instVars : [
 		'qTable',
-		'action',
-		'total',
 		'bins',
-		'episode',
-		'last100',
-		'state',
-		'steps'
+		'action',
+		'state'
 	],
 	#category : #'NumPharo-Gym'
 }
@@ -51,6 +47,14 @@ QLearning >> binsMin: aFloat max: aFloat2 num: anInteger [
 ]
 
 { #category : #private }
+QLearning >> changeEpisode [
+	self addSteps: steps.
+	self showInfo.
+	steps := 0.
+	episode := episode + 1
+]
+
+{ #category : #private }
 QLearning >> digitize: anArray [
 	| a |
 	a := anArray
@@ -61,34 +65,11 @@ QLearning >> digitize: anArray [
 	^ a sum + 1
 ]
 
-{ #category : #accessing }
-QLearning >> episode [
-	^ episode
-]
-
-{ #category : #accessing }
-QLearning >> episode: anObject [
-	episode := anObject
-]
-
 { #category : #initialization }
 QLearning >> initialize [
-	episode := 1.
-	steps := 0.
-	total := OrderedCollection new.
-	last100 := OrderedCollection new.
+	super initialize.
 	self setupBins.
 	self setupQTable
-]
-
-{ #category : #accessing }
-QLearning >> last100 [
-	^ last100
-]
-
-{ #category : #accessing }
-QLearning >> last100: anObject [
-	last100 := anObject
 ]
 
 { #category : #accessing }
@@ -128,6 +109,18 @@ QLearning >> setupQTable [
 	""
 ]
 
+{ #category : #private }
+QLearning >> showInfo [
+	Transcript
+		show: 'episode=';
+		show: episode;
+		show: ' steps=';
+		show: steps;
+		show: ' average=';
+		show: recents average asFloat;
+		cr
+]
+
 { #category : #accessing }
 QLearning >> state [
 	^ state
@@ -136,29 +129,4 @@ QLearning >> state [
 { #category : #accessing }
 QLearning >> state: anObject [
 	state := anObject
-]
-
-{ #category : #accessing }
-QLearning >> steps [
-	^ steps
-]
-
-{ #category : #accessing }
-QLearning >> steps: anObject [
-	steps := anObject
-]
-
-{ #category : #accessing }
-QLearning >> total [
-	^ total
-]
-
-{ #category : #accessing }
-QLearning >> total: anObject [
-	total := anObject
-]
-
-{ #category : #api }
-QLearning >> update: anArray reward: anInteger done: aBoolean [
-	self subclassResponsibility
 ]

@@ -36,7 +36,7 @@ LearningService >> getActionFrom: aDictionary [
 	done := aDictionary
 		at: 'done'
 		ifAbsent: [ ^ self engine defaultAction ].
-	^ engine update: observation reward: reward done: done
+	^ (engine update: observation reward: reward done: done) - 1
 ]
 
 { #category : #'request handling' }
@@ -141,8 +141,9 @@ LearningService >> start [
 	s
 		delegate: self;
 		start.
-	(s isRunning and: [ s isListening ])
-		ifFalse: [ self error: 'cannot start service' ].
+	(s isRunning "and: [ s isListening ]")
+		ifFalse: [ s stop.
+			self error: 'cannot start service' ].
 	self server: s
 ]
 
