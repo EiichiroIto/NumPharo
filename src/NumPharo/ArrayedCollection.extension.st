@@ -41,11 +41,6 @@ ArrayedCollection >> asFlatArray [
 ]
 
 { #category : #'*NumPharo' }
-ArrayedCollection >> asNDArray [
-	^ NDArray fromArray: self
-]
-
-{ #category : #'*NumPharo' }
 ArrayedCollection >> dot: another [
 	| result |
 	result := 0.
@@ -77,6 +72,11 @@ ArrayedCollection >> inplaceMin: other [
 { #category : #'*NumPharo' }
 ArrayedCollection >> isFlatArray [
 	^ true
+]
+
+{ #category : #'*NumPharo' }
+ArrayedCollection >> std [
+	^ (self - self average) squared average sqrt
 ]
 
 { #category : #'*NumPharo' }

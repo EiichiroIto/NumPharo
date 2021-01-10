@@ -142,6 +142,13 @@ PharoPlot >> newScatterGraph [
 ]
 
 { #category : #api }
+PharoPlot >> plot: aNdArray label: aString [
+	| xs |
+	xs := NDArray arangeFrom: 1 to: aNdArray size by: 1.
+	self plotX: xs y: aNdArray label: aString
+]
+
+{ #category : #api }
 PharoPlot >> plotX: aNdArray1 y: aNdArray2 label: aString [
 	self assureSubPlots.
 	current isLineGraph

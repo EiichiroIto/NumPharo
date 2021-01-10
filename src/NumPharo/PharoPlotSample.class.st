@@ -178,8 +178,8 @@ PharoPlotSample class >> example8 [
 { #category : #examples }
 PharoPlotSample class >> example9 [
 	| x y plt |
-	x := NDArray random: 100.
-	y := NDArray random: 100.
+	x := NDArray randomUniform: 100.
+	y := NDArray randomUniform: 100.
 	plt := PharoPlot new.
 	plt extent: 300 @ 300.
 	plt scatterX: x y: y label: 'a'.

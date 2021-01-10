@@ -38,20 +38,20 @@ TwoLayerNet >> inputSize: anInteger1 hiddenSize: anInteger3 outputSize: anIntege
 			weightInitStd
 				*
 					(NDArray
-						normalRandom:
+						randomNormal:
 							{anInteger1.
 							anInteger3}).
-	params at: #b1 put: (NDArray zeros: anInteger3).
+	params at: #b1 put: (NDArray zeros: anInteger3 dtype: #Float).
 	params
 		at: #W2
 		put:
 			weightInitStd
 				*
 					(NDArray
-						normalRandom:
+						randomNormal:
 							{anInteger3.
 							anInteger2}).
-	params at: #b2 put: (NDArray zeros: anInteger2)
+	params at: #b2 put: (NDArray zeros: anInteger2 dtype: #Float)
 ]
 
 { #category : #api }

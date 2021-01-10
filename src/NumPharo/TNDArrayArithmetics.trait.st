@@ -124,6 +124,16 @@ TNDArrayArithmetics >> argMaxAxis: anInteger [
 	^ self do: #argMax axis: anInteger dtype: #Integer
 ]
 
+{ #category : #arithmetic }
+TNDArrayArithmetics >> average [
+	^ self array average
+]
+
+{ #category : #arithmetic }
+TNDArrayArithmetics >> averageAxis: anInteger [
+	^ self do: #average axis: anInteger dtype: self dtype
+]
+
 { #category : #private }
 TNDArrayArithmetics >> col2DArray: anInteger dtype: aSymbol [
 	| newArray index delta |
@@ -165,6 +175,18 @@ TNDArrayArithmetics >> cos [
 ]
 
 { #category : #arithmetic }
+TNDArrayArithmetics >> digitize: aNDArray right: aBoolean [
+	| arr |
+	arr := IntegerArray new: self size.
+	self array
+		withIndexDo: [ :each :index | 
+			| r |
+			r := each digitize: aNDArray right: aBoolean.
+			arr at: index put: r ].
+	^ self class array: arr shape: self shape
+]
+
+{ #category : #private }
 TNDArrayArithmetics >> do: aSymbol axis: anInteger dtype: aSymbol2 [
 	anInteger = 0
 		ifTrue: [ ^ self perform: aSymbol ].
@@ -218,6 +240,37 @@ TNDArrayArithmetics >> dot: aNDArray [
 { #category : #arithmetic }
 TNDArrayArithmetics >> exp [
 	^ self newArrayDoing: #exp
+]
+
+{ #category : #arithmetic }
+TNDArrayArithmetics >> hstack: aNDArray [
+	| arr src1 src2 dst newShape size1 size2 |
+	newShape := self shapeForHstack: aNDArray.
+	newShape ifNil: [ self error ].
+	self ndim = 1
+		ifTrue: [ ^ self class array: self array , aNDArray array shape: newShape ].
+	arr := self class
+		newArrayDtype: self dtype
+		size: (self class finiteProductOf: newShape).
+	src1 := src2 := dst := 1.
+	size1 := self class finiteProductOf: self shape copyWithoutFirst.
+	size2 := self class finiteProductOf: aNDArray shape copyWithoutFirst.
+	1 to: self shape first do: [ :index | 
+		arr
+			replaceFrom: dst
+			to: dst + size1 - 1
+			with: self array
+			startingAt: src1.
+		dst := dst + size1.
+		src1 := src1 + size1.
+		arr
+			replaceFrom: dst
+			to: dst + size2 - 1
+			with: aNDArray array
+			startingAt: src2.
+		dst := dst + size2.
+		src2 := src2 + size2 ].
+	^ self class array: arr shape: newShape
 ]
 
 { #category : #accessing }
@@ -320,23 +373,28 @@ TNDArrayArithmetics >> newArraySize: anInteger [
 	^ self class newArrayDtype: self dtype size: anInteger
 ]
 
-{ #category : #private }
-TNDArrayArithmetics >> nextIndex: anArray [
-	| newArray |
-	anArray size = self ndim
-		ifFalse: [ self error ].
-	anArray = self shape
-		ifTrue: [ ^ nil ].
-	newArray := anArray copy.
-	newArray
-		withIndexDo: [ :each :index | 
-			| b |
-			b := self shape at: index.
-			each < b
-				ifTrue: [ newArray at: index put: each + 1.
-					^ newArray ]
-				ifFalse: [ newArray at: index put: 1 ] ].
-	self error
+{ #category : #converting }
+TNDArrayArithmetics >> omitBefore: anInteger after: anInteger2 [
+	^ NDPadder new
+		before: anInteger;
+		after: anInteger2;
+		omit: self
+]
+
+{ #category : #converting }
+TNDArrayArithmetics >> padBefore: anInteger after: anInteger2 [
+	^ NDPadder new
+		before: anInteger;
+		after: anInteger2;
+		constant: self
+]
+
+{ #category : #converting }
+TNDArrayArithmetics >> padEdgeBefore: anInteger after: anInteger2 [
+	^ NDPadder new
+		before: anInteger;
+		after: anInteger2;
+		edge: self
 ]
 
 { #category : #private }
@@ -398,9 +456,34 @@ TNDArrayArithmetics >> row2DArray: anInteger dtype: aSymbol [
 	^ arr
 ]
 
+{ #category : #private }
+TNDArrayArithmetics >> shapeForHstack: aNDArray [
+	self ndim ~= aNDArray ndim
+		ifTrue: [ ^ nil ].
+	self ndim = 1
+		ifTrue: [ ^ Array with: self size + aNDArray size ].
+	^ self shape
+		withIndexCollect: [ :each :index | 
+			(each = (aNDArray shape at: index) or: [ index = 2 ])
+				ifFalse: [ ^ nil ].
+			index = 2
+				ifTrue: [ each + (aNDArray shape at: index) ]
+				ifFalse: [ each ] ]
+]
+
 { #category : #arithmetic }
 TNDArrayArithmetics >> sin [
 	^ self newArrayDoing: #sin
+]
+
+{ #category : #arithmetic }
+TNDArrayArithmetics >> std [
+	^ self array std
+]
+
+{ #category : #arithmetic }
+TNDArrayArithmetics >> stdAxis: anInteger [
+	^ self do: #std axis: anInteger dtype: self dtype
 ]
 
 { #category : #arithmetic }
@@ -419,15 +502,14 @@ TNDArrayArithmetics >> sumAxis: anInteger [
 
 { #category : #converting }
 TNDArrayArithmetics >> t [
-	| arr arr2 i |
+	| arr2 i iter |
 	self ndim = 1
 		ifTrue: [ ^ self ].
 	arr2 := self newArraySize: self size.
-	arr := Array new: self ndim withAll: 1.
+	iter := NDIndexIterator new shape: self shape.
 	1 to: self size do: [ :each | 
-		i := self arrayIndexAt: arr.
-		arr2 at: each put: (self array at: i).
-		arr := self nextIndex: arr ].
+		i := self arrayIndexAt: iter nextForT.
+		arr2 at: each put: (self array at: i) ].
 	^ self class array: arr2 shape: self shape reversed
 ]
 
