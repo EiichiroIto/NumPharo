@@ -13,12 +13,40 @@ RLearningTest >> newLearning [
 ]
 
 { #category : #test }
+RLearningTest >> testAddSteps [
+	| l |
+	l := self newLearning.
+	l steps: 10.
+	l addSteps.
+	l steps: 20.
+	l addSteps.
+	self assertCollection: l total equals: #(10 20) asOrderedCollection.
+	self assertCollection: l recents equals: #(10 20) asOrderedCollection.
+	l numRecents: 2.
+	l steps: 30.
+	l addSteps.
+	self
+		assertCollection: l total
+		equals: #(10 20 30) asOrderedCollection.
+	self assertCollection: l recents equals: #(20 30) asOrderedCollection
+]
+
+{ #category : #test }
 RLearningTest >> testEpisode [
 	| c |
 	c := self newLearning.
 	self assert: c episode equals: 1.
 	c episode: 123.
 	self assert: c episode equals: 123
+]
+
+{ #category : #test }
+RLearningTest >> testNumRecents [
+	| l |
+	l := self newLearning.
+	self assert: l numRecents equals: l defaultNumRecents.
+	l numRecents: 123.
+	self assert: l numRecents equals: 123
 ]
 
 { #category : #test }

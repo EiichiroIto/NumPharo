@@ -5,13 +5,14 @@ Class {
 		'episode',
 		'steps',
 		'total',
-		'recents'
+		'recents',
+		'numRecents'
 	],
 	#category : #'NumPharo-Gym'
 }
 
 { #category : #private }
-RLearning >> addSteps: anInteger [
+RLearning >> addSteps [
 	total add: steps.
 	recents add: steps.
 	recents size > self numRecents
@@ -21,6 +22,11 @@ RLearning >> addSteps: anInteger [
 { #category : #private }
 RLearning >> defaultAction [
 	^ self numActions atRandom
+]
+
+{ #category : #constants }
+RLearning >> defaultNumRecents [
+	^ 100
 ]
 
 { #category : #accessing }
@@ -56,9 +62,14 @@ RLearning >> numObservations [
 	self subclassResponsibility
 ]
 
-{ #category : #constants }
+{ #category : #accessing }
 RLearning >> numRecents [
-	^ 100
+	^ numRecents ifNil: [ self defaultNumRecents ]
+]
+
+{ #category : #accessing }
+RLearning >> numRecents: anInteger [
+	numRecents := anInteger
 ]
 
 { #category : #accessing }

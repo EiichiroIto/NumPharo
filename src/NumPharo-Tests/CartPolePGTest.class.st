@@ -2,18 +2,18 @@
 A CartPoleNNTest is a test class for testing the behavior of CartPoleNN
 "
 Class {
-	#name : #CartPoleNNTest,
+	#name : #CartPolePGTest,
 	#superclass : #TestCase,
 	#category : #'NumPharo-Tests'
 }
 
 { #category : #private }
-CartPoleNNTest >> newLearning [
+CartPolePGTest >> newLearning [
 	^ CartPolePG new
 ]
 
 { #category : #test }
-CartPoleNNTest >> testActionFor [
+CartPolePGTest >> testActionFor [
 	| l a r |
 	l := self newLearning.
 	a := NDArray fromArray: #(1 2 3 4).
@@ -22,7 +22,7 @@ CartPoleNNTest >> testActionFor [
 ]
 
 { #category : #test }
-CartPoleNNTest >> testBatches [
+CartPolePGTest >> testBatches [
 	| l |
 	l := self newLearning.
 	self assert: l batches equals: 1.
@@ -31,7 +31,7 @@ CartPoleNNTest >> testBatches [
 ]
 
 { #category : #test }
-CartPoleNNTest >> testCalculate [
+CartPolePGTest >> testCalculate [
 	| l a r |
 	l := self newLearning.
 	a := NDArray fromArray: #(1 2 3 4).
@@ -42,7 +42,7 @@ CartPoleNNTest >> testCalculate [
 ]
 
 { #category : #test }
-CartPoleNNTest >> testChangeEpisode [
+CartPolePGTest >> testChangeEpisode [
 	| l |
 	l := self newLearning.
 	l batches: 8.
@@ -53,7 +53,7 @@ CartPoleNNTest >> testChangeEpisode [
 ]
 
 { #category : #test }
-CartPoleNNTest >> testN [
+CartPolePGTest >> testN [
 	| l a |
 	l := self newLearning.
 	self assert: l n isNDArray.
@@ -63,7 +63,7 @@ CartPoleNNTest >> testN [
 ]
 
 { #category : #test }
-CartPoleNNTest >> testRewards [
+CartPolePGTest >> testRewards [
 	| l a |
 	l := self newLearning.
 	self assert: l rewards isArray.
@@ -73,7 +73,7 @@ CartPoleNNTest >> testRewards [
 ]
 
 { #category : #test }
-CartPoleNNTest >> testSetupBatch [
+CartPolePGTest >> testSetupBatch [
 	| l |
 	l := self newLearning.
 	l n: nil.
@@ -85,7 +85,7 @@ CartPoleNNTest >> testSetupBatch [
 ]
 
 { #category : #test }
-CartPoleNNTest >> testSetupN [
+CartPolePGTest >> testSetupN [
 	| l |
 	l := self newLearning.
 	l n: nil.
@@ -95,7 +95,7 @@ CartPoleNNTest >> testSetupN [
 ]
 
 { #category : #test }
-CartPoleNNTest >> testSetupRewards [
+CartPolePGTest >> testSetupRewards [
 	| l |
 	l := self newLearning.
 	l rewards: nil.
@@ -106,7 +106,7 @@ CartPoleNNTest >> testSetupRewards [
 ]
 
 { #category : #test }
-CartPoleNNTest >> testSetupW [
+CartPolePGTest >> testSetupW [
 	| l |
 	l := self newLearning.
 	l w: nil.
@@ -116,7 +116,7 @@ CartPoleNNTest >> testSetupW [
 ]
 
 { #category : #test }
-CartPoleNNTest >> testSetupWTry [
+CartPolePGTest >> testSetupWTry [
 	| l |
 	l := self newLearning.
 	l wTry: nil.
@@ -126,7 +126,7 @@ CartPoleNNTest >> testSetupWTry [
 ]
 
 { #category : #test }
-CartPoleNNTest >> testUpdateRewardDone [
+CartPolePGTest >> testUpdateRewardDone [
 	| l r |
 	l := self newLearning.
 	l steps: 5.
@@ -160,7 +160,7 @@ CartPoleNNTest >> testUpdateRewardDone [
 ]
 
 { #category : #test }
-CartPoleNNTest >> testW [
+CartPolePGTest >> testW [
 	| l a |
 	l := self newLearning.
 	self assert: l w isNDArray.
@@ -170,7 +170,7 @@ CartPoleNNTest >> testW [
 ]
 
 { #category : #test }
-CartPoleNNTest >> testWTry [
+CartPolePGTest >> testWTry [
 	| l a |
 	l := self newLearning.
 	self assert: l wTry isNDArray.

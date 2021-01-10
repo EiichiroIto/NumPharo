@@ -5,10 +5,10 @@ Class {
 	#classTraits : 'TCartPole classTrait',
 	#instVars : [
 		'w',
-		'rewards',
 		'n',
+		'wTry',
 		'batches',
-		'wTry'
+		'rewards'
 	],
 	#category : #'NumPharo-Gym'
 }
@@ -143,7 +143,7 @@ CartPolePG >> update: anArray reward: anInteger done: aBoolean [
 	reward := steps >= self maxNumberOfSteps
 		ifTrue: [ -1 ]
 		ifFalse: [ steps - self maxNumberOfSteps ].
-	self addSteps: steps.
+	self addSteps.
 	batches >= (self numBatches - 1)
 		ifTrue: [ self showInfo ].
 	rewards at: batches put: reward.
