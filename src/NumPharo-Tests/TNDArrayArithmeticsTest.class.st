@@ -266,25 +266,6 @@ TNDArrayArithmeticsTest >> testHstack [
 ]
 
 { #category : #test }
-TNDArrayArithmeticsTest >> testIndexAt [
-	| a |
-	a := self newArrayFrom: #(10 20 30 40 50).
-	self assertCollection: (a indexAt: 3) equals: #(3).
-	a := self newArrayFrom: #((10 20) (30 40) (50 60)).
-	self assertCollection: (a indexAt: 3) equals: #(2 1).
-	a := self newArrayFrom: #(((10 20) (30 40)) ((50 60) (70 80))).
-	self assertCollection: (a indexAt: 7) equals: #(2 2 1).
-	self assert: (a at: (a indexAt: 1)) equals: 10.
-	self assert: (a at: (a indexAt: 2)) equals: 20.
-	self assert: (a at: (a indexAt: 3)) equals: 30.
-	self assert: (a at: (a indexAt: 4)) equals: 40.
-	self assert: (a at: (a indexAt: 5)) equals: 50.
-	self assert: (a at: (a indexAt: 6)) equals: 60.
-	self assert: (a at: (a indexAt: 7)) equals: 70.
-	self assert: (a at: (a indexAt: 8)) equals: 80
-]
-
-{ #category : #test }
 TNDArrayArithmeticsTest >> testItemSizeAxis [
 	| a |
 	a := NDArray ones: #(2 4 1 3 2) dtype: #Integer.
@@ -887,47 +868,6 @@ TNDArrayArithmeticsTest >> testTildaEqualsSign [
 	self assertCollection: r array equals: #(true false true).
 	self assertCollection: r shape equals: #(3).
 	self assert: r dtype equals: #Boolean
-]
-
-{ #category : #test }
-TNDArrayArithmeticsTest >> testWhere [
-	| a r |
-	a := self newArrayFrom: #(true false true false) dtype: #Boolean.
-	r := a where.
-	self assert: r isArray.
-	self assert: r size equals: 1.
-	self assert: (r first isKindOf: NDArray).
-	self assertCollection: r first array equals: #(1 3) asIntegerArray.
-	self assertCollection: r first shape equals: #(2).
-	self assert: r first dtype equals: #Integer.
-	a := self newArrayFrom: #((true false false) (false true true)) dtype: #Boolean.
-	r := a where.
-	self assert: r isArray.
-	self assert: r size equals: 2.
-	self assert: (r first isKindOf: NDArray).
-	self assertCollection: r first array equals: #(1 2 2) asIntegerArray.
-	self assertCollection: r first shape equals: #(3).
-	self assert: r first dtype equals: #Integer.
-	self assert: (r second isKindOf: NDArray).
-	self assertCollection: r second array equals: #(1 2 3) asIntegerArray.
-	self assertCollection: r second shape equals: #(3).
-	self assert: r second dtype equals: #Integer.
-	a := self newArrayFrom: #(((false true) (false false)) ((true false) (true true))) dtype: #Boolean.
-	r := a where.
-	self assert: r isArray.
-	self assert: r size equals: 3.
-	self assert: (r first isKindOf: NDArray).
-	self assertCollection: r first array equals: #(1 2 2 2) asIntegerArray.
-	self assertCollection: r first shape equals: #(4).
-	self assert: r first dtype equals: #Integer.
-	self assert: (r second isKindOf: NDArray).
-	self assertCollection: r second array equals: #(1 1 2 2) asIntegerArray.
-	self assertCollection: r second shape equals: #(4).
-	self assert: r second dtype equals: #Integer.
-	self assert: (r third isKindOf: NDArray).
-	self assertCollection: r third array equals: #(2 1 1 2) asIntegerArray.
-	self assertCollection: r third shape equals: #(4).
-	self assert: r third dtype equals: #Integer
 ]
 
 { #category : #test }

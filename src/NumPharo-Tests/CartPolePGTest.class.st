@@ -22,15 +22,6 @@ CartPolePGTest >> testActionFor [
 ]
 
 { #category : #test }
-CartPolePGTest >> testBatches [
-	| l |
-	l := self newLearning.
-	self assert: l batches equals: 1.
-	l batches: 123.
-	self assert: l batches equals: 123
-]
-
-{ #category : #test }
 CartPolePGTest >> testCalculate [
 	| l a r |
 	l := self newLearning.
@@ -53,6 +44,13 @@ CartPolePGTest >> testChangeEpisode [
 ]
 
 { #category : #test }
+CartPolePGTest >> testEta [
+	| l |
+	l := self newLearning.
+	self assert: l eta isFloat
+]
+
+{ #category : #test }
 CartPolePGTest >> testN [
 	| l a |
 	l := self newLearning.
@@ -60,6 +58,13 @@ CartPolePGTest >> testN [
 	a := NDArray randomNormal: 10.
 	l n: a.
 	self assert: l n identicalTo: a
+]
+
+{ #category : #test }
+CartPolePGTest >> testNumBatches [
+	| l |
+	l := self newLearning.
+	self assert: l numBatches isInteger
 ]
 
 { #category : #test }
@@ -123,6 +128,13 @@ CartPolePGTest >> testSetupWTry [
 	l setupWTry.
 	self assert: l wTry isNDArray.
 	self assertCollection: l wTry shape equals: #(4)
+]
+
+{ #category : #test }
+CartPolePGTest >> testSigma [
+	| l |
+	l := self newLearning.
+	self assert: l sigma isFloat
 ]
 
 { #category : #test }

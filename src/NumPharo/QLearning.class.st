@@ -130,26 +130,3 @@ QLearning >> state [
 QLearning >> state: anObject [
 	state := anObject
 ]
-
-{ #category : #api }
-QLearning >> update: anArray reward: anInteger done: aBoolean [
-	| reward pair v1 v2 |
-	pair := self nextFromObservation: anArray.
-	reward := aBoolean
-		ifTrue: [ anInteger - self maxNumberOfSteps ]
-		ifFalse: [ anInteger ].
-	(state notNil and: [ action notNil ])
-		ifTrue: [ v1 := (1 - self alpha)
-				* (self qValueAtState: state action: action).
-			v2 := self alpha
-				*
-					(self gamma * (self qValueAtState: pair first action: pair second)
-						+ reward).
-			self qValueAtState: state action: action put: v1 + v2 ].
-	state := pair first.
-	action := pair second.
-	steps := steps + 1.
-	aBoolean
-		ifTrue: [ self changeEpisode ].
-	^ action
-]

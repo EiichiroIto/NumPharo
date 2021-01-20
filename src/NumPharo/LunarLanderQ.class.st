@@ -1,13 +1,13 @@
 Class {
-	#name : #CartPoleQ,
+	#name : #LunarLanderQ,
 	#superclass : #QLearning,
-	#traits : 'TCartPole',
-	#classTraits : 'TCartPole classTrait',
+	#traits : 'TLunarLander',
+	#classTraits : 'TLunarLander classTrait',
 	#category : #'NumPharo-Gym'
 }
 
 { #category : #examples }
-CartPoleQ class >> example1 [
+LunarLanderQ class >> example1 [
 	| s r |
 	s := LearningService new engine: CartPoleQ new.
 	s start.
@@ -33,17 +33,17 @@ CartPoleQ class >> example1 [
 ]
 
 { #category : #constants }
-CartPoleQ >> alpha [
+LunarLanderQ >> alpha [
 	^ 0.2
 ]
 
 { #category : #constants }
-CartPoleQ >> gamma [
+LunarLanderQ >> gamma [
 	^ 0.99
 ]
 
 { #category : #private }
-CartPoleQ >> nextFromObservation: anArray [
+LunarLanderQ >> nextFromObservation: anArray [
 	| nextState epsilon nextAction |
 	nextState := self digitize: anArray.
 	epsilon := 0.5 * (0.99 ** episode).
@@ -54,14 +54,14 @@ CartPoleQ >> nextFromObservation: anArray [
 ]
 
 { #category : #private }
-CartPoleQ >> setupBins [
+LunarLanderQ >> setupBins [
 	bins :=
-			(#(#(-2.4 2.4 4) #(-3.0 3.0 4) #(-0.5 0.5 4) #(-2.0 2.0 4))
+			(#(#(-1.0 1.0 4) #(-1.0 1.0 4) #(-1.0 1.0 4) #(-1.0 1.0 4))
 				collect: [ :each | self binsMin: each first max: each second num: each third ])
 ]
 
 { #category : #private }
-CartPoleQ >> setupQTable [
+LunarLanderQ >> setupQTable [
 	| size |
 	size := Array
 		with: self numObservations ** self numObservations
@@ -70,12 +70,10 @@ CartPoleQ >> setupQTable [
 ]
 
 { #category : #api }
-CartPoleQ >> update: anArray reward: anInteger done: aBoolean [
+LunarLanderQ >> update: anArray reward: anInteger done: aBoolean [
 	| reward pair v1 v2 |
 	pair := self nextFromObservation: anArray.
-	reward := aBoolean
-		ifTrue: [ anInteger - self maxNumberOfSteps ]
-		ifFalse: [ anInteger ].
+	reward := anInteger.
 	(state notNil and: [ action notNil ])
 		ifTrue: [ v1 := (1 - self alpha)
 				* (self qValueAtState: state action: action).

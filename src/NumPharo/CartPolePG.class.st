@@ -7,7 +7,6 @@ Class {
 		'w',
 		'n',
 		'wTry',
-		'batches',
 		'rewards'
 	],
 	#category : #'NumPharo-Gym'
@@ -18,16 +17,6 @@ CartPolePG >> actionFor: anArray [
 	^ (self calculate: anArray) > 0.0
 		ifTrue: [ 2 ]
 		ifFalse: [ 1 ]
-]
-
-{ #category : #accessing }
-CartPolePG >> batches [
-	^ batches
-]
-
-{ #category : #accessing }
-CartPolePG >> batches: anObject [
-	batches := anObject
 ]
 
 { #category : #private }

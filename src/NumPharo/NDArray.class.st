@@ -1,8 +1,8 @@
 Class {
 	#name : #NDArray,
 	#superclass : #Object,
-	#traits : 'TNDArrayArithmetics',
-	#classTraits : 'TNDArrayArithmetics classTrait',
+	#traits : 'TNDArrayArithmetics + TNDArrayAccessors',
+	#classTraits : 'TNDArrayArithmetics classTrait + TNDArrayAccessors classTrait',
 	#instVars : [
 		'shape',
 		'array'
@@ -547,95 +547,6 @@ NDArray >> asGrayScale [
 { #category : #converting }
 NDArray >> asNDArray [
 	^ self
-]
-
-{ #category : #accessing }
-NDArray >> at: anArray [
-	| arr pos num |
-	arr := self class normalizedIndex: anArray.
-	pos := self arrayIndexAt: arr.
-	num := self itemSizeAxis: arr size.
-	self ndim = arr size
-		ifTrue: [ ^ array at: pos ].
-	^ self class
-		array: (array copyFrom: pos to: pos + num - 1)
-		shape: (shape copyFrom: arr size + 1 to: shape size)
-]
-
-{ #category : #modifying }
-NDArray >> at: anArray put: anObject [
-	| arr pos num |
-	arr := self class normalizedIndex: anArray.
-	pos := self arrayIndexAt: arr.
-	num := self itemSizeAxis: arr size.
-	self coerceDtype: anObject dtype.
-	num = 1
-		ifTrue: [ ^ self arrayAt: pos put: anObject ].
-	anObject size = num
-		ifFalse: [ self error ].
-	anObject array
-		withIndexDo: [ :each :index | self arrayAt: pos + index - 1 put: each ]
-]
-
-{ #category : #accessing }
-NDArray >> atAll: anObject [
-	| indexes |
-	indexes := anObject asNDArray.
-	^ indexes dtype = #Boolean
-		ifTrue: [ self atAllBooleans: indexes ]
-		ifFalse: [ self atAllIndexes: indexes ]
-]
-
-{ #category : #modifying }
-NDArray >> atAll: anObject put: anObject2 [
-	anObject do: [ :each | self at: each put: anObject2 ]
-]
-
-{ #category : #private }
-NDArray >> atAllBooleans: aBooleanArray [
-	| s |
-	self size = aBooleanArray size
-		ifFalse: [ ^ self atAllFlatBooleans: aBooleanArray ].
-	s := WriteStream on: self array class new.
-	self array
-		with: aBooleanArray
-		do: [ :each :flag | 
-			flag
-				ifTrue: [ s nextPut: each ] ].
-	^ self class
-		array: s contents
-		shape: {s contents size}
-]
-
-{ #category : #private }
-NDArray >> atAllFlatBooleans: aBooleanArray [
-	| s c |
-	self shape first = aBooleanArray size
-		ifFalse: [ self error ].
-	c := 0.
-	s := WriteStream on: self array class new.
-	aBooleanArray
-		withIndexDo: [ :each :index | 
-			each
-				ifTrue: [ s nextPutAll: (self rawAt: index).
-					c := c + 1 ] ].
-	^ self class
-		array: s contents
-		shape: (Array with: c) , self shape copyWithoutFirst
-]
-
-{ #category : #private }
-NDArray >> atAllIndexes: anArray [
-	| s c |
-	c := 0.
-	s := WriteStream on: self array class new.
-	anArray
-		do: [ :index | 
-			s nextPutAll: (self rawAt: index rounded).
-			c := c + 1 ].
-	^ self class
-		array: s contents
-		shape: (Array with: c) , self shape copyWithoutFirst
 ]
 
 { #category : #converting }

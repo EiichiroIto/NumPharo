@@ -134,8 +134,8 @@ DeepLearningFromScratch1Chapter4 >> testChapter4_2_3 [
 	batchSize := 10.
 	batchMask := NDArray randomChoice: batchSize from: trainSize.
 	self assert: batchMask size equals: batchSize.
-	xBatch := xTrain atAll: batchMask.
-	tBatch := tTrain atAll: batchMask.
+	xBatch := xTrain at: batchMask.
+	tBatch := tTrain at: batchMask.
 	self
 		assertCollection: xBatch shape
 		equals:

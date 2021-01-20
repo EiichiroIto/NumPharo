@@ -273,27 +273,19 @@ TNDArrayArithmetics >> hstack: aNDArray [
 	^ self class array: arr shape: newShape
 ]
 
-{ #category : #accessing }
-TNDArrayArithmetics >> indexAt: anInteger [
-	| r v a |
-	v := anInteger - 1.
-	r := WriteStream on: Array new.
-	1 to: self ndim do: [ :each | 
-		a := self itemSizeAxis: each.
-		r nextPut: (v // a) + 1.
-		v := v \\ a ].
-	^ r contents
-]
-
 { #category : #testing }
 TNDArrayArithmetics >> isZero [
 	^ false
 ]
 
 { #category : #private }
+TNDArrayArithmetics >> itemShapeAxis: anInteger [
+	^ self shape copyFrom: anInteger + 1 to: self shape size
+]
+
+{ #category : #private }
 TNDArrayArithmetics >> itemSizeAxis: anInteger [
-	^ self class
-		finiteProductOf: (self shape copyFrom: anInteger + 1 to: self shape size)
+	^ self class finiteProductOf: (self itemShapeAxis: anInteger)
 ]
 
 { #category : #arithmetic }
@@ -511,21 +503,6 @@ TNDArrayArithmetics >> t [
 		i := self arrayIndexAt: iter nextForT.
 		arr2 at: each put: (self array at: i) ].
 	^ self class array: arr2 shape: self shape reversed
-]
-
-{ #category : #accessing }
-TNDArrayArithmetics >> where [
-	| result |
-	result := (1 to: self ndim)
-		collect: [ :each | OrderedCollection new ].
-	1 to: self array size do: [ :each | 
-		(self arrayAt: each)
-			ifTrue: [ | index |
-				index := self indexAt: each.
-				index
-					withIndexDo: [ :each2 :index2 | (result at: index2) add: each2 ] ] ].
-	^ result
-		collect: [ :each | self class array: each asIntegerArray shape: {each size} ]
 ]
 
 { #category : #comparing }

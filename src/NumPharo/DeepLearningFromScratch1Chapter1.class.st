@@ -107,7 +107,7 @@ DeepLearningFromScratch1Chapter1 >> testChapter1_5_6 [
 		equals: #(51 55 14 19 0 4) asIntegerArray.
 	self assertCollection: x shape equals: #(6).
 	self assert: x dtype equals: #Integer.
-	r := x atAll: (Array with: 1 with: 3 with: 5).
+	r := x at: (Array with: 1 with: 3 with: 5) asNDArray.
 	self assertCollection: r array equals: #(51 14 0) asIntegerArray.
 	self assertCollection: r shape equals: #(3).
 	self assert: r dtype equals: #Integer.
@@ -117,7 +117,7 @@ DeepLearningFromScratch1Chapter1 >> testChapter1_5_6 [
 		equals: #(true true false true false false).
 	self assertCollection: r shape equals: #(6).
 	self assert: r dtype equals: #Boolean.
-	r := x atAll: x > 15.
+	r := x at: x > 15.
 	self assertCollection: r array equals: #(51 55 19) asIntegerArray.
 	self assertCollection: r shape equals: #(3).
 	self assert: r dtype equals: #Integer

@@ -48,11 +48,6 @@ RLearning >> initialize [
 ]
 
 { #category : #constants }
-RLearning >> maxNumberOfSteps [
-	^ self subclassResponsibility
-]
-
-{ #category : #constants }
 RLearning >> numActions [
 	self subclassResponsibility
 ]
@@ -99,7 +94,7 @@ RLearning >> saveStepsFileNamed: aString [
 		ifTrue: [ aString ]
 		ifFalse: [ aString , '.ston' ].
 	form := PharoPlot new
-		extent: self total @ self maxNumberOfSteps;
+		extent: self total @ 200;
 		plot: self total asNDArray label: self class name;
 		buildForm.
 	PNGReadWriter putForm: form onFileNamed: filename

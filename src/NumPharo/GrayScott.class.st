@@ -205,12 +205,12 @@ GrayScott >> setup [
 	u := NDArray ones: shape dtype: #Float.
 	v := NDArray zeros: shape dtype: #Float.
 	u
-		atAll:
+		at:
 			{(grid // 2 - (square // 2) to: grid // 2 + (square // 2)).
 			(grid // 2 - (square // 2) to: grid // 2 + (square // 2))} comprehension
 		put: 0.5.
 	v
-		atAll:
+		at:
 			{(grid // 2 - (square // 2) to: grid // 2 + (square // 2)).
 			(grid // 2 - (square // 2) to: grid // 2 + (square // 2))} comprehension
 		put: 0.25.
@@ -235,7 +235,7 @@ GrayScott >> u [
 
 { #category : #api }
 GrayScott >> uAtAll: anArray put: aNumber [
-	u atAll: anArray put: aNumber
+	u at: anArray put: aNumber
 ]
 
 { #category : #accessing }

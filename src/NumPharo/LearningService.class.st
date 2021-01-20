@@ -26,17 +26,20 @@ LearningService >> engine: anObject [
 
 { #category : #private }
 LearningService >> getActionFrom: aDictionary [
-	| observation reward done |
-	observation := aDictionary
+	| observations reward done |
+	observations := aDictionary
 		at: 'observation'
 		ifAbsent: [ ^ self engine defaultAction ].
+	observations size > engine numObservations
+		ifTrue:
+			[ observations := observations copyFrom: 1 to: engine numObservations ].
 	reward := aDictionary
 		at: 'reward'
 		ifAbsent: [ ^ self engine defaultAction ].
 	done := aDictionary
 		at: 'done'
 		ifAbsent: [ ^ self engine defaultAction ].
-	^ (engine update: observation reward: reward done: done) - 1
+	^ (engine update: observations reward: reward done: done) - 1
 ]
 
 { #category : #'request handling' }
@@ -119,7 +122,7 @@ LearningService >> setupFrom: aDictionary [
 				show: 'actions not specified';
 				cr.
 			^ false ].
-	self engine numObservations = observations
+	self engine numObservations >= observations
 		ifFalse: [ Transcript
 				show: 'invalid numObservations';
 				cr.

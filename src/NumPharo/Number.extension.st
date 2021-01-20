@@ -14,6 +14,11 @@ Number >> adaptToNDArray: rcvr andSend: selector [
 ]
 
 { #category : #'*NumPharo' }
+Number >> asNDArray [
+	^ NDArray fromArray: { self }
+]
+
+{ #category : #'*NumPharo' }
 Number >> asNDIndexes [
 	^ Array with: self
 ]
