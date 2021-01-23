@@ -231,15 +231,20 @@ TNDArrayAccessorsTest >> testAtTuplePut [
 { #category : #test }
 TNDArrayAccessorsTest >> testAtTuples [
 	| a r |
-	a := self newArrayFrom: #((10 20) (30 40) (50 60)).
-	r := a atTuples: #((3 1) (2 1)).
+	a := self newArrayFrom: #(#(10 20) #(30 40) #(50 60)).
+	r := a atTuples: #(#(3 1) #(2 1)).
 	self assertCollection: r array equals: #(60 10) asFloatArray.
 	self assertCollection: r shape equals: #(2).
-	a := self newArrayFrom: #(((10 20) (30 40)) ((50 60) (70 80)) ((90 100) (110 120))).
-	r := a atTuples: #((3 1) (2 2)).
+	r := a atTuples: #(#(1 2 3) #(2)).
+	self assertCollection: r array equals: #(20 40 60) asFloatArray.
+	self assertCollection: r shape equals: #(3).
+	self should: [ a atTuple: #(#(1 2 3) #(1 2)) ] raise: Error.
+	a := self
+		newArrayFrom: #(#(#(10 20) #(30 40)) #(#(50 60) #(70 80)) #(#(90 100) #(110 120))).
+	r := a atTuples: #(#(3 1) #(2 2)).
 	self assertCollection: r array equals: #(110 120 30 40) asFloatArray.
 	self assertCollection: r shape equals: #(2 2).
-	r := a atTuples: #((3 1) (2 2) (1 1)).
+	r := a atTuples: #(#(3 1) #(2 2) #(1 1)).
 	self assertCollection: r array equals: #(110 30) asFloatArray.
 	self assertCollection: r shape equals: #(2)
 ]
@@ -250,6 +255,10 @@ TNDArrayAccessorsTest >> testAtTuplesPut [
 	a := self newArrayFrom: #((10 20) (30 40) (50 60)).
 	a atTuples: #((3 1) (2 1)) put: 99.
 	self assertCollection: a array equals: #(99 20 30 40 50 99) asFloatArray.
+	a := self newArrayFrom: #((10 20) (30 40) (50 60)).
+	a atTuples: #(#(1 2 3) #(2)) put: 99.
+	self assertCollection: a array equals: #(10 99 30 99 50 99) asFloatArray.
+	self should: [ a atTuple: #(#(1 2 3) #(1 2)) put: 99 ] raise: Error.
 	a := self newArrayFrom: #(((10 20) (30 40)) ((50 60) (70 80)) ((90 100) (110 120))).
 	a atTuples: #((3 1) (2 2)) put: #(99 98).
 	self assertCollection: a array equals: #(10 20 99 98 50 60 70 80 90 100 99 98) asFloatArray.

@@ -29,53 +29,64 @@ GrayScott class >> bubbles [
 { #category : #examples }
 GrayScott class >> example1 [
 	| gif |
-	gif := AnimatedGifRecorder new openFileNamed: 'grayScott1.gif'.
+	gif := AnimatedGifRecorder new
+		openFileNamed: 'grayScott-amorphous.gif'.
 	gif extent: 512 @ 512.
 	self amorphous
-		in: [ :gs | 1000 timesRepeat: [ gif writeForm: gs form ] ].
+		do: [ :gs | gif writeForm: gs form ]
+		times: 1000
+		showing: 'amorphous'.
 	gif close
 ]
 
 { #category : #examples }
 GrayScott class >> example2 [
 	| gif |
-	gif := AnimatedGifRecorder new openFileNamed: 'grayScott2.gif'.
+	gif := AnimatedGifRecorder new openFileNamed: 'grayScott-spot.gif'.
 	gif extent: 512 @ 512.
 	gif frameDelay: 20.
 	self spot
-		in: [ :gs | 1000 timesRepeat: [ gif writeForm: gs form ] ].
+		do: [ :gs | gif writeForm: gs form ]
+		times: 1000
+		showing: 'spot'.
 	gif close
 ]
 
 { #category : #examples }
 GrayScott class >> example3 [
 	| gif |
-	gif := AnimatedGifRecorder new openFileNamed: 'grayScott3.gif'.
+	gif := AnimatedGifRecorder new openFileNamed: 'grayScott-bubbles.gif'.
 	gif extent: 512 @ 512.
 	self bubbles
-		in: [ :gs | 1000 timesRepeat: [ gif writeForm: gs form ] ].
+		do: [ :gs | gif writeForm: gs form ]
+		times: 1000
+		showing: 'bubbles'.
 	gif close
 ]
 
 { #category : #examples }
 GrayScott class >> example4 [
 	| gif |
-	gif := AnimatedGifRecorder new openFileNamed: 'grayScott4.gif'.
+	gif := AnimatedGifRecorder new openFileNamed: 'grayScott-stripe.gif'.
 	gif extent: 512 @ 512.
 	gif frameDelay: 20.
 	self stripe
-		in: [ :gs | 1000 timesRepeat: [ gif writeForm: gs form ] ].
+		do: [ :gs | gif writeForm: gs form ]
+		times: 1000
+		showing: 'stripe'.
 	gif close
 ]
 
 { #category : #examples }
 GrayScott class >> example5 [
 	| gif |
-	gif := AnimatedGifRecorder new openFileNamed: 'grayScott5.gif'.
+	gif := AnimatedGifRecorder new openFileNamed: 'grayScott-waves.gif'.
 	gif extent: 512 @ 512.
 	gif frameDelay: 20.
 	self waves
-		in: [ :gs | 1000 timesRepeat: [ gif writeForm: gs form ] ].
+		do: [ :gs | gif writeForm: gs form ]
+		times: 1000
+		showing: 'waves'.
 	gif close
 ]
 
@@ -104,6 +115,18 @@ GrayScott class >> stripe [
 { #category : #'instance creation' }
 GrayScott class >> waves [
 	^ self f: 0.025 k: 0.05
+]
+
+{ #category : #api }
+GrayScott >> do: aBlock times: anInteger showing: aString [
+	aString
+		displayProgressFrom: 0
+		to: anInteger
+		during: [ :bar | 
+			1 to: anInteger do: [ :each | 
+				bar value: each.
+				self loop.
+				aBlock value: self ] ]
 ]
 
 { #category : #accessing }
@@ -231,11 +254,6 @@ GrayScott >> square: anInteger [
 { #category : #accessing }
 GrayScott >> u [
 	^ u
-]
-
-{ #category : #api }
-GrayScott >> uAtAll: anArray put: aNumber [
-	u at: anArray put: aNumber
 ]
 
 { #category : #accessing }

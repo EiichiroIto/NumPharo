@@ -24,12 +24,6 @@ NDIndexIterator >> indexesForPad [
 ]
 
 { #category : #api }
-NDIndexIterator >> indexesForT [
-	self nextIndex: nil.
-	^ self indexesFor: [ self nextForT ]
-]
-
-{ #category : #api }
 NDIndexIterator >> nextForPad [
 	nextIndex ifNil: [ ^ self resetIndex ].
 	nextIndex last = 1
@@ -53,6 +47,22 @@ NDIndexIterator >> nextForT [
 	nextIndex
 		withIndexDo: [ :each :index | 
 			| b |
+			b := shape at: index.
+			each < b
+				ifTrue: [ nextIndex at: index put: each + 1.
+					^ nextIndex copy ]
+				ifFalse: [ nextIndex at: index put: 1 ] ].
+	self error
+]
+
+{ #category : #api }
+NDIndexIterator >> nextForTranspose [
+	nextIndex ifNil: [ ^ self resetIndex ].
+	nextIndex = shape
+		ifTrue: [ ^ nil ].
+	nextIndex size to: 1 by: -1 do: [ :index | 
+			| each b |
+			each := nextIndex at: index.
 			b := shape at: index.
 			each < b
 				ifTrue: [ nextIndex at: index put: each + 1.

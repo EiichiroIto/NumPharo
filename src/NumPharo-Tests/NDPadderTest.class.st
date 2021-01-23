@@ -33,11 +33,12 @@ NDPadderTest >> testBefore [
 { #category : #test }
 NDPadderTest >> testConstant [
 	| a p r |
+	a := NDArray fromArray: #(#(1 2 3) #(4 5 6)).
 	p := self newPadder.
 	p
 		before: 1;
-		after: 2.
-	a := NDArray fromArray: #(#(1 2 3) #(4 5 6)).
+		after: 2;
+		setupFor: a.
 	r := p constant: a.
 	self
 		assertCollection: r array
@@ -45,6 +46,11 @@ NDPadderTest >> testConstant [
 			#(0 0 0 0 0 0 0 1 2 3 0 0 0 4 5 6 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
 				asIntegerArray.
 	self assertCollection: r shape equals: #(5 6).
+	p := self newPadder
+		before: 1;
+		after: 2;
+		setupFor: a;
+		yourself.
 	a := NDArray fromArray: #(#(1 2) #(3 4) #(5 6)).
 	r := p constant: a.
 	self
@@ -54,6 +60,11 @@ NDPadderTest >> testConstant [
 				asIntegerArray.
 	self assertCollection: r shape equals: #(6 5).
 	a := NDArray fromArray: #(((1) (2)) ((3) (4))).
+	p := self newPadder
+		before: 1;
+		after: 2;
+		setupFor: a;
+		yourself.
 	r := p constant: a.
 	self
 		assertCollection: r array
@@ -70,18 +81,29 @@ NDPadderTest >> testConstantCopy [
 		before: 1;
 		after: 2.
 	a := NDArray fromArray: #(1 2 3).
+	p setupFor: a.
 	p setupForPadding: a.
 	p constantCopy: a.
 	self
 		assertCollection: p ndArray array
 		equals: #(0 1 2 3 0 0) asIntegerArray.
 	a := NDArray fromArray: #((1 2) (3 4) (5 6)).
+	p := self newPadder.
+	p
+		before: 1;
+		after: 2;
+		setupFor: a.
 	p setupForPadding: a.
 	p constantCopy: a.
 	self
 		assertCollection: p ndArray array
 		equals: #(0 0 0 0 0 0 1 2 0 0 0 3 4 0 0 0 5 6 0 0 0 0 0 0 0 0 0 0 0 0) asIntegerArray.
 	a := NDArray fromArray: #(((1) (2)) ((3) (4)) ((5) (6))).
+	p := self newPadder.
+	p
+		before: 1;
+		after: 2;
+		setupFor: a.
 	p setupForPadding: a.
 	p constantCopy: a.
 	self
@@ -92,15 +114,19 @@ NDPadderTest >> testConstantCopy [
 { #category : #test }
 NDPadderTest >> testEdge [
 	| a p r |
-	p := self newPadder.
-	p
-		before: 1;
-		after: 2.
 	a := NDArray fromArray: #(1 2 3).
+	p := self newPadder
+		before: 1;
+		after: 2;
+		setupFor: a.
 	r := p edge: a.
 	self assertCollection: r array equals: #(1 1 2 3 3 3) asIntegerArray.
 	self assertCollection: r shape equals: #(6).
 	a := NDArray fromArray: #(#(1 2 3) #(4 5 6)).
+	p := self newPadder
+		before: 1;
+		after: 2;
+		setupFor: a.
 	r := p edge: a.
 	self
 		assertCollection: r array
@@ -109,6 +135,10 @@ NDPadderTest >> testEdge [
 				asIntegerArray.
 	self assertCollection: r shape equals: #(5 6).
 	a := NDArray fromArray: #(#(1 2) #(3 4) #(5 6)).
+	p := self newPadder
+		before: 1;
+		after: 2;
+		setupFor: a.
 	r := p edge: a.
 	self
 		assertCollection: r array
@@ -117,6 +147,10 @@ NDPadderTest >> testEdge [
 				asIntegerArray.
 	self assertCollection: r shape equals: #(6 5).
 	a := NDArray fromArray: #(((1 2) (3 4)) ((5 6) (7 8))).
+	p := self newPadder
+		before: 1;
+		after: 2;
+		setupFor: a.
 	r := p edge: a.
 	self
 		assertCollection: r array
@@ -125,6 +159,10 @@ NDPadderTest >> testEdge [
 				asIntegerArray.
 	self assertCollection: r shape equals: #(5 5 5).
 	a := NDArray fromArray: #(((1) (2)) ((3) (4))).
+	p := self newPadder
+		before: 1;
+		after: 2;
+		setupFor: a.
 	r := p edge: a.
 	self
 		assertCollection: r array
@@ -142,6 +180,7 @@ NDPadderTest >> testEdgeEnd [
 	p ndArray: a.
 	p before: 1.
 	p after: 2.
+	p setupFor: a.
 	self assertCollection: (p edgeEnd: #(1 1 2)) equals: #(2 2 3).
 	self assertCollection: (p edgeEnd: #(1 2 2)) equals: #(2 3 3).
 	self assertCollection: (p edgeEnd: #(2 1 2)) equals: #(3 2 3).
@@ -195,6 +234,7 @@ NDPadderTest >> testEdgeStart [
 	p ndArray: a.
 	p before: 1.
 	p after: 2.
+	p setupFor: a.
 	self assertCollection: (p edgeStart: #(1 1 1)) equals: #(2 2 2).
 	self assertCollection: (p edgeStart: #(1 2 1)) equals: #(2 3 2).
 	self assertCollection: (p edgeStart: #(2 1 1)) equals: #(3 2 2).
@@ -217,13 +257,13 @@ NDPadderTest >> testNdArray [
 { #category : #test }
 NDPadderTest >> testOmit [
 	| a p r |
-	p := self newPadder.
-	p
-		before: 1;
-		after: 2.
 	a := NDArray
 		fromArray:
 			#(#(0 0 0 0 0 0) #(0 1 2 3 0 0) #(0 4 5 6 0 0) #(0 0 0 0 0 0) #(0 0 0 0 0 0)).
+	p := self newPadder
+		before: 1;
+		after: 2;
+		setupFor: a.
 	r := p omit: a.
 	self
 		assertCollection: r array
@@ -232,12 +272,20 @@ NDPadderTest >> testOmit [
 	a := NDArray
 		fromArray:
 			#(#(0 0 0 0 0) #(0 1 2 0 0) #(0 3 4 0 0) #(0 5 6 0 0) #(0 0 0 0 0) #(0 0 0 0 0)).
+	p := self newPadder
+		before: 1;
+		after: 2;
+		setupFor: a.
 	r := p omit: a.
 	self assertCollection: r array equals: #(1 2 3 4 5 6) asIntegerArray.
 	self assertCollection: r shape equals: #(3 2).
 	a := NDArray
 		fromArray:
 			#(#(#(0 0 0 0) #(0 0 0 0) #(0 0 0 0) #(0 0 0 0) #(0 0 0 0)) #(#(0 0 0 0) #(0 1 0 0) #(0 2 0 0) #(0 0 0 0) #(0 0 0 0)) #(#(0 0 0 0) #(0 3 0 0) #(0 4 0 0) #(0 0 0 0) #(0 0 0 0)) #(#(0 0 0 0) #(0 0 0 0) #(0 0 0 0) #(0 0 0 0) #(0 0 0 0)) #(#(0 0 0 0) #(0 0 0 0) #(0 0 0 0) #(0 0 0 0) #(0 0 0 0))).
+	p := self newPadder
+		before: 1;
+		after: 2;
+		setupFor: a.
 	r := p omit: a.
 	self assertCollection: r array equals: #(1 2 3 4) asIntegerArray.
 	self assertCollection: r shape equals: #(2 2 1)
@@ -246,13 +294,18 @@ NDPadderTest >> testOmit [
 { #category : #test }
 NDPadderTest >> testSetupForOmitting [
 	| a p |
+	a := NDArray fromArray: #((1 2 3) (4 5 4) (7 8 9)).
 	p := self newPadder.
 	p before: 1.
 	p after: 1.
-	a := NDArray fromArray: #((1 2 3) (4 5 4) (7 8 9)).
+	p setupFor: a.
 	p setupForOmitting: a.
 	self assertCollection: p ndArray shape equals: #(1 1).
 	a := NDArray fromArray: #(1 2 3 4 5 6 7).
+	p := self newPadder.
+	p before: 1.
+	p after: 1.
+	p setupFor: a.
 	p setupForOmitting: a.
 	self assertCollection: p ndArray shape equals: #(5)
 ]
@@ -260,13 +313,18 @@ NDPadderTest >> testSetupForOmitting [
 { #category : #test }
 NDPadderTest >> testSetupForPadding [
 	| a p |
+	a := NDArray fromArray: #((1 2) (3 4)).
 	p := self newPadder.
 	p before: 1.
 	p after: 2.
-	a := NDArray fromArray: #((1 2) (3 4)).
+	p setupFor: a.
 	p setupForPadding: a.
 	self assertCollection: p ndArray shape equals: #(5 5).
 	a := NDArray fromArray: #((1) (2) (3) (4)).
+	p := self newPadder.
+	p before: 1.
+	p after: 2.
+	p setupFor: a.
 	p setupForPadding: a.
 	self assertCollection: p ndArray shape equals: #(7 4)
 ]
@@ -274,20 +332,32 @@ NDPadderTest >> testSetupForPadding [
 { #category : #test }
 NDPadderTest >> testStartPos [
 	| p a |
-	p := self newPadder.
-	p
-		before: 1;
-		after: 2.
 	a := NDArray fromArray: #(1 2 3).
+	p := self newPadder
+		before: 1;
+		after: 2;
+		setupFor: a.
 	p setupForPadding: a.
 	self assert: p startPos equals: 2.
 	a := NDArray fromArray: #((1 2) (3 4) (5 6)).
+	p := self newPadder
+		before: 1;
+		after: 2;
+		setupFor: a.
 	p setupForPadding: a.
 	self assert: p startPos equals: 7.
 	a := NDArray fromArray: #(((1) (2)) ((3) (4)) ((5) (6))).
+	p := self newPadder
+		before: 1;
+		after: 2;
+		setupFor: a.
 	p setupForPadding: a.
 	self assert: p startPos equals: 26.
 	a := NDArray fromArray: #(((1 2 3) (4 5 6)) ((7 8 9) (10 11 12))).
+	p := self newPadder
+		before: 1;
+		after: 2;
+		setupFor: a.
 	p setupForPadding: a.
 	self assert: p startPos equals: 38.
 ]

@@ -871,6 +871,33 @@ TNDArrayArithmeticsTest >> testTildaEqualsSign [
 ]
 
 { #category : #test }
+TNDArrayArithmeticsTest >> testTranspose [
+	| a r |
+	a := NDArray arangeFrom: 0 to: 11 by: 1.
+	a := a reShape: #(3 4).
+	r := a transpose: #(1 2).
+	self assertCollection: r array equals: a array.
+	r := a transpose: #(2 1).
+	self
+		assertCollection: r array
+		equals: #(0 4 8 1 5 9 2 6 10 3 7 11) asIntegerArray.
+	a := NDArray arangeFrom: 0 to: 23 by: 1.
+	a := a reShape: #(4 3 2).
+	r := a transpose: #(1 2 3).
+	self assertCollection: r array equals: a array.
+	r := a transpose: #(2 1 3).
+	self
+		assertCollection: r array
+		equals:
+			#(0 1 6 7 12 13 18 19 2 3 8 9 14 15 20 21 4 5 10 11 16 17 22 23)
+				asIntegerArray.
+	a := self newArrayFrom: #((1 2 3) (4 5 6) (7 8 9)).
+	r := a transpose: #(2 1).
+	self assertCollection: r array equals: a t array.
+	self assertCollection: r shape equals: a t shape
+]
+
+{ #category : #test }
 TNDArrayArithmeticsTest >> testWrapCopyFromSizeOnAt [
 	| a arr |
 	a := #(1 2 3 4 5 6 7 8).

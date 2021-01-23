@@ -505,6 +505,19 @@ TNDArrayArithmetics >> t [
 	^ self class array: arr2 shape: self shape reversed
 ]
 
+{ #category : #converting }
+TNDArrayArithmetics >> transpose: anArray [
+	| newObj dst |
+	newObj := self class
+		array: (self newArraySize: self size)
+		shape: (self shape permutateUsing: anArray).
+	dst := NDIndexIterator new shape: self shape.
+	self array
+		do:
+			[ :each | newObj at: (dst nextForTranspose permutateUsing: anArray) put: each ].
+	^ newObj
+]
+
 { #category : #comparing }
 TNDArrayArithmetics >> ~= other [
 	^ other adaptToNDArray: self andCompare: #~=

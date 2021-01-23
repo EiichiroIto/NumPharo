@@ -4,7 +4,9 @@ Class {
 	#instVars : [
 		'ndArray',
 		'before',
-		'after'
+		'after',
+		'afters',
+		'befores'
 	],
 	#category : #'NumPharo-Core'
 }
@@ -20,6 +22,16 @@ NDPadder >> after: anObject [
 ]
 
 { #category : #accessing }
+NDPadder >> afters [
+	^ afters
+]
+
+{ #category : #accessing }
+NDPadder >> afters: anArray [
+	afters := anArray
+]
+
+{ #category : #accessing }
 NDPadder >> before [
 	^ before
 ]
@@ -29,8 +41,19 @@ NDPadder >> before: anObject [
 	before := anObject
 ]
 
+{ #category : #accessing }
+NDPadder >> befores [
+	^ befores
+]
+
+{ #category : #accessing }
+NDPadder >> befores: anArray [
+	befores := anArray
+]
+
 { #category : #api }
 NDPadder >> constant: aNDArray [
+	self setupFor: aNDArray.
 	self setupForPadding: aNDArray.
 	self constantCopy: aNDArray.
 	^ self ndArray
@@ -38,15 +61,14 @@ NDPadder >> constant: aNDArray [
 
 { #category : #private }
 NDPadder >> constantCopy: aNDArray [
-	| arr src dst size iter index offset |
+	| arr src dst size iter index |
 	arr := self ndArray array.
 	size := aNDArray shape last.
 	iter := NDIndexIterator new shape: aNDArray shape.
 	src := 1.
-	offset := Array new: self ndArray ndim withAll: self before.
 	[ index := iter nextForPad.
 	index notNil ]
-		whileTrue: [ dst := self ndArray arrayIndexAt: index + offset.
+		whileTrue: [ dst := self ndArray arrayIndexAt: index + befores.
 			arr
 				replaceFrom: dst
 				to: dst + size - 1
@@ -57,6 +79,7 @@ NDPadder >> constantCopy: aNDArray [
 
 { #category : #api }
 NDPadder >> edge: aNDArray [
+	self setupFor: aNDArray.
 	self setupForPadding: aNDArray.
 	self constantCopy: aNDArray.
 	self edgeCopy: aNDArray.
@@ -80,15 +103,15 @@ NDPadder >> edgeCopy: aNDArray [
 					to := self edgeEndOf: f for: aNDArray.
 					to := self edgeEnd: to.
 					to := self ndArray arrayIndexAt: to.
-					self edgeCopyFrom: from to: to size: each ] ]
+					self edgeCopyFrom: from to: to size: each at: index ] ]
 ]
 
 { #category : #private }
-NDPadder >> edgeCopyFrom: anInteger to: anInteger2 size: anInteger3 [
+NDPadder >> edgeCopyFrom: anInteger to: anInteger2 size: anInteger3 at: anInteger4 [
 	| arr dst |
 	arr := self ndArray array.
 	dst := anInteger.
-	self before
+	(befores at: anInteger4)
 		timesRepeat: [ dst := dst - anInteger3.
 			arr
 				replaceFrom: dst
@@ -96,7 +119,7 @@ NDPadder >> edgeCopyFrom: anInteger to: anInteger2 size: anInteger3 [
 				with: arr
 				startingAt: anInteger ].
 	dst := anInteger2 + 1.
-	self after
+	(afters at: anInteger4)
 		timesRepeat: [ arr
 				replaceFrom: dst
 				to: dst + anInteger3 - 1
@@ -108,7 +131,7 @@ NDPadder >> edgeCopyFrom: anInteger to: anInteger2 size: anInteger3 [
 { #category : #private }
 NDPadder >> edgeEnd: anArray [
 	| r |
-	r := anArray + self before.
+	r := anArray + (befores copyFrom: 1 to: anArray size).
 	anArray size = self ndArray ndim
 		ifTrue: [ ^ r ].
 	^ r
@@ -126,7 +149,7 @@ NDPadder >> edgeEndOf: anArray for: aNDArray [
 { #category : #private }
 NDPadder >> edgeStart: anArray [
 	| r |
-	r := anArray + self before.
+	r := anArray + (befores copyFrom: 1 to: anArray size).
 	anArray size = self ndArray ndim
 		ifTrue: [ ^ r ].
 	^ r forceTo: self ndArray ndim paddingWith: 1
@@ -144,6 +167,7 @@ NDPadder >> ndArray: anObject [
 
 { #category : #api }
 NDPadder >> omit: aNDArray [
+	self setupFor: aNDArray.
 	self setupForOmitting: aNDArray.
 	self omitCopy: aNDArray.
 	^ self ndArray
@@ -151,15 +175,14 @@ NDPadder >> omit: aNDArray [
 
 { #category : #private }
 NDPadder >> omitCopy: aNDArray [
-	| arr src dst size iter index offset |
+	| arr src dst size iter index |
 	arr := self ndArray array.
 	size := self ndArray shape last.
 	iter := NDIndexIterator new shape: self ndArray shape.
 	dst := 1.
-	offset := Array new: aNDArray ndim withAll: self before.
 	[ index := iter nextForPad.
 	index notNil ]
-		whileTrue: [ src := aNDArray arrayIndexAt: index + offset.
+		whileTrue: [ src := aNDArray arrayIndexAt: index + befores.
 			arr
 				replaceFrom: dst
 				to: dst + size - 1
@@ -169,10 +192,17 @@ NDPadder >> omitCopy: aNDArray [
 ]
 
 { #category : #private }
+NDPadder >> setupFor: aNDArray [
+	afters ifNil: [ afters := IntegerArray new: aNDArray ndim withAll: after ].
+	befores
+		ifNil: [ befores := IntegerArray new: aNDArray ndim withAll: before ]
+]
+
+{ #category : #private }
 NDPadder >> setupForOmitting: aNDArray [
 	| newShape |
 	newShape := aNDArray shape
-		collect: [ :each | each - self before - self after ].
+		withIndexCollect: [ :each :index | each - (befores at: index) - (afters at: index) ].
 	self ndArray: (NDArray zeros: newShape dtype: aNDArray dtype)
 ]
 
@@ -180,7 +210,7 @@ NDPadder >> setupForOmitting: aNDArray [
 NDPadder >> setupForPadding: aNDArray [
 	| newShape |
 	newShape := aNDArray shape
-		collect: [ :each | each + self before + self after ].
+		withIndexCollect: [ :each :index | each + (befores at: index) + (afters at: index) ].
 	self ndArray: (NDArray zeros: newShape dtype: aNDArray dtype)
 ]
 
@@ -188,6 +218,6 @@ NDPadder >> setupForPadding: aNDArray [
 NDPadder >> startPos [
 	| pos |
 	pos := 1.
-	1 to: self ndArray ndim do: [ :each | pos := (self ndArray itemSizeAxis: each) * self before + pos ].
+	1 to: self ndArray ndim do: [ :each | pos := (self ndArray itemSizeAxis: each) * (befores at: each) + pos ].
 	^ pos
 ]

@@ -14,7 +14,7 @@ ReLu >> backward: dout [
 ]
 
 { #category : #api }
-ReLu >> forwardX: x [
+ReLu >> forward: x [
 	| out |
 	mask := x <= 0.
 	out := x copy.

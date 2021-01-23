@@ -4,3 +4,8 @@ Extension { #name : #SequenceableCollection }
 SequenceableCollection >> asNDArray [
 	^ NDArray fromArray: self asArray
 ]
+
+{ #category : #'*NumPharo' }
+SequenceableCollection >> permutateUsing: anArray [
+	^ anArray collect: [ :each | self at: each ]
+]

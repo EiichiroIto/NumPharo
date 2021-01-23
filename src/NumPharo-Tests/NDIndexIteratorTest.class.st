@@ -92,6 +92,48 @@ NDIndexIteratorTest >> testNextForT [
 ]
 
 { #category : #test }
+NDIndexIteratorTest >> testNextForTranspose [
+	| a i |
+	a := NDArray fromArray: #(4 5 6).
+	i := self newIter shape: a shape.
+	self assert: i nextIndex isNil.
+	self assertCollection: i nextForTranspose equals: #(1).
+	self assertCollection: i nextForTranspose equals: #(2).
+	self assertCollection: i nextForTranspose equals: #(3).
+	self assert: i nextForTranspose isNil.
+	a := NDArray fromArray: #((1 2) (3 4)).
+	i := self newIter shape: a shape.
+	self assert: i nextIndex isNil.
+	self assertCollection: i nextForTranspose equals: #(1 1).
+	self assertCollection: i nextForTranspose equals: #(1 2).
+	self assertCollection: i nextForTranspose equals: #(2 1).
+	self assertCollection: i nextForTranspose equals: #(2 2).
+	self assert: i nextForTranspose isNil.
+	a := NDArray fromArray: #((1 2) (3 4) (5 6)).
+	i := self newIter shape: a shape.
+	self assert: i nextIndex isNil.
+	self assertCollection: i nextForTranspose equals: #(1 1).
+	self assertCollection: i nextForTranspose equals: #(1 2).
+	self assertCollection: i nextForTranspose equals: #(2 1).
+	self assertCollection: i nextForTranspose equals: #(2 2).
+	self assertCollection: i nextForTranspose equals: #(3 1).
+	self assertCollection: i nextForTranspose equals: #(3 2).
+	self assert: i nextForTranspose isNil.
+	a := NDArray fromArray: #(((1 2) (3 4)) ((5 6) (7 8))).
+	i := self newIter shape: a shape.
+	self assert: i nextIndex isNil.
+	self assertCollection: i nextForTranspose equals: #(1 1 1).
+	self assertCollection: i nextForTranspose equals: #(1 1 2).
+	self assertCollection: i nextForTranspose equals: #(1 2 1).
+	self assertCollection: i nextForTranspose equals: #(1 2 2).
+	self assertCollection: i nextForTranspose equals: #(2 1 1).
+	self assertCollection: i nextForTranspose equals: #(2 1 2).
+	self assertCollection: i nextForTranspose equals: #(2 2 1).
+	self assertCollection: i nextForTranspose equals: #(2 2 2).
+	self assert: i nextForTranspose isNil
+]
+
+{ #category : #test }
 NDIndexIteratorTest >> testNextIndex [
 	| i |
 	i := self newIter.

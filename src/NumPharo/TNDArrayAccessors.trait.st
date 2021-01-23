@@ -174,14 +174,15 @@ TNDArrayAccessors >> atTuple: anArray put: anObject [
 
 { #category : #private }
 TNDArrayAccessors >> atTuples: anArray [
-	| num1 num2 newShape arr src dst size |
-	num1 := anArray size.
-	num2 := anArray first size.
+	| num1 num2 newShape arr src dst size arr2 |
+	arr2 := self class normalizedIndexes: anArray.
+	num1 := arr2 size.
+	num2 := arr2 first size.
 	size := self itemSizeAxis: num1.
 	arr := self newArraySize: num2 * size.
 	dst := 1.
 	1 to: num2 do: [ :index | 
-		newShape := anArray collect: [ :each | each at: index ].
+		newShape := arr2 collect: [ :each | each at: index ].
 		src := self arrayIndexAt: newShape.
 		arr
 			replaceFrom: dst
@@ -194,13 +195,14 @@ TNDArrayAccessors >> atTuples: anArray [
 
 { #category : #private }
 TNDArrayAccessors >> atTuples: anArray put: anObject [
-	| num1 num2 newShape dst size data |
-	num1 := anArray size.
-	num2 := anArray first size.
+	| num1 num2 newShape dst size data arr |
+	arr := self class normalizedIndexes: anArray.
+	num1 := arr size.
+	num2 := arr first size.
 	size := self itemSizeAxis: num1.
 	data := self broadcast: anObject axis: num1.
 	1 to: num2 do: [ :index | 
-		newShape := anArray collect: [ :each | each at: index ].
+		newShape := arr collect: [ :each | each at: index ].
 		dst := self arrayIndexAt: newShape.
 		self array
 			replaceFrom: dst

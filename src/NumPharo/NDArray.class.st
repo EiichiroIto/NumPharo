@@ -48,23 +48,25 @@ NDArray class >> coerceDtype: aSymbol1 with: aSymbol2 [
 
 { #category : #private }
 NDArray class >> comprehension: anArray [
-	| sizes num result itemSize itemCount pos |
+	| sizes num result itemSize itemCount pos arr |
 	sizes := anArray collect: #size.
 	num := self finiteProductOf: sizes.
-	result := (1 to: num) collect: [ :each | Array new: anArray size ].
+	result := Array new: anArray size.
 	anArray
 		withIndexDo: [ :each1 :index1 | 
 			itemSize := self finiteProductOf: (sizes copyWithoutIndex: index1).
 			itemCount := self
 				finiteProductOf: (sizes copyFrom: index1 + 1 to: sizes size).
+			arr := Array new: num.
 			pos := 1.
 			itemSize / itemCount
 				timesRepeat: [ each1
 						withIndexDo: [ :each2 :index2 | 
 							"pos := (index2 - 1) * itemSize + 1."
 							itemCount
-								timesRepeat: [ (result at: pos) at: index1 put: each2.
-									pos := pos + 1 ] ] ] ].
+								timesRepeat: [ arr at: pos put: each2.
+									pos := pos + 1 ] ] ].
+			result at: index1 put: arr ].
 	^ result
 ]
 
@@ -265,6 +267,24 @@ NDArray class >> normalizedIndex: anObject [
 	^ anObject isNumber
 		ifTrue: [ Array with: anObject asInteger ]
 		ifFalse: [ anObject copy asArray ]
+]
+
+{ #category : #private }
+NDArray class >> normalizedIndexes: anArray [
+	| sizes result tmp |
+	anArray isEmpty
+		ifTrue: [ ^ #() ].
+	sizes := anArray collect: #size.
+	result := Array new: anArray size.
+	anArray
+		withIndexDo: [ :each :index | 
+			tmp := each size = sizes max
+				ifTrue: [ each copy ]
+				ifFalse: [ each size = 1
+						ifTrue: [ Array new: sizes max withAll: each first ]
+						ifFalse: [ self error ] ].
+			result at: index put: tmp ].
+	^ result
 ]
 
 { #category : #'instance creation' }

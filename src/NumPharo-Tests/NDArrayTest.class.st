@@ -192,18 +192,18 @@ NDArrayTest >> testCoerceDtype [
 NDArrayTest >> testComprehension [
 	| r |
 	r := NDArray comprehension: #(#(1) #(2 3 4)).
-	self assertCollection: r equals: #(#(1 2) #(1 3) #(1 4)).
+	self assertCollection: r equals: #(#(1 1 1) #(2 3 4)).
 	r := NDArray comprehension: #(#(1 2) #(3 4)).
-	self assertCollection: r equals: #(#(1 3) #(1 4) #(2 3) #(2 4)).
+	self assertCollection: r equals: #(#(1 1 2 2) #(3 4 3 4)).
 	r := NDArray comprehension: #(#(1 2 3) #(4 5 6)).
 	self
 		assertCollection: r
-		equals: #(#(1 4) #(1 5) #(1 6) #(2 4) #(2 5) #(2 6) #(3 4) #(3 5) #(3 6)).
+		equals: #(#(1 1 1 2 2 2 3 3 3) #(4 5 6 4 5 6 4 5 6)).
 	r := NDArray comprehension: #(#(1 2) #(3 4 5) #(6 7)).
 	self
 		assertCollection: r
 		equals:
-			#(#(1 3 6) #(1 3 7) #(1 4 6) #(1 4 7) #(1 5 6) #(1 5 7) #(2 3 6) #(2 3 7) #(2 4 6) #(2 4 7) #(2 5 6) #(2 5 7))
+			#(#(1 1 1 1 1 1 2 2 2 2 2 2) #(3 3 4 4 5 5 3 3 4 4 5 5) #(6 7 6 7 6 7 6 7 6 7 6 7))
 ]
 
 { #category : #test }
@@ -543,6 +543,22 @@ NDArrayTest >> testNormalizedIndex [
 	self assertCollection: r equals: #(2).
 	r := NDArray normalizedIndex: #(1 2).
 	self assertCollection: r equals: #(1 2)
+]
+
+{ #category : #test }
+NDArrayTest >> testNormalizedIndexes [
+	| r |
+	r := NDArray normalizedIndexes: #().
+	self assert: r isEmpty.
+	r := NDArray normalizedIndexes: #(#(1) #(2 3 4)).
+	self assertCollection: r equals: #(#(1 1 1) #(2 3 4)).
+	r := NDArray normalizedIndexes: #(#(1 2) #(3 4)).
+	self assertCollection: r equals: #(#(1 2) #(3 4)).
+	r := NDArray normalizedIndexes: #(#(1 2 3) #(4 5 6)).
+	self assertCollection: r equals: #(#(1 2 3) #(4 5 6)).
+	self
+		should: [ NDArray normalizedIndexes: #(#(1 2) #(2 3 4)) ]
+		raise: Error
 ]
 
 { #category : #test }
