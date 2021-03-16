@@ -1,10 +1,6 @@
 Class {
 	#name : #MNistImageReader,
 	#superclass : #MNistReader,
-	#instVars : [
-		'images',
-		'rows'
-	],
 	#category : #'NumPharo-MNist'
 }
 
@@ -19,10 +15,7 @@ MNistImageReader >> fromFileNamed: aString [
 			row := self read32BitIntegerFrom: s.
 			col := self read32BitIntegerFrom: s.
 			array := s next: size * row * col ].
-	^ NDArray
-		fromArray: array
-		shape: (Array with: size with: row with: col)
-		dtype: #Byte
+	^ Array with: (Array with: size with: row with: col) with: array
 ]
 
 { #category : #private }

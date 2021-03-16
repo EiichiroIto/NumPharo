@@ -74,3 +74,54 @@ DeepLearningFromScratch1Chapter5 >> testChapter5_5_1 [
 	y at: mask put: 0.
 	self assertCollection: y array equals: #(1.0 0 0 3.0) asFloatArray
 ]
+
+{ #category : #tests }
+DeepLearningFromScratch1Chapter5 >> testChapter5_6_1 [
+	| x w b |
+	x := NDArray randomUniform: 2.
+	w := NDArray randomUniform: #(2 3).
+	b := NDArray randomUniform: 3.
+	self assertCollection: x shape equals: #(2).
+	self assertCollection: w shape equals: #(2 3).
+	self assertCollection: b shape equals: #(3).
+	^ (x dot: w) + b
+]
+
+{ #category : #tests }
+DeepLearningFromScratch1Chapter5 >> testChapter5_6_2 [
+	| xDotW b r dy db |
+	xDotW := NDArray fromArray: #((0 0 0) (10 10 10)).
+	b := NDArray fromArray: #(1 2 3).
+	r := xDotW + b.
+	self assertCollection: r array equals: #(1 2 3 11 12 13) asIntegerArray.
+	self assertCollection: r shape equals: #(2 3).
+	dy := NDArray fromArray: #((1 2 3) (4 5 6)).
+	db := dy sumAxis: 1.
+	self assertCollection: db array equals: #(5 7 9) asIntegerArray.
+	self assertCollection: db shape equals: #(3)
+]
+
+{ #category : #tests }
+DeepLearningFromScratch1Chapter5 >> testChapter5_7_3 [
+	| mnist xTrain tTrain xBatch tBatch network gradNumerical gradBackProp |
+	self timeLimit: 500 seconds.
+	mnist := MNistData new.
+	mnist
+		normalize: true;
+		oneHotLabel: true.
+	xTrain := mnist trainingImages.
+	tTrain := mnist trainingLabels.
+	xBatch := xTrain copyFrom: 1 to: 3.
+	tBatch := tTrain copyFrom: 1 to: 3.
+	network := TwoLayerNet2 new
+		inputSize: 784
+		hiddenSize: 50
+		outputSize: 10.
+	gradBackProp := network gradient: xBatch t: tBatch.
+	gradNumerical := network numericalGradient: xBatch t: tBatch.
+	gradNumerical
+		keysDo: [ :each | 
+			self trace: each , ':'.
+			self
+				traceCr: ((gradBackProp at: each) - (gradNumerical at: each)) abs average ]
+]

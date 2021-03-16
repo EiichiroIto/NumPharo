@@ -18,6 +18,15 @@ TNDArrayArithmeticsTest >> newArrayFrom: anArray dtype: aSymbol [
 ]
 
 { #category : #test }
+TNDArrayArithmeticsTest >> testAbs [
+	| n r |
+	n := self newArrayFrom: #(-1 2 3 -4 -5 6).
+	r := n abs.
+	self assertCollection: r array equals: #(1 2 3 4 5 6) asFloatArray.
+	self assertCollection: r shape equals: #(6)
+]
+
+{ #category : #test }
 TNDArrayArithmeticsTest >> testArgIndexAxis [
 	| a |
 	a := self newArrayFrom: #(#(1 2) #(3 4) #(5 6)).
@@ -69,6 +78,12 @@ TNDArrayArithmeticsTest >> testArgMaxAxis [
 	r := a argMaxAxis: 2.
 	self assertCollection: r array equals: #(2 2 2) asIntegerArray.
 	self assertCollection: r shape equals: #(3).
+	r := a argMaxAxis: -1.
+	self assertCollection: r array equals: #(2 2 2) asIntegerArray.
+	self assertCollection: r shape equals: #(3).
+	r := a argMaxAxis: -2.
+	self assertCollection: r array equals: #(3 3) asIntegerArray.
+	self assertCollection: r shape equals: #(2).
 	a := self newArrayFrom: #(((1 2) (3 4) (5 6)) ((7 6) (5 4) (3 2))).
 	self assertCollection: a shape equals: #(2 3 2).
 	r := a argMaxAxis: 1.

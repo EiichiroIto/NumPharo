@@ -5,28 +5,6 @@ Class {
 }
 
 { #category : #private }
-DeepLearningFromScratch1Chapter3 >> chapter3_6_3 [
-	| data x network w1 w2 w3 t batchSize accuracyCount xBatch yBatch tBatch p |
-	data := self getData362.
-	x := data first.
-	network := self initNetwork362.
-	w1 := network at: #W1.
-	w2 := network at: #W2.
-	w3 := network at: #W3.
-	t := data second.
-	batchSize := 100.
-	accuracyCount := 0.
-	(1 to: x len by: batchSize)
-		do: [ :each | 
-			xBatch := x copyFrom: each to: each + batchSize - 1.
-			yBatch := self predict362: network x: xBatch.
-			p := (yBatch argMaxAxis: 2) - 1.
-			tBatch := t copyFrom: each to: each + batchSize - 1.
-			accuracyCount := accuracyCount + (p = tBatch) sum ].
-	^ (accuracyCount / x len) asFloat
-]
-
-{ #category : #private }
 DeepLearningFromScratch1Chapter3 >> checkFileNamed: aString1 ifNotDownloadFrom: aString2 [
 	| fr fn |
 	fr := FileSystem workingDirectory / aString1.
@@ -62,12 +40,9 @@ DeepLearningFromScratch1Chapter3 >> forward343: network x: x [
 { #category : #private }
 DeepLearningFromScratch1Chapter3 >> getData362 [
 	| mnist xTest tTest |
-	mnist := MNistReader load.
-	xTest := mnist second first.
-	tTest := mnist second second.
-	xTest := xTest withShape: (Array with: xTest shape first with: -1).
-	xTest := xTest withDtype: #Float.
-	xTest := xTest / 255.
+	mnist := MNistData new flatten: true; normalize: true; yourself.
+	xTest := mnist testingImages.
+	tTest := mnist testingLabels.
 	^ Array with: xTest with: tTest
 ]
 
@@ -343,11 +318,12 @@ DeepLearningFromScratch1Chapter3 >> testChapter3_5_3 [
 { #category : #test }
 DeepLearningFromScratch1Chapter3 >> testChapter3_6_1 [
 	| mnist xTrain tTrain xTest tTest |
-	mnist := MNistReader load.
-	xTrain := mnist first first withShape: #(60000 -1).
-	tTrain := mnist first second.
-	xTest := mnist second first withShape: #(10000 -1).
-	tTest := mnist second second.
+	mnist := MNistData new.
+	mnist flatten: true.
+	xTrain := mnist trainingImages.
+	tTrain := mnist trainingLabels.
+	xTest := mnist testingImages.
+	tTest := mnist testingLabels.
 	self assertCollection: xTrain shape equals: #(60000 784).
 	self assertCollection: tTrain shape equals: #(60000).
 	self assertCollection: xTest shape equals: #(10000 784).
@@ -357,9 +333,10 @@ DeepLearningFromScratch1Chapter3 >> testChapter3_6_1 [
 { #category : #test }
 DeepLearningFromScratch1Chapter3 >> testChapter3_6_1b [
 	| mnist xTrain tTrain img label plt |
-	mnist := MNistReader load.
-	xTrain := mnist first first withShape: #(60000 -1).
-	tTrain := mnist first second.
+	mnist := MNistData new.
+	mnist flatten: true.
+	xTrain := mnist trainingImages.
+	tTrain := mnist trainingLabels.
 	img := xTrain at: 1.
 	label := tTrain at: 1.
 	self assert: label equals: 5.

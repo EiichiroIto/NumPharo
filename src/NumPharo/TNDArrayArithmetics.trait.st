@@ -58,6 +58,11 @@ TNDArrayArithmetics >> \\ other [
 	^ other adaptToNDArray: self andSend: #\\=
 ]
 
+{ #category : #arithmetic }
+TNDArrayArithmetics >> abs [
+	^ self newArrayDoing: #abs
+]
+
 { #category : #converting }
 TNDArrayArithmetics >> adaptToInteger: rcvr andSend: selector [
 	^ self adaptToNumber: rcvr andSend: selector
@@ -188,11 +193,15 @@ TNDArrayArithmetics >> digitize: aNDArray right: aBoolean [
 
 { #category : #private }
 TNDArrayArithmetics >> do: aSymbol axis: anInteger dtype: aSymbol2 [
+	| axis |
 	anInteger = 0
 		ifTrue: [ ^ self perform: aSymbol ].
+	axis := anInteger > 0
+		ifTrue: [ anInteger ]
+		ifFalse: [ self ndim + anInteger + 1 ].
 	^ self
 		collect: [ :array | array perform: aSymbol ]
-		axis: anInteger
+		axis: axis
 		dtype: aSymbol2
 ]
 

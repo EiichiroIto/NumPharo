@@ -127,9 +127,9 @@ DeepLearningFromScratch1Chapter4 >> testChapter4_2_2 [
 { #category : #test }
 DeepLearningFromScratch1Chapter4 >> testChapter4_2_3 [
 	| mnist xTrain tTrain trainSize batchSize batchMask xBatch tBatch |
-	mnist := MNistReader load.
-	xTrain := mnist first first.
-	tTrain := mnist first second.
+	mnist := MNistData new.
+	xTrain := mnist trainingImages.
+	tTrain := mnist trainingLabels.
 	trainSize := xTrain shape at: 1.
 	batchSize := 10.
 	batchMask := NDArray randomChoice: batchSize from: trainSize.

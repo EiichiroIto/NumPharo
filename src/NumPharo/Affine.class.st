@@ -31,10 +31,30 @@ Affine >> backward: dout [
 	^ dx reShape: originalShape
 ]
 
+{ #category : #accessing }
+Affine >> db [
+	^ db
+]
+
+{ #category : #accessing }
+Affine >> db: anObject [
+	db := anObject
+]
+
+{ #category : #accessing }
+Affine >> dw [
+	^ dw
+]
+
+{ #category : #accessing }
+Affine >> dw: anObject [
+	dw := anObject
+]
+
 { #category : #api }
 Affine >> forward: aNDArray [
 	originalShape := aNDArray shape.
-	x := aNDArray reShape: { aNDArray first. -1 }.
+	x := aNDArray reShape: { aNDArray shape first. -1 }.
 	^ (x dot: w) + b
 ]
 
@@ -56,4 +76,14 @@ Affine >> w [
 { #category : #accessing }
 Affine >> w: anObject [
 	w := anObject
+]
+
+{ #category : #accessing }
+Affine >> x [
+	^ x
+]
+
+{ #category : #accessing }
+Affine >> x: anObject [
+	x := anObject
 ]

@@ -1,9 +1,6 @@
 Class {
 	#name : #MNistLabelReader,
 	#superclass : #MNistReader,
-	#instVars : [
-		'labels'
-	],
 	#category : #'NumPharo-MNist'
 }
 
@@ -16,7 +13,7 @@ MNistLabelReader >> fromFileNamed: aString [
 			self readMagicFrom: s.
 			size := self read32BitIntegerFrom: s.
 			array := s next: size ].
-	^ NDArray fromArray: array dtype: #Byte
+	^ array
 ]
 
 { #category : #private }

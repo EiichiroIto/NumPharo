@@ -3,25 +3,21 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'params',
-		'weightInitStd'
+		'weightInitStd',
+		'functions'
 	],
 	#category : #'NumPharo-Demo'
 }
 
 { #category : #api }
-TwoLayerNet >> accuracyX: x andT: t [
+TwoLayerNet >> accuracy: x t: t [
 	| y t2 |
 	y := self predict: x.
 	y := y argMaxAxis: 2.
-	t2 := t argMaxAxis: 2.
+	t2 := t ndim = 1
+		ifTrue: [ t ]
+		ifFalse: [ t argMaxAxis: 2 ].
 	^ (y = t2) sum / x shape first asFloat
-]
-
-{ #category : #private }
-TwoLayerNet >> crossEntropyErrorY: y andT: t [
-	| delta |
-	delta := 1.0e-7.
-	^ (t * (y + delta) ln) sum negated
 ]
 
 { #category : #initialization }
@@ -55,10 +51,10 @@ TwoLayerNet >> inputSize: anInteger1 hiddenSize: anInteger3 outputSize: anIntege
 ]
 
 { #category : #api }
-TwoLayerNet >> lossX: x t: t [
+TwoLayerNet >> loss: x t: t [
 	| y |
 	y := self predict: x.
-	^ self crossEntropyErrorY: y andT: t
+	^ functions crossEntropyErrorY: y andT: t
 ]
 
 { #category : #private }
@@ -91,9 +87,9 @@ TwoLayerNet >> numericalGradient: aBlock ofBatch: aNDArray [
 ]
 
 { #category : #api }
-TwoLayerNet >> numericalGradientX: x andT: t [
+TwoLayerNet >> numericalGradient: x t: t [
 	| lossW grads |
-	lossW := [ :a | self lossX: x t: t ].
+	lossW := [ :a | self loss: x t: t ].
 	grads := Dictionary new.
 	grads
 		at: #W1
@@ -123,23 +119,30 @@ TwoLayerNet >> predict: x [
 	b1 := params at: #b1.
 	b2 := params at: #b2.
 	a1 := (x dot: w1) + b1.
-	z1 := self sigmoid: a1.
+	z1 := functions sigmoid: a1.
 	a2 := (z1 dot: w2) + b2.
-	^ self softMax: a2
+	^ functions softMax: a2
 ]
 
-{ #category : #private }
-TwoLayerNet >> sigmoid: x [
-	^ 1 / (1 + x negated exp)
-]
-
-{ #category : #private }
-TwoLayerNet >> softMax: a [
-	| c exp sum |
-	c := a max.
-	exp := (a - c) exp.
-	sum := exp sum.
-	^ exp / sum
+{ #category : #api }
+TwoLayerNet >> readParamsFromFiles [
+	params := Dictionary new.
+	params
+		at: #W1
+		put:
+			(STON fromStream: (FileSystem workingDirectory / 'W1.ston') readStream).
+	params
+		at: #W2
+		put:
+			(STON fromStream: (FileSystem workingDirectory / 'W2.ston') readStream).
+	params
+		at: #b1
+		put:
+			(STON fromStream: (FileSystem workingDirectory / 'b1.ston') readStream).
+	params
+		at: #b2
+		put:
+			(STON fromStream: (FileSystem workingDirectory / 'b2.ston') readStream)
 ]
 
 { #category : #accessing }
