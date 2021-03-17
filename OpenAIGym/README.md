@@ -14,3 +14,10 @@ $ python3 cartpole-client.py
 ```smalltalk
 q stop.
 ```
+
+# Using pre-trained data
+```smalltalk
+pg := STON fromStream: (FileSystem workingDirectory / 'cartpole-pg.ston') readStream.
+q := LearningService new engine: pg.
+q start.
+```
