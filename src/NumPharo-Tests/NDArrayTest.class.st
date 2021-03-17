@@ -281,18 +281,6 @@ NDArrayTest >> testCopyWithNdim [
 ]
 
 { #category : #test }
-NDArrayTest >> testCrossEntropyErrorYAndT [
-	| t y r |
-	t := NDArray fromArray: #(0 0 1 0 0 0 0 0 0 0).
-	y := NDArray fromArray: #(0.1 0.05 0.6 0.0 0.05 0.1 0.0 0.1 0.0 0.0).
-	r := NDArray crossEntropyErrorY: y andT: t.
-	self assert: r closeTo: 0.51082545.
-	y := NDArray fromArray: #(0.1 0.05 0.1 0.0 0.05 0.1 0.0 0.6 0.0 0.0).
-	r := NDArray crossEntropyErrorY: y andT: t.
-	self assert: r closeTo: 2.30258409
-]
-
-{ #category : #test }
 NDArrayTest >> testDtype [
 	| a |
 	a := self newArrayFrom: #(1 2 3).
@@ -390,18 +378,6 @@ NDArrayTest >> testLinspaceFromToNumWithEndPoint [
 	self assertCollection: a array equals: #(1 2 3) asFloatArray.
 	self assertCollection: a shape equals: #(3).
 	self assert: a dtype equals: #Float
-]
-
-{ #category : #test }
-NDArrayTest >> testMeanSquaredErrorYAndT [
-	| t y r |
-	t := NDArray fromArray: #(0 0 1 0 0 0 0 0 0 0).
-	y := NDArray fromArray: #(0.1 0.05 0.6 0.0 0.05 0.1 0.0 0.1 0.0 0.0).
-	r := NDArray meanSquaredErrorY: y andT: t.
-	self assert: r closeTo: 0.0975.
-	y := NDArray fromArray: #(0.1 0.05 0.1 0.0 0.05 0.1 0.0 0.6 0.0 0.0).
-	r := NDArray meanSquaredErrorY: y andT: t.
-	self assert: r closeTo: 0.5975
 ]
 
 { #category : #test }
@@ -625,55 +601,6 @@ NDArrayTest >> testPrivShape [
 ]
 
 { #category : #test }
-NDArrayTest >> testRandomChoiceFrom [
-	| a |
-	a := NDArray randomChoice: 10 from: (100 to: 200).
-	self assert: a array size equals: 10.
-	self assert: a array asSet size equals: 10.
-	self assert: a dtype equals: #Integer.
-	self assert: (a array allSatisfy: [ :each | each between: 100 and: 200 ]).
-	a := NDArray randomChoice: 5 from: 50.
-	self assert: a array size equals: 5.
-	self assert: a array asSet size equals: 5.
-	self assert: a dtype equals: #Integer.
-	self assert: (a array allSatisfy: [ :each | each between: 1 and: 50 ])
-]
-
-{ #category : #test }
-NDArrayTest >> testRandomNormal [
-	| a |
-	a := NDArray randomNormal: 10000.
-	self assert: a average abs < 0.1.
-	self assert: (a std - 1) abs < 0.1
-]
-
-{ #category : #test }
-NDArrayTest >> testRandomNormalMeanStd [
-	| a |
-	a := NDArray randomNormal: 10000 mean: 5 std: 2.
-	self assert: (a average - 5) abs < 0.1.
-	self assert: (a std - 2) abs < 0.1
-]
-
-{ #category : #test }
-NDArrayTest >> testRandomUniform [
-	| r |
-	100
-		timesRepeat: [ r := NDArray randomUniform: 10.
-			self assert: ((r >= 0) array allSatisfy: [ :each | each ]).
-			self assert: ((r < 1) array allSatisfy: [ :each | each ]) ]
-]
-
-{ #category : #test }
-NDArrayTest >> testRandomUniformFromTo [
-	| r |
-	100
-		timesRepeat: [ r := NDArray randomUniform: 10 from: 5 to: 8.
-			self assert: ((r >= 5) array allSatisfy: [ :each | each ]).
-			self assert: ((r < 8) array allSatisfy: [ :each | each ]) ]
-]
-
-{ #category : #test }
 NDArrayTest >> testRawAt [
 	| a r |
 	a := self newArrayFrom: #(10 20 30).
@@ -745,14 +672,6 @@ NDArrayTest >> testSize [
 	self assert: a size equals: 4.
 	a := self newArrayFrom: #((1 2) (3 4)).
 	self assert: a size equals: 4
-]
-
-{ #category : #test }
-NDArrayTest >> testSoftMax [
-	| a y |
-	a := NDArray fromArray: #(0.3 2.9 4.0).
-	y := NDArray softMax: a.
-	self assert: y sum closeTo: 1
 ]
 
 { #category : #test }

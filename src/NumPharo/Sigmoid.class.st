@@ -14,6 +14,6 @@ Sigmoid >> backward: dout [
 
 { #category : #api }
 Sigmoid >> forward: x [
-	out := NDArray sigmoid: x.
+	out := functions sigmoid: x.
 	^ out
 ]

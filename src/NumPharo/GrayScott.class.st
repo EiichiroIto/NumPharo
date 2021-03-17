@@ -237,8 +237,8 @@ GrayScott >> setup [
 			{(grid // 2 - (square // 2) to: grid // 2 + (square // 2)).
 			(grid // 2 - (square // 2) to: grid // 2 + (square // 2))} comprehension
 		put: 0.25.
-	u := (u + ((NDArray randomUniform: shape) * 0.1)) minimum: 1.
-	v := (v + ((NDArray randomUniform: shape) * 0.1)) minimum: 1
+	u := (u + ((NDRandom randomUniform: shape) * 0.1)) minimum: 1.
+	v := (v + ((NDRandom randomUniform: shape) * 0.1)) minimum: 1
 ]
 
 { #category : #accessing }

@@ -55,7 +55,7 @@ CartPolePGTest >> testN [
 	| l a |
 	l := self newLearning.
 	self assert: l n isNDArray.
-	a := NDArray randomNormal: 10.
+	a := NDRandom randomNormal: 10.
 	l n: a.
 	self assert: l n identicalTo: a
 ]
@@ -176,7 +176,7 @@ CartPolePGTest >> testW [
 	| l a |
 	l := self newLearning.
 	self assert: l w isNDArray.
-	a := NDArray randomNormal: 10.
+	a := NDRandom randomNormal: 10.
 	l w: a.
 	self assert: l w identicalTo: a
 ]
@@ -186,7 +186,7 @@ CartPolePGTest >> testWTry [
 	| l a |
 	l := self newLearning.
 	self assert: l wTry isNDArray.
-	a := NDArray randomNormal: 10.
+	a := NDRandom randomNormal: 10.
 	l wTry: a.
 	self assert: l wTry identicalTo: a
 ]

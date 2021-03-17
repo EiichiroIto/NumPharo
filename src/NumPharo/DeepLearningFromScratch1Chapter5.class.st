@@ -78,9 +78,9 @@ DeepLearningFromScratch1Chapter5 >> testChapter5_5_1 [
 { #category : #tests }
 DeepLearningFromScratch1Chapter5 >> testChapter5_6_1 [
 	| x w b |
-	x := NDArray randomUniform: 2.
-	w := NDArray randomUniform: #(2 3).
-	b := NDArray randomUniform: 3.
+	x := NDRandom randomUniform: 2.
+	w := NDRandom randomUniform: #(2 3).
+	b := NDRandom randomUniform: 3.
 	self assertCollection: x shape equals: #(2).
 	self assertCollection: w shape equals: #(2 3).
 	self assertCollection: b shape equals: #(3).

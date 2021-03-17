@@ -56,7 +56,7 @@ PharoPlotSample class >> example11 [
 	^ plt
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #examples }
 PharoPlotSample class >> example12 [
 	| x y plt |
 	x := NDArray
@@ -74,7 +74,7 @@ PharoPlotSample class >> example12 [
 PharoPlotSample class >> example2 [
 	| x y plt |
 	x := NDArray arangeFrom: -5 to: 5 by: 0.1.
-	y := NDArray stepFunction: x.
+	y := self stepFunction: x.
 	plt := PharoPlot new plotX: x y: y label: 'step'.
 	plt yLimitFrom: -0.1 to: 1.1.
 	plt showAxisX: true y: false.
@@ -86,11 +86,11 @@ PharoPlotSample class >> example2 [
 PharoPlotSample class >> example3 [
 	| x y plt |
 	x := NDArray arangeFrom: -4 to: 4 by: 0.1.
-	y := NDArray stepFunction: x.
+	y := self stepFunction: x.
 	plt := PharoPlot new plotX: x y: y label: 'step'.
 	plt extent: 400 @ 200.
-	plt plotX: x y: (NDArray sigmoid: x) label: 'sigmoid'.
-	plt plotX: x y: (NDArray relu: x) label: 'relu'.
+	plt plotX: x y: (self sigmoid: x) label: 'sigmoid'.
+	plt plotX: x y: (self relu: x) label: 'relu'.
 	plt yLimitFrom: -0.1 to: 1.1.
 	plt showLegend: true.
 	plt show.
@@ -147,14 +147,14 @@ PharoPlotSample class >> example6 [
 { #category : #examples }
 PharoPlotSample class >> example7 [
 	| p mn |
-	mn := MNistReader load.
+	mn := MNistData new.
 	p := PharoPlot new.
 	p extent: 400 @ 400.
 	1 to: 20 do: [ :each | 
 		p subPlotRow: 4 col: 5 index: each.
-		p image: (mn first first at: each) asForm.
+		p image: (mn trainingImages at: each) asForm.
 		p showAxisX: false y: false.
-		p title: (mn first second at: each) ].
+		p title: (mn trainingLabels at: each) ].
 	p show.
 	^ p
 ]
@@ -178,8 +178,8 @@ PharoPlotSample class >> example8 [
 { #category : #examples }
 PharoPlotSample class >> example9 [
 	| x y plt |
-	x := NDArray randomUniform: 100.
-	y := NDArray randomUniform: 100.
+	x := NDRandom randomUniform: 100.
+	y := NDRandom randomUniform: 100.
 	plt := PharoPlot new.
 	plt extent: 300 @ 300.
 	plt scatterX: x y: y label: 'a'.
@@ -190,4 +190,19 @@ PharoPlotSample class >> example9 [
 	plt showLegend: true.
 	plt show.
 	^ plt
+]
+
+{ #category : #utilities }
+PharoPlotSample class >> relu: x [
+	^ x min: x max: 0
+]
+
+{ #category : #utilities }
+PharoPlotSample class >> sigmoid: x [
+	^ 1 / (1 + x negated exp)
+]
+
+{ #category : #utilities }
+PharoPlotSample class >> stepFunction: x [
+	^ (x > 0) withDtype: #Integer
 ]

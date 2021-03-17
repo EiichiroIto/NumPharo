@@ -66,7 +66,7 @@ LunarLanderQ >> setupQTable [
 	size := Array
 		with: self numObservations ** self numObservations
 		with: self numActions.
-	qTable := (NDArray randomUniform: size from: -1 to: 1)
+	qTable := (NDRandom randomUniform: size from: -1 to: 1)
 ]
 
 { #category : #api }

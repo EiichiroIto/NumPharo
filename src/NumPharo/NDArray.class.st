@@ -8,8 +8,7 @@ Class {
 		'array'
 	],
 	#classVars : [
-		'Coerces',
-		'Rand'
+		'Coerces'
 	],
 	#category : #'NumPharo-Core'
 }
@@ -39,7 +38,7 @@ NDArray class >> arrayFrom: from to: to num: anInteger withEndPoint: aBoolean [
 	^ s contents
 ]
 
-{ #category : #accessing }
+{ #category : #private }
 NDArray class >> coerceDtype: aSymbol1 with: aSymbol2 [
 	aSymbol1 = aSymbol2
 		ifTrue: [ ^ aSymbol1 ].
@@ -68,13 +67,6 @@ NDArray class >> comprehension: anArray [
 									pos := pos + 1 ] ] ].
 			result at: index1 put: arr ].
 	^ result
-]
-
-{ #category : #utilities }
-NDArray class >> crossEntropyErrorY: y andT: t [
-	| delta |
-	delta := 1.0e-7.
-	^ (t * (y + delta) ln) sum negated
 ]
 
 { #category : #private }
@@ -120,27 +112,6 @@ NDArray class >> fromArray: anArray dtype: aSymbol [
 ]
 
 { #category : #'instance creation' }
-NDArray class >> fromArray: anArray shape: anArray2 dtype: aSymbol [
-	| arr size |
-	arr := nil.
-	aSymbol = #Float
-		ifTrue: [ arr := anArray copy asFloatArray ].
-	aSymbol = #Integer
-		ifTrue: [ arr := anArray copy asIntegerArray ].
-	aSymbol = #Byte
-		ifTrue: [ arr := anArray copy asByteArray ].
-	aSymbol = #Word
-		ifTrue: [ arr := anArray copy asWordArray ].
-	aSymbol = #Boolean
-		ifTrue: [ arr := anArray copy ].
-	arr ifNil: [ self error: 'invalid dtype' ].
-	size := self finiteProductOf: anArray2.
-	size = arr size
-		ifFalse: [ self error: 'invalid shape' ].
-	^ self array: arr shape: anArray2 copy
-]
-
-{ #category : #'instance creation' }
 NDArray class >> full: anObject withAll: aNumber dtype: aSymbol [
 	| arr shape size |
 	shape := self normalizedIndex: anObject.
@@ -152,8 +123,7 @@ NDArray class >> full: anObject withAll: aNumber dtype: aSymbol [
 { #category : #'class initialization' }
 NDArray class >> initialize [
 	"self initialize"
-	self setupCoerces.
-	Rand := Random new
+	self setupCoerces
 ]
 
 { #category : #'instance creation' }
@@ -161,11 +131,6 @@ NDArray class >> linspaceFrom: from to: to num: anInteger withEndPoint: aBoolean
 	| arr |
 	arr := self arrayFrom: from to: to num: anInteger withEndPoint: aBoolean.
 	^ self array: arr shape: (Array with: arr size)
-]
-
-{ #category : #utilities }
-NDArray class >> meanSquaredErrorY: y andT: t [
-	^ 0.5 * ((y - t) ** 2) sum
 ]
 
 { #category : #private }
@@ -209,7 +174,7 @@ NDArray class >> meshShapeOf: anArray [
 	^ list
 ]
 
-{ #category : #accessing }
+{ #category : #private }
 NDArray class >> newArrayDtype: aSymbol [
 	aSymbol = #Float
 		ifTrue: [ ^ FloatArray new ].
@@ -224,7 +189,7 @@ NDArray class >> newArrayDtype: aSymbol [
 	self error
 ]
 
-{ #category : #accessing }
+{ #category : #private }
 NDArray class >> newArrayDtype: aSymbol size: anInteger [
 	aSymbol = #Float
 		ifTrue: [ ^ FloatArray new: anInteger ].
@@ -239,7 +204,7 @@ NDArray class >> newArrayDtype: aSymbol size: anInteger [
 	self error
 ]
 
-{ #category : #accessing }
+{ #category : #private }
 NDArray class >> newArrayDtype: aSymbol size: anInteger withAll: aNumber [
 	aSymbol = #Float
 		ifTrue: [ ^ FloatArray new: anInteger withAll: aNumber ].
@@ -252,14 +217,6 @@ NDArray class >> newArrayDtype: aSymbol size: anInteger withAll: aNumber [
 	aSymbol = #Boolean
 		ifTrue: [ ^ Array new: anInteger withAll: aNumber ].
 	self error
-]
-
-{ #category : #private }
-NDArray class >> normalRandomNumber [
-	| r |
-	r := 0.0.
-	12 timesRepeat: [ r := r + self uniformRandomNumber ].
-	^ r - 6
 ]
 
 { #category : #private }
@@ -310,61 +267,6 @@ NDArray class >> presumeDtype: anArray [
 ]
 
 { #category : #private }
-NDArray class >> random: anObject generateEach: aBlock [
-	| shape array |
-	shape := self normalizedIndex: anObject.
-	array := FloatArray new: (self finiteProductOf: shape).
-	1 to: array size do: [ :each | array at: each put: aBlock value ].
-	^ self array: array shape: shape
-]
-
-{ #category : #'instance creation' }
-NDArray class >> randomChoice: anInteger from: aCollection [
-	| list |
-	list := aCollection isNumber
-		ifTrue: [ 1 to: aCollection ]
-		ifFalse: [ aCollection ].
-	^ self
-		fromArray: (list shuffled copyFrom: 1 to: anInteger)
-		dtype: #Integer
-]
-
-{ #category : #'instance creation' }
-NDArray class >> randomNormal: anObject [
-	^ self random: anObject generateEach: [ self normalRandomNumber ]
-]
-
-{ #category : #'instance creation' }
-NDArray class >> randomNormal: anObject mean: aNumber2 std: aNumber3 [
-	^ self
-		random: anObject
-		generateEach: [ self normalRandomNumber * aNumber3 + aNumber2 ]
-]
-
-{ #category : #'instance creation' }
-NDArray class >> randomUniform: anObject [
-	^ self random: anObject generateEach: [ self uniformRandomNumber ]
-]
-
-{ #category : #'instance creation' }
-NDArray class >> randomUniform: anObject from: anInteger2 to: anInteger3 [
-	^ self
-		random: anObject
-		generateEach:
-			[ anInteger2 + ((anInteger3 - anInteger2) * self uniformRandomNumber) ]
-]
-
-{ #category : #private }
-NDArray class >> randomUniformFrom: anInteger to: anInteger2 [
-	^ anInteger + ((anInteger2 - anInteger) * self uniformRandomNumber)
-]
-
-{ #category : #utilities }
-NDArray class >> relu: x [
-	^ x min: x max: 0
-]
-
-{ #category : #private }
 NDArray class >> setupCoerces [
 	| dict |
 	dict := Dictionary new.
@@ -392,6 +294,15 @@ NDArray class >> setupCoerces [
 ]
 
 { #category : #private }
+NDArray class >> shape: anObject generateEach: aBlock [
+	| shape array |
+	shape := self normalizedIndex: anObject.
+	array := FloatArray new: (self finiteProductOf: shape).
+	1 to: array size do: [ :each | array at: each put: aBlock value ].
+	^ self array: array shape: shape
+]
+
+{ #category : #private }
 NDArray class >> shapeOf: anArray [
 	| arr list |
 	arr := anArray.
@@ -400,30 +311,6 @@ NDArray class >> shapeOf: anArray [
 		whileTrue: [ list add: arr size.
 			arr := arr first ].
 	^ list asArray
-]
-
-{ #category : #utilities }
-NDArray class >> sigmoid: x [
-	^ 1 / (1 + x negated exp)
-]
-
-{ #category : #utilities }
-NDArray class >> softMax: a [
-	| c exp sum |
-	c := a max.
-	exp := (a - c) exp.
-	sum := exp sum.
-	^ exp / sum
-]
-
-{ #category : #utilities }
-NDArray class >> stepFunction: x [
-	^ (x > 0) withDtype: #Integer
-]
-
-{ #category : #private }
-NDArray class >> uniformRandomNumber [
-	^ Rand next
 ]
 
 { #category : #private }

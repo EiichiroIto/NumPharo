@@ -47,7 +47,7 @@ CartPoleQ >> nextFromObservation: anArray [
 	| nextState epsilon nextAction |
 	nextState := self digitize: anArray.
 	epsilon := 0.5 * (0.99 ** episode).
-	nextAction := (epsilon <= (NDArray randomUniformFrom: 0 to: 1))
+	nextAction := (epsilon <= (NDRandom randomUniformFrom: 0 to: 1))
 		ifTrue: [ self actionFor: nextState ]
 		ifFalse: [ self defaultAction ].
 	^ Array with: nextState with: nextAction
@@ -66,7 +66,7 @@ CartPoleQ >> setupQTable [
 	size := Array
 		with: self numObservations ** self numObservations
 		with: self numActions.
-	qTable := (NDArray randomUniform: size from: -1 to: 1)
+	qTable := (NDRandom randomUniform: size from: -1 to: 1)
 ]
 
 { #category : #api }

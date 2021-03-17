@@ -83,7 +83,7 @@ CartPolePG >> setupBatch [
 
 { #category : #private }
 CartPolePG >> setupN [
-	n := NDArray
+	n := NDRandom
 		randomNormal:
 			{self numBatches.
 			w shape first}
@@ -98,7 +98,7 @@ CartPolePG >> setupRewards [
 
 { #category : #private }
 CartPolePG >> setupW [
-	w := NDArray randomNormal: self numObservations
+	w := NDRandom randomNormal: self numObservations
 ]
 
 { #category : #private }

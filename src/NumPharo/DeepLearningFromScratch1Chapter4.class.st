@@ -132,7 +132,7 @@ DeepLearningFromScratch1Chapter4 >> testChapter4_2_3 [
 	tTrain := mnist trainingLabels.
 	trainSize := xTrain shape at: 1.
 	batchSize := 10.
-	batchMask := NDArray randomChoice: batchSize from: trainSize.
+	batchMask := NDRandom randomChoice: batchSize from: trainSize.
 	self assert: batchMask size equals: batchSize.
 	xBatch := xTrain at: batchMask.
 	tBatch := tTrain at: batchMask.
@@ -263,4 +263,16 @@ DeepLearningFromScratch1Chapter4 >> testGradient2d [
 	plt xLabel: 'x0'.
 	plt yLabel: 'x1'.
 	plt show
+]
+
+{ #category : #test }
+DeepLearningFromScratch1Chapter4 >> testMeanSquaredErrorYAndT [
+	| t y r |
+	t := NDArray fromArray: #(0 0 1 0 0 0 0 0 0 0).
+	y := NDArray fromArray: #(0.1 0.05 0.6 0.0 0.05 0.1 0.0 0.1 0.0 0.0).
+	r := self meanSquaredErrorY: y andT: t.
+	self assert: r closeTo: 0.0975.
+	y := NDArray fromArray: #(0.1 0.05 0.1 0.0 0.05 0.1 0.0 0.6 0.0 0.0).
+	r := self meanSquaredErrorY: y andT: t.
+	self assert: r closeTo: 0.5975
 ]

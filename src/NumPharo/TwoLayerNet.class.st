@@ -33,7 +33,7 @@ TwoLayerNet >> inputSize: anInteger1 hiddenSize: anInteger3 outputSize: anIntege
 		put:
 			weightInitStd
 				*
-					(NDArray
+					(NDRandom
 						randomNormal:
 							{anInteger1.
 							anInteger3}).
@@ -43,7 +43,7 @@ TwoLayerNet >> inputSize: anInteger1 hiddenSize: anInteger3 outputSize: anIntege
 		put:
 			weightInitStd
 				*
-					(NDArray
+					(NDRandom
 						randomNormal:
 							{anInteger3.
 							anInteger2}).
