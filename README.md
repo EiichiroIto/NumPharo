@@ -17,7 +17,7 @@ For now, I implemented some alternative tools like this:
 
 ## Install repository on Pharo (for developer)
 
-```
+```smalltalk
 Metacello new
     baseline: 'NumPharo';
     repository: 'github://EiichiroIto/NumPharo:main/src';
@@ -27,7 +27,7 @@ Metacello new
 ## Demo & Tests
 see PharoPlotSample class methods and DeepLearningFromScratch1Chapter classes.
 
-```
+```smalltalk
 example1
   | x y plt |
   x := NDArray arangeFrom: 0 to: 6 by: 0.1.
