@@ -39,7 +39,7 @@ MNistDataTest >> testConvertLabelData [
 	| d r |
 	d := self newData.
 	r := d convertLabelData: #[1 2 3].
-	self assertCollection: r array equals: #[1 2 3].
+	self assertCollection: r array equals: #[2 3 4].
 	self assertCollection: r shape equals: #(3).
 	d oneHotLabel: true.
 	r := d convertLabelData: #[1 2 3].

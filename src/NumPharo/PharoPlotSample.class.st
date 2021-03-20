@@ -154,7 +154,7 @@ PharoPlotSample class >> example7 [
 		p subPlotRow: 4 col: 5 index: each.
 		p image: (mn trainingImages at: each) asForm.
 		p showAxisX: false y: false.
-		p title: (mn trainingLabels at: each) ].
+		p title: (mn trainingLabels at: each) - 1 ].
 	p show.
 	^ p
 ]

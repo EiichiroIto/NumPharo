@@ -38,7 +38,7 @@ MNistData >> convertLabelData: anArray [
 			self writeOneHotData: d to: array at: pos.
 			pos := pos + 10 ] ]
 		ifFalse: [ [ :d | 
-			array at: pos put: d.
+			array at: pos put: d + 1.
 			pos := pos + 1 ] ].
 	anArray do: [ :each | block cull: each ].
 	^ NDArray array: array shape: shape

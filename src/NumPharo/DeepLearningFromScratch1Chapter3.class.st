@@ -38,15 +38,6 @@ DeepLearningFromScratch1Chapter3 >> forward343: network x: x [
 ]
 
 { #category : #private }
-DeepLearningFromScratch1Chapter3 >> getData362 [
-	| mnist xTest tTest |
-	mnist := MNistData new flatten: true; normalize: true; yourself.
-	xTest := mnist testingImages.
-	tTest := mnist testingLabels.
-	^ Array with: xTest with: tTest
-]
-
-{ #category : #private }
 DeepLearningFromScratch1Chapter3 >> identity342: x [
 	^ x
 ]
@@ -339,7 +330,7 @@ DeepLearningFromScratch1Chapter3 >> testChapter3_6_1b [
 	tTrain := mnist trainingLabels.
 	img := xTrain at: 1.
 	label := tTrain at: 1.
-	self assert: label equals: 5.
+	self assert: label equals: 6.
 	img := img withShape: #(28 28).
 	plt := PharoPlot new.
 	plt image: img asForm.
@@ -349,17 +340,18 @@ DeepLearningFromScratch1Chapter3 >> testChapter3_6_1b [
 { #category : #test }
 DeepLearningFromScratch1Chapter3 >> testChapter3_6_2 [
 	| data network x t accuracyCount |
-	data := self getData362.
-	x := data first.
-	t := data second.
+	data := MNistData new flatten: true; normalize: true; yourself.
+	x := data testingImages.
+	t := data testingLabels.
 	network := self initNetwork362.
 	accuracyCount := 0.
 	1 to: 100 do: [ :index | 
 		| y p |
 		y := self predict362: network x: (x at: index).
-		p := y argMax - 1.
+		p := y argMax.
 		(p = (t at: index))
 			ifTrue: [ accuracyCount := accuracyCount + 1 ] ].
+	self assert: accuracyCount >= 95.
 	self inform: 'Accuracy: ', ((accuracyCount / 100) asFloat asString)
 ]
 
@@ -367,8 +359,8 @@ DeepLearningFromScratch1Chapter3 >> testChapter3_6_2 [
 DeepLearningFromScratch1Chapter3 >> testChapter3_6_3 [
 	| data x network w1 w2 w3 t batchSize accuracyCount xBatch yBatch tBatch p |
 	self timeLimit: 300 seconds.
-	data := self getData362.
-	x := data first.
+	data := MNistData new flatten: true; normalize: true; yourself.
+	x := data testingImages.
 	network := self initNetwork362.
 	w1 := network at: #W1.
 	w2 := network at: #W2.
@@ -378,14 +370,14 @@ DeepLearningFromScratch1Chapter3 >> testChapter3_6_3 [
 	self assertCollection: w1 shape equals: #(784 50).
 	self assertCollection: w2 shape equals: #(50 100).
 	self assertCollection: w3 shape equals: #(100 10).
-	t := data second.
+	t := data testingLabels.
 	batchSize := 100.
 	accuracyCount := 0.
 	(1 to: x len by: batchSize)
 		do: [ :each | 
 			xBatch := x copyFrom: each to: each + batchSize - 1.
 			yBatch := self predict362: network x: xBatch.
-			p := (yBatch argMaxAxis: 2) - 1.
+			p := yBatch argMaxAxis: 2.
 			tBatch := t copyFrom: each to: each + batchSize - 1.
 			accuracyCount := accuracyCount + (p = tBatch) sum ].
 	self assert: (accuracyCount / x len) asFloat closeTo: 0.9352

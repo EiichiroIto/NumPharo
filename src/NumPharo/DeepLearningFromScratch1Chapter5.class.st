@@ -121,7 +121,8 @@ DeepLearningFromScratch1Chapter5 >> testChapter5_7_3 [
 	gradNumerical := network numericalGradient: xBatch t: tBatch.
 	gradNumerical
 		keysDo: [ :each | 
-			self trace: each , ':'.
+			self assert: ((gradBackProp at: each) - (gradNumerical at: each)) abs average < 0.0003.
+			"self trace: each , ':'.
 			self
-				traceCr: ((gradBackProp at: each) - (gradNumerical at: each)) abs average ]
+				traceCr: ((gradBackProp at: each) - (gradNumerical at: each)) abs average" ]
 ]
